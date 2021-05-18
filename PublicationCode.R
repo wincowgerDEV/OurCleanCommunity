@@ -22,13 +22,31 @@ library(data.table)
 library(dplyr)
 library(tidyr)
 library(fitdistrplus) #https://cran.r-project.org/web/packages/fitdistrplus/vignettes/paper2JSS.pdf
-
+library(swfscMisc)
+library(circular)
 
 #Functions ----
 #Function returns the difference between two bearings
 angle_diff <- function(theta1, theta2){
   theta <- abs(theta1 - theta2) %% 360 
   return(ifelse(theta > 180, 360 - theta, theta))
+}
+
+rainpresabs <- function(startdate, enddate){
+  any(Weather %>%
+        dplyr::filter(Date >= as.Date(startdate, "%Y-%m-%d") & Date <= as.Date(enddate, "%Y-%m-%d")) %>%
+        select(Total.Precip..in.) %>%
+        pull() > 0, na.rm = T)
+}
+
+differenceofmean <- function(startdate, enddate){
+  Weather %>%
+    dplyr::filter(Date >= as.Date(startdate, "%Y-%m-%d") & Date <= as.Date(enddate, "%Y-%m-%d")) %>%
+    select(Mean.Wind.Dir..deg.) %>%
+    pull() %>%
+    circular(type="directions", units="degrees", template="geographics", rotation="clock") %>%
+    mean.circular(na.rm = T) %>%
+    ifelse(.<0, .+360, .)
 }
 
 #Trip Distances ----
@@ -128,157 +146,30 @@ for(row in 1:nrow(pdf_ie_dist)){
   montecarlo_vector <- c(montecarlo_vector, rlnorm(n = unlist(pdf_ie_dist[row, "count"]), meanlog = log(unlist(pdf_ie_dist[row, "mean_dist"])), sdlog = fitln$estimate[2])) 
 }
 
+#Or Uniform
 for(row in 1:nrow(pdf_ie_dist)){
   montecarlo_vector <- c(montecarlo_vector, runif(n = unlist(pdf_ie_dist[row, "count"]), min = unlist(pdf_ie_dist[row, "min_dist"]), max = unlist(pdf_ie_dist[row, "max_dist"]))) 
 }
 
+#Result doesn't seem to depend much on which of the above we choose. Could also try log uniform, might be a nice way to get to the middle ground.
 
 #In m
 ggplot() + stat_ecdf(aes(montecarlo_vector * 1.60934 * 1000)) + scale_x_log10()
 
-angle_diff(18, 360)
+#Might not be the best way to do this because the data set is synthesized.
+ks.test(x = montecarlo_vector * 1.60934 * 1000, y =  CompleteDataWithGoogle$DistanceFromLocation)
 
-
-register_google(key = ) #to run mutate_geocode function
-set_key(key = ) #To run google_find_place function
-
-Weather <- read.csv("G:/My Drive/GrayLab/Projects/Plastics/ActiveProjects/TrackingTrashReceipts/Data/Processed Data/RiversideMuniAirport_Cleaned.csv") %>%
+#Wind and Rain ----
+Weather <- read.csv("RiversideMuniAirport_Cleaned.csv") %>%
            na_if("M") %>%
            mutate(Date = as.Date(Date, "%m/%d/%Y")) %>%
            mutate(across(where(is.character), as.numeric))
   
 Weather[Weather == "M"] <- NA
 
-Data2018 <- read.csv("Data_Receipts2018.csv")
-summary(Data2018)
-str(Data2018)
-
-AllReceiptsData <- read.csv('All_Receipts_Draft.csv')
-
-Data2018Complete <- left_join(Data2018, AllReceiptsData, by = c("ï..LitterID" = "LitterID")) #Data from only 2018
-
-Data2018Cleaned <- Data2018Complete %>% #New table to generate coordinates of receipt place locations
-  mutate(dateprintedcleaned = as.character(Date.Printed)) %>%
-  mutate(timeprintedcleaned = as.character(Time.Printed)) %>%
-  mutate(dateprintedcleaned = ifelse(dateprintedcleaned == "Unknown", NA, dateprintedcleaned)) %>%
-  mutate(dateprintedcleaned = as.Date(dateprintedcleaned, format = c("%m/%d/%Y"))) %>%
-  mutate(TimestampDatecleaned = as.character(Timestamp.Date)) %>%
-  mutate(TimestampDatecleaned = as.Date(TimestampDatecleaned, format = c("%m/%d/%Y"))) %>%
-  mutate(Timedifference = as.numeric(TimestampDatecleaned - dateprintedcleaned)) %>%
-  mutate(Locationaddresscleaned = as.character(Location.address)) %>%
-  mutate(Locationnamecleaned = as.character(Location.name))%>%
-  mutate(Locationnamecleaned = ifelse(Locationnamecleaned == "Unknown", NA, Locationnamecleaned)) %>%
-  mutate(paymentmethodcleaned = as.character(Payment.Method)) %>%
-  mutate(Value = as.numeric(as.character(Total.Value..US.dollars.))) %>%
-  mutate(litterID = as.character(ï..LitterID)) %>%
-  select(litterID, username, user_id, dateprintedcleaned, TimestampDatecleaned, Timedifference, Locationaddresscleaned, Non.Specific.Location.Address, Manual.Lat, Manual.Lon, Locationnamecleaned, Itemized, paymentmethodcleaned, Value, lat, lon)
-
-  
-Data20182019 <- read.csv("All_Receipts.csv")
-summary(Data20182019)
-str(Data20182019)
-
-Data20182019cleaned <- Data20182019 %>% #Data from both 2018 & 2019
-  mutate(dateprintedcleaned = as.character(Date.Printed)) %>%
-  mutate(timeprintedcleaned1 = as.character(Time.Printed)) %>%
-  mutate(dateprintedcleaned = ifelse(dateprintedcleaned == "Unknown", NA, dateprintedcleaned)) %>%
-  mutate(dateprintedcleaned = as.Date(dateprintedcleaned, format = c("%m/%d/%Y"))) %>%
-  mutate(TimestampDatecleaned = as.character(Timestamp.Date)) %>%
-  mutate(TimestampDatecleaned = as.Date(TimestampDatecleaned, format = c("%m/%d/%Y"))) %>%
-  mutate(Timedifference = as.numeric(TimestampDatecleaned - dateprintedcleaned)) %>%
-  mutate(Locationaddresscleaned = as.character((Location.address))) %>%
-  mutate(Locationnamecleaned = as.character(Location.name)) %>%
-  mutate(Locationnamecleaned = ifelse(Locationnamecleaned == "Unknown", NA, Locationnamecleaned)) %>%
-  mutate(paymentmethodcleaned = as.character(Payment.Method)) %>%
-  mutate(Value = as.numeric(as.character(Total.Value..US.dollars.))) %>%
-  mutate(litterID = as.character(LitterID)) %>%
-  select(litterID, username, user_id, dateprintedcleaned, TimestampDatecleaned, Timedifference, Locationaddresscleaned, Non.Specific.Location.Address, Manual.Lat, Manual.Lon, Locationnamecleaned, Itemized, paymentmethodcleaned, Value, lat, lon)
-
-JacquelinesSiteData <- read.csv("JacquelinesSiteReceiptData.csv")
-
-JacquelinesSiteDataCleaned <- JacquelinesSiteData %>% #2019 data not included in 2019 dataset
-  mutate(dateprintedcleaned = as.character(Date.Printed)) %>%
-  mutate(dateprintedcleaned = ifelse(dateprintedcleaned == "Unknown", NA, dateprintedcleaned)) %>%
-  mutate(dateprintedcleaned = as.Date(dateprintedcleaned, format = c("%m/%d/%Y"))) %>%
-  mutate(TimestampDatecleaned = as.character(Timestamp.Date)) %>%
-  mutate(TimestampDatecleaned = as.Date(TimestampDatecleaned, format = c("%m/%d/%Y"))) %>%
-  mutate(Timedifference = as.numeric(TimestampDatecleaned - dateprintedcleaned)) %>%
-  mutate(Locationaddresscleaned = as.character(Location.address)) %>%
-  mutate(Locationnamecleaned = as.character(Location.name)) %>%
-  mutate(Locationnamecleaned = ifelse(Locationnamecleaned == "Unknown", NA, Locationnamecleaned)) %>%
-  mutate(paymentmethodcleaned = as.character(Payment.Method)) %>%
-  mutate(Value = as.numeric(as.character(Total.Value..US.dollars.))) %>%
-  mutate(litterID = as.character(litterId)) %>%
-  select(litterID, username, user_id, dateprintedcleaned, TimestampDatecleaned, Timedifference, Locationaddresscleaned, Non.Specific.Location.Address, Manual.Lat, Manual.Lon, Locationnamecleaned, Itemized, paymentmethodcleaned, Value, lat, lon)
-
-CombinedData <- rbind(Data2018Cleaned, Data20182019cleaned, JacquelinesSiteDataCleaned) #all 3 data sets combined into 1
-
-#Files of generated coordinates
-Data2018LocLatLon <- read.csv("Data2018LocLatLon.csv")
-Data20182019LocLatLon <- read.csv("Data20182019LocLatLon.csv")
-JacquelinesSiteDataLocLatLon <- read.csv("JacquelinesSiteDataLocLatLon.csv")
-
-CombinedLocLatLon <- rbind(Data2018LocLatLon, Data20182019LocLatLon, JacquelinesSiteDataLocLatLon)
-
-CombinedDataLatLon<-cbind(CombinedData, CombinedLocLatLon) #Generated coordinates combined with the other attributes
-
-#To find the distance between the location where the receipt was found and the location of the place it came from
-ReceiptsData <- CombinedDataLatLon %>%
-  mutate(latrad = (lat*pi)/180) %>%
-  mutate(lonrad = (lon*pi)/180) %>%
-  mutate(LocationLatrad = (LocLat*pi)/180) %>%
-  mutate(LocationLonrad = (LocLon*pi)/180)
-
-R <- 6371000 #meters
-timestamplat <- ReceiptsData$latrad
-locaddresslat <- ReceiptsData$LocationLatrad
-timestamplon <- ReceiptsData$lonrad
-locaddresslon <- ReceiptsData$LocationLonrad
-changeinlat <- timestamplat - locaddresslat
-changeinlon <- timestamplon - locaddresslon
-a <- (sin(changeinlat/2) * sin(changeinlat/2)) + (cos(locaddresslat) * cos(timestamplat) * sin(changeinlon/2) * sin(changeinlon/2))
-c <- 2 * atan2(sqrt(a), sqrt(1-a))
-DistanceFromLocation <- R * c
-
-ReceiptsDataandDistance <- cbind(ReceiptsData, DistanceFromLocation) #Calculated distance combined with rest of attributes
-
-LocationNames <- read.csv("LocationNames.csv") #Location type categorization of places
-CompleteData<-left_join(ReceiptsDataandDistance, LocationNames) #Final version: receipt dataset with all attributes
-
-for (row in 1:nrow(CompleteData)) { #for loop output was made into a csv file
-  combo1vec<-cbind(as.vector(as.numeric(CompleteData$lat[row])), as.vector(as.numeric(CompleteData$lon[row])))
-  LocNames1<-CompleteData$Locationnamecleaned[row]
-  if(is.na(LocNames1)) next
-  Search1<-google_find_place(input = LocNames1, fields = c("name", "formatted_address", "geometry/location"), point = combo1vec)
-  Search1df<-data.frame(Search1)
-  Refined1<-slice(.data = Search1df, ... = 1, .preserve = FALSE)
-  CompleteData[row, "googleformattedaddress"] <- Refined1$candidates.formatted_address
-  CompleteData[row, "googleformattedlat"] <- Refined1$candidates.geometry$location$lat
-  CompleteData[row, "googleformattedlon"] <- Refined1$candidates.geometry$location$lng
-  CompleteData[row, "googleformattedname"] <- Refined1$candidates.name
-  print(row)
-}
-
-
-CompleteDataWithGoogle <- CompleteData %>%
-  mutate(googleLatrad = (googleformattedlat*pi)/180) %>%
-  mutate(googleLonrad = (googleformattedlon*pi)/180) %>%
-  mutate(changelat = latrad - googleLatrad) %>%
-  mutate(changelon = lonrad - googleLonrad) %>%
-  mutate(a = (sin(changelat/2) * sin(changelat/2)) + (cos(googleLatrad) * cos(latrad) * sin(changelon/2) * sin(changelon/2))) %>%
-  mutate(c = 2 * atan2(sqrt(a), sqrt(1-a))) %>%
-  mutate(googledistancemeters = R * c)
-
-
-
 #Start HERE ----
 CompleteDataWithGoogle <- read.csv("CompleteDataWithGoogle.csv") %>%
   mutate(startdate = as.Date(dateprintedcleaned, "%Y-%m-%d"), enddate =  as.Date(TimestampDatecleaned, "%Y-%m-%d"))
-
-#This isn't working ----
-
-library(swfscMisc)
-#getAnywhere(bearing)[2]
 
 for(row in 1:nrow(CompleteDataWithGoogle)){ #This is the inverse of what we would think because wind direction is the inverse. This will tell us what direction the trash came from.
   CompleteDataWithGoogle[row, "bearing"] <-bearing(lat2 = CompleteDataWithGoogle[row,"LocLat"]*pi/180, 
@@ -287,7 +178,7 @@ for(row in 1:nrow(CompleteDataWithGoogle)){ #This is the inverse of what we woul
                                                    lon1 = CompleteDataWithGoogle[row,"lon"]*pi/180)[1]
 }
 
-library(circular)
+
 x.circ <- circular(CompleteDataWithGoogle$bearing, type="directions", units="degrees", template="geographics", rotation="clock")
 rose.diag(x.circ, bins=10, col="gray", border=NA)
 
@@ -306,15 +197,7 @@ bearing <- CompleteDataWithGoogle[1, "bearing"] %>% pull()
 #Need to convert bearing to azimuth
 startdate = CompleteDataWithGoogle[1,"startdate"] 
 enddate = CompleteDataWithGoogle[1,"enddate"]
-differenceofmean <- function(startdate, enddate){
-  Weather %>%
-    dplyr::filter(Date >= as.Date(startdate, "%Y-%m-%d") & Date <= as.Date(enddate, "%Y-%m-%d")) %>%
-    select(Mean.Wind.Dir..deg.) %>%
-    pull() %>%
-    circular(type="directions", units="degrees", template="geographics", rotation="clock") %>%
-    mean.circular(na.rm = T) %>%
-    ifelse(.<0, .+360, .)
-}
+
 
 for(row in 1:nrow(CompleteDataWithGoogle)){
   CompleteDataWithGoogle[row, "meanbearing"] <- differenceofmean(startdate = CompleteDataWithGoogle[row,"startdate"], enddate = CompleteDataWithGoogle[row,"enddate"])
@@ -324,12 +207,6 @@ CompleteDataWithGoogle$differencebearings <- angle_diff(CompleteDataWithGoogle$b
 
 cor.circular(CompleteDataWithGoogle$bearing, CompleteDataWithGoogle$meanbearing, test = T)
 
-rainpresabs <- function(startdate, enddate){
-  any(Weather %>%
-        dplyr::filter(Date >= as.Date(startdate, "%Y-%m-%d") & Date <= as.Date(enddate, "%Y-%m-%d")) %>%
-        select(Total.Precip..in.) %>%
-        pull() > 0, na.rm = T)
-}
 
 for(row in 1:nrow(CompleteDataWithGoogle)){
   CompleteDataWithGoogle[row, "precip"] <-rainpresabs(startdate = CompleteDataWithGoogle[row,"dateprintedcleaned"], enddate = CompleteDataWithGoogle[row,"TimestampDatecleaned"])
@@ -337,20 +214,9 @@ for(row in 1:nrow(CompleteDataWithGoogle)){
 
 #Wind velocity transport velocity correlation ----
 
-WindData <- function(startdate, enddate) {
-  Weather %>%
-    dplyr::filter(Date >= as.Date(startdate, "%Y-%m-%d") & Date <= as.Date(enddate, "%Y-%m-%d")) %>%
-    select(Mean.Wind.Speed..mph.) %>%
-    pull() %>%
-    #circular(type="directions", units="degrees", template="geographics", rotation="clock") %>%
-    mean(na.rm = T)# %>%
-    #ifelse(.<0, .+360, .)
-}
-
 for(row in 1:nrow(CompleteDataWithGoogle)){
   CompleteDataWithGoogle[row, "precip"] <-rainpresabs(startdate = CompleteDataWithGoogle[row,"dateprintedcleaned"], enddate = CompleteDataWithGoogle[row,"TimestampDatecleaned"])
 }
-
 
 x.circ <- circular(CompleteDataWithGoogle$bearing, type="directions", units="degrees", template="geographics", rotation="clock")
 rose.diag(x.circ, bins=10, col="gray", border=NA)
@@ -561,3 +427,128 @@ ggplot(data = PaymentCounts, aes(x = reorder(Payment.Method, Count), y = Count))
 
 #LocationNames <- data.frame(Locationnamecleaned = unique(ReceiptsDataandDistance$Locationnamecleaned))
 #write.csv(LocationNames, "LocationNames.csv") #Location type categorization of places
+
+
+#Cleanup Receipt Data ----
+Data2018 <- read.csv("Data_Receipts2018.csv")
+summary(Data2018)
+str(Data2018)
+
+AllReceiptsData <- read.csv('All_Receipts_Draft.csv')
+
+Data2018Complete <- left_join(Data2018, AllReceiptsData, by = c("ï..LitterID" = "LitterID")) #Data from only 2018
+
+Data2018Cleaned <- Data2018Complete %>% #New table to generate coordinates of receipt place locations
+  mutate(dateprintedcleaned = as.character(Date.Printed)) %>%
+  mutate(timeprintedcleaned = as.character(Time.Printed)) %>%
+  mutate(dateprintedcleaned = ifelse(dateprintedcleaned == "Unknown", NA, dateprintedcleaned)) %>%
+  mutate(dateprintedcleaned = as.Date(dateprintedcleaned, format = c("%m/%d/%Y"))) %>%
+  mutate(TimestampDatecleaned = as.character(Timestamp.Date)) %>%
+  mutate(TimestampDatecleaned = as.Date(TimestampDatecleaned, format = c("%m/%d/%Y"))) %>%
+  mutate(Timedifference = as.numeric(TimestampDatecleaned - dateprintedcleaned)) %>%
+  mutate(Locationaddresscleaned = as.character(Location.address)) %>%
+  mutate(Locationnamecleaned = as.character(Location.name))%>%
+  mutate(Locationnamecleaned = ifelse(Locationnamecleaned == "Unknown", NA, Locationnamecleaned)) %>%
+  mutate(paymentmethodcleaned = as.character(Payment.Method)) %>%
+  mutate(Value = as.numeric(as.character(Total.Value..US.dollars.))) %>%
+  mutate(litterID = as.character(ï..LitterID)) %>%
+  select(litterID, username, user_id, dateprintedcleaned, TimestampDatecleaned, Timedifference, Locationaddresscleaned, Non.Specific.Location.Address, Manual.Lat, Manual.Lon, Locationnamecleaned, Itemized, paymentmethodcleaned, Value, lat, lon)
+
+
+Data20182019 <- read.csv("All_Receipts.csv")
+summary(Data20182019)
+str(Data20182019)
+
+Data20182019cleaned <- Data20182019 %>% #Data from both 2018 & 2019
+  mutate(dateprintedcleaned = as.character(Date.Printed)) %>%
+  mutate(timeprintedcleaned1 = as.character(Time.Printed)) %>%
+  mutate(dateprintedcleaned = ifelse(dateprintedcleaned == "Unknown", NA, dateprintedcleaned)) %>%
+  mutate(dateprintedcleaned = as.Date(dateprintedcleaned, format = c("%m/%d/%Y"))) %>%
+  mutate(TimestampDatecleaned = as.character(Timestamp.Date)) %>%
+  mutate(TimestampDatecleaned = as.Date(TimestampDatecleaned, format = c("%m/%d/%Y"))) %>%
+  mutate(Timedifference = as.numeric(TimestampDatecleaned - dateprintedcleaned)) %>%
+  mutate(Locationaddresscleaned = as.character((Location.address))) %>%
+  mutate(Locationnamecleaned = as.character(Location.name)) %>%
+  mutate(Locationnamecleaned = ifelse(Locationnamecleaned == "Unknown", NA, Locationnamecleaned)) %>%
+  mutate(paymentmethodcleaned = as.character(Payment.Method)) %>%
+  mutate(Value = as.numeric(as.character(Total.Value..US.dollars.))) %>%
+  mutate(litterID = as.character(LitterID)) %>%
+  select(litterID, username, user_id, dateprintedcleaned, TimestampDatecleaned, Timedifference, Locationaddresscleaned, Non.Specific.Location.Address, Manual.Lat, Manual.Lon, Locationnamecleaned, Itemized, paymentmethodcleaned, Value, lat, lon)
+
+JacquelinesSiteData <- read.csv("JacquelinesSiteReceiptData.csv")
+
+JacquelinesSiteDataCleaned <- JacquelinesSiteData %>% #2019 data not included in 2019 dataset
+  mutate(dateprintedcleaned = as.character(Date.Printed)) %>%
+  mutate(dateprintedcleaned = ifelse(dateprintedcleaned == "Unknown", NA, dateprintedcleaned)) %>%
+  mutate(dateprintedcleaned = as.Date(dateprintedcleaned, format = c("%m/%d/%Y"))) %>%
+  mutate(TimestampDatecleaned = as.character(Timestamp.Date)) %>%
+  mutate(TimestampDatecleaned = as.Date(TimestampDatecleaned, format = c("%m/%d/%Y"))) %>%
+  mutate(Timedifference = as.numeric(TimestampDatecleaned - dateprintedcleaned)) %>%
+  mutate(Locationaddresscleaned = as.character(Location.address)) %>%
+  mutate(Locationnamecleaned = as.character(Location.name)) %>%
+  mutate(Locationnamecleaned = ifelse(Locationnamecleaned == "Unknown", NA, Locationnamecleaned)) %>%
+  mutate(paymentmethodcleaned = as.character(Payment.Method)) %>%
+  mutate(Value = as.numeric(as.character(Total.Value..US.dollars.))) %>%
+  mutate(litterID = as.character(litterId)) %>%
+  select(litterID, username, user_id, dateprintedcleaned, TimestampDatecleaned, Timedifference, Locationaddresscleaned, Non.Specific.Location.Address, Manual.Lat, Manual.Lon, Locationnamecleaned, Itemized, paymentmethodcleaned, Value, lat, lon)
+
+CombinedData <- rbind(Data2018Cleaned, Data20182019cleaned, JacquelinesSiteDataCleaned) #all 3 data sets combined into 1
+
+#Files of generated coordinates
+Data2018LocLatLon <- read.csv("Data2018LocLatLon.csv")
+Data20182019LocLatLon <- read.csv("Data20182019LocLatLon.csv")
+JacquelinesSiteDataLocLatLon <- read.csv("JacquelinesSiteDataLocLatLon.csv")
+
+CombinedLocLatLon <- rbind(Data2018LocLatLon, Data20182019LocLatLon, JacquelinesSiteDataLocLatLon)
+
+CombinedDataLatLon<-cbind(CombinedData, CombinedLocLatLon) #Generated coordinates combined with the other attributes
+
+#To find the distance between the location where the receipt was found and the location of the place it came from
+ReceiptsData <- CombinedDataLatLon %>%
+  mutate(latrad = (lat*pi)/180) %>%
+  mutate(lonrad = (lon*pi)/180) %>%
+  mutate(LocationLatrad = (LocLat*pi)/180) %>%
+  mutate(LocationLonrad = (LocLon*pi)/180)
+
+R <- 6371000 #meters
+timestamplat <- ReceiptsData$latrad
+locaddresslat <- ReceiptsData$LocationLatrad
+timestamplon <- ReceiptsData$lonrad
+locaddresslon <- ReceiptsData$LocationLonrad
+changeinlat <- timestamplat - locaddresslat
+changeinlon <- timestamplon - locaddresslon
+a <- (sin(changeinlat/2) * sin(changeinlat/2)) + (cos(locaddresslat) * cos(timestamplat) * sin(changeinlon/2) * sin(changeinlon/2))
+c <- 2 * atan2(sqrt(a), sqrt(1-a))
+DistanceFromLocation <- R * c
+
+ReceiptsDataandDistance <- cbind(ReceiptsData, DistanceFromLocation) #Calculated distance combined with rest of attributes
+
+LocationNames <- read.csv("LocationNames.csv") #Location type categorization of places
+CompleteData<-left_join(ReceiptsDataandDistance, LocationNames) #Final version: receipt dataset with all attributes
+
+for (row in 1:nrow(CompleteData)) { #for loop output was made into a csv file
+  combo1vec<-cbind(as.vector(as.numeric(CompleteData$lat[row])), as.vector(as.numeric(CompleteData$lon[row])))
+  LocNames1<-CompleteData$Locationnamecleaned[row]
+  if(is.na(LocNames1)) next
+  Search1<-google_find_place(input = LocNames1, fields = c("name", "formatted_address", "geometry/location"), point = combo1vec)
+  Search1df<-data.frame(Search1)
+  Refined1<-slice(.data = Search1df, ... = 1, .preserve = FALSE)
+  CompleteData[row, "googleformattedaddress"] <- Refined1$candidates.formatted_address
+  CompleteData[row, "googleformattedlat"] <- Refined1$candidates.geometry$location$lat
+  CompleteData[row, "googleformattedlon"] <- Refined1$candidates.geometry$location$lng
+  CompleteData[row, "googleformattedname"] <- Refined1$candidates.name
+  print(row)
+}
+
+
+CompleteDataWithGoogle <- CompleteData %>%
+  mutate(googleLatrad = (googleformattedlat*pi)/180) %>%
+  mutate(googleLonrad = (googleformattedlon*pi)/180) %>%
+  mutate(changelat = latrad - googleLatrad) %>%
+  mutate(changelon = lonrad - googleLonrad) %>%
+  mutate(a = (sin(changelat/2) * sin(changelat/2)) + (cos(googleLatrad) * cos(latrad) * sin(changelon/2) * sin(changelon/2))) %>%
+  mutate(c = 2 * atan2(sqrt(a), sqrt(1-a))) %>%
+  mutate(googledistancemeters = R * c)
+
+
+
