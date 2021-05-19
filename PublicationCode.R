@@ -35,26 +35,29 @@ angle_diff <- function(theta1, theta2){
 rainpresabs <- function(startdate, enddate){
   any(Weather %>%
         dplyr::filter(Date >= as.Date(startdate, "%Y-%m-%d") & Date <= as.Date(enddate, "%Y-%m-%d")) %>%
-        select(Total.Precip..in.) %>%
+        dplyr::select(Total.Precip..in.) %>%
         pull() > 0, na.rm = T)
 }
 
 differenceofmean <- function(startdate, enddate){
   Weather %>%
     dplyr::filter(Date >= as.Date(startdate, "%Y-%m-%d") & Date <= as.Date(enddate, "%Y-%m-%d")) %>%
-    select(Mean.Wind.Dir..deg.) %>%
+    dplyr::select(Mean.Wind.Dir..deg.) %>%
     pull() %>%
     circular(type="directions", units="degrees", template="geographics", rotation="clock") %>%
     mean.circular(na.rm = T) %>%
     ifelse(.<0, .+360, .)
 }
 
-#Trip Distances ----
+#Datasets ----
+CompleteDataWithGoogle <- read.csv("CompleteDataWithGoogle.csv") %>%
+  mutate(startdate = as.Date(dateprintedcleaned, "%Y-%m-%d"), enddate =  as.Date(TimestampDatecleaned, "%Y-%m-%d"))
+
 Trips <- fread("Trips_by_Distance.csv")
 #Dataset source
 #https://data.bts.gov/Research-and-Statistics/Trips-by-Distance/w96p-f2qv
 
-
+#Trip Distances ----
 #Was thinking that we should limit this to work trips but I don't think so any more. 
 IETrips <- Trips %>%
   filter(`State Postal Code` == "CA") %>%
@@ -142,9 +145,9 @@ ppcomp(list(fitw, fitln, fitgamma), legendtext = plot.legend)
 
 #Going with lognormal
 montecarlo_vector <- c()
-for(row in 1:nrow(pdf_ie_dist)){
-  montecarlo_vector <- c(montecarlo_vector, rlnorm(n = unlist(pdf_ie_dist[row, "count"]), meanlog = log(unlist(pdf_ie_dist[row, "mean_dist"])), sdlog = fitln$estimate[2])) 
-}
+#for(row in 1:nrow(pdf_ie_dist)){
+#  montecarlo_vector <- c(montecarlo_vector, rlnorm(n = unlist(pdf_ie_dist[row, "count"]), meanlog = log(unlist(pdf_ie_dist[row, "mean_dist"])), sdlog = fitln$estimate[2])) 
+#}
 
 #Or Uniform
 for(row in 1:nrow(pdf_ie_dist)){
@@ -153,8 +156,12 @@ for(row in 1:nrow(pdf_ie_dist)){
 
 #Result doesn't seem to depend much on which of the above we choose. Could also try log uniform, might be a nice way to get to the middle ground.
 
-#In m
-ggplot() + stat_ecdf(aes(montecarlo_vector * 1.60934 * 1000)) + scale_x_log10()
+#In meters
+ggplot() + 
+  stat_ecdf(data = CompleteDataWithGoogle, aes(x = DistanceFromLocation), color = "red") + 
+  stat_ecdf(aes(x = montecarlo_vector * 1.60934 * 1000), color = "blue") + 
+  scale_x_log10()
+
 
 #Might not be the best way to do this because the data set is synthesized.
 ks.test(x = montecarlo_vector * 1.60934 * 1000, y =  CompleteDataWithGoogle$DistanceFromLocation)
@@ -164,12 +171,9 @@ Weather <- read.csv("RiversideMuniAirport_Cleaned.csv") %>%
            na_if("M") %>%
            mutate(Date = as.Date(Date, "%m/%d/%Y")) %>%
            mutate(across(where(is.character), as.numeric))
-  
-Weather[Weather == "M"] <- NA
 
-#Start HERE ----
-CompleteDataWithGoogle <- read.csv("CompleteDataWithGoogle.csv") %>%
-  mutate(startdate = as.Date(dateprintedcleaned, "%Y-%m-%d"), enddate =  as.Date(TimestampDatecleaned, "%Y-%m-%d"))
+CompleteDataWithGoogle_Weather <- 
+#Receipt Distances ----
 
 for(row in 1:nrow(CompleteDataWithGoogle)){ #This is the inverse of what we would think because wind direction is the inverse. This will tell us what direction the trash came from.
   CompleteDataWithGoogle[row, "bearing"] <-bearing(lat2 = CompleteDataWithGoogle[row,"LocLat"]*pi/180, 
@@ -182,23 +186,19 @@ for(row in 1:nrow(CompleteDataWithGoogle)){ #This is the inverse of what we woul
 x.circ <- circular(CompleteDataWithGoogle$bearing, type="directions", units="degrees", template="geographics", rotation="clock")
 rose.diag(x.circ, bins=10, col="gray", border=NA)
 
-
 CompleteDataWithGoogle %>%
   filter(!is.na(Timedifference) & !is.na(bearing)) %>%
   as_tibble()
 
-ggplot() + stat_ecdf(data = CompleteDataWithGoogle, aes(x = googledistancemeters)) + stat_ecdf(data = CompleteDataWithGoogle, aes(x = DistanceFromLocation), color = "red") + stat_ecdf(aes(x = montecarlo_vector * 1.60934 * 1000), color = "blue") + scale_x_log10()
-ggplot() + stat_ecdf(data = CompleteDataWithGoogle, aes(x = DistanceFromLocation), color = "red") + stat_ecdf(aes(x = montecarlo_vector * 1.60934 * 1000), color = "blue") + scale_x_log10()
-
 startdate <- CompleteDataWithGoogle[1, "dateprintedcleaned"]
 enddate <- CompleteDataWithGoogle[1, "TimestampDatecleaned"]
-bearing <- CompleteDataWithGoogle[1, "bearing"] %>% pull()
+bearing <- CompleteDataWithGoogle[1, "bearing"] 
 
 #Need to convert bearing to azimuth
 startdate = CompleteDataWithGoogle[1,"startdate"] 
 enddate = CompleteDataWithGoogle[1,"enddate"]
 
-
+#difference between bearings.
 for(row in 1:nrow(CompleteDataWithGoogle)){
   CompleteDataWithGoogle[row, "meanbearing"] <- differenceofmean(startdate = CompleteDataWithGoogle[row,"startdate"], enddate = CompleteDataWithGoogle[row,"enddate"])
 }
