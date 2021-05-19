@@ -113,41 +113,8 @@ pdf_ie_dist <- IEDistribution %>%
   mutate(percent = value/sum(value)) %>%
   mutate(count = round(percent * 10000))
 
-montecarlo_vector_mean <- c()
-for(row in 1:nrow(pdf_ie_dist)){
-  montecarlo_vector_mean <- c(montecarlo_vector_mean, rep(times = unlist(pdf_ie_dist[row, "count"]), x = unlist(pdf_ie_dist[row,"mean_dist"]))) 
-}
-
-#Fit distribution to travel distances
-
-plotdist(montecarlo_vector_mean, histo = T, demp = T)
-descdist(montecarlo_vector_mean, boot = 1000)
-
-fitw<- fitdist(montecarlo_vector_mean, "weibull")
-summary(fitw)
-plot(fitw)
-
-fitgamma<- fitdist(montecarlo_vector_mean, "gamma")
-summary(fitgamma)
-plot(fitgamma)
-
-fitln<- fitdist(montecarlo_vector_mean, "lnorm")
-summary(fitln)
-plot(fitln)
-
-par(mfrow = c(2, 2))
-plot.legend <- c("Weibull", "lognormal", "gamma")
-denscomp(list(fitw, fitln, fitgamma), legendtext = plot.legend)
-qqcomp(list(fitw, fitln, fitgamma), legendtext = plot.legend)
-cdfcomp(list(fitw, fitln, fitgamma), legendtext = plot.legend)
-ppcomp(list(fitw, fitln, fitgamma), legendtext = plot.legend)
-
-
 #Going with lognormal
 montecarlo_vector <- c()
-#for(row in 1:nrow(pdf_ie_dist)){
-#  montecarlo_vector <- c(montecarlo_vector, rlnorm(n = unlist(pdf_ie_dist[row, "count"]), meanlog = log(unlist(pdf_ie_dist[row, "mean_dist"])), sdlog = fitln$estimate[2])) 
-#}
 
 #Or Uniform
 for(row in 1:nrow(pdf_ie_dist)){
