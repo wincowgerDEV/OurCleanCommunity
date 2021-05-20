@@ -24,6 +24,9 @@ library(tidyr)
 library(fitdistrplus) #https://cran.r-project.org/web/packages/fitdistrplus/vignettes/paper2JSS.pdf
 library(swfscMisc)
 library(circular)
+library(geosphere)
+devtools::install_github(repo = "michaelmalick/r-malick")
+library(malick)
 
 #Functions ----
 #Function returns the difference between two bearings
@@ -50,12 +53,80 @@ differenceofmean <- function(startdate, enddate){
 }
 
 #Datasets ----
+
 CompleteDataWithGoogle <- read.csv("CompleteDataWithGoogle.csv") %>%
   mutate(startdate = as.Date(dateprintedcleaned, "%Y-%m-%d"), enddate =  as.Date(TimestampDatecleaned, "%Y-%m-%d"))
 
 Trips <- fread("Trips_by_Distance.csv")
+
+Weather <- read.csv("RiversideMuniAirport_Cleaned.csv") %>%
+  na_if("M") %>%
+  mutate(Date = as.Date(Date, "%m/%d/%Y")) %>%
+  mutate(across(where(is.character), as.numeric))
+
+full_data <- fread("Litterati-Partners.csv") %>%
+  mutate(timestamp = as.POSIXct(gsub(" GMT", "", Date), format = "%d/%m/%Y %H:%M:%OS")) %>%
+  mutate(lat = as.numeric(gsub("/.{1,}", "", `Location (Lat / Long)`))) %>%
+  mutate(lon = as.numeric(gsub(".{1,}/", "", `Location (Lat / Long)`))) %>%
+  mutate(week = strftime(timestamp, format = "%W")) %>%
+  mutate(day = strftime(timestamp, format = "%D"))
+
+vechaversine <- Vectorize(haversine)
+
+data_2018 <- fread("CleanedData2018.csv") %>%
+  dplyr::select(ID:Brand) %>%
+  rename(Litter = ID, date_unformatted = Date) %>%
+  inner_join(full_data) %>%
+  dplyr::select(Litter, Longitude, Latitude, timestamp, Username, Name, Material, Item, Brand) %>%
+  group_by(Username) %>%
+  mutate(minlat = min(Latitude), maxlat = max(Latitude), minlon = min(Longitude), maxlon = max(Longitude)) %>%
+  ungroup()%>%
+  mutate(horizdist = vechaversine(lon1 = minlon, lat1 = maxlat, lon2 = maxlon, lat2 = maxlat), vertdist = vechaversine(lon1 = minlon, lat1 = minlat, lon2 = minlon, lat2 = maxlat)) %>%
+  mutate(area_m2 = horizdist * vertdist)
+
 #Dataset source
 #https://data.bts.gov/Research-and-Statistics/Trips-by-Distance/w96p-f2qv
+
+
+#Basic Stats 2018 ----
+
+#Input Rate Changes
+input_rate <- data_2018 %>%
+  #filter(user_id == 92684) %>%
+  #mutate(Date = substr(photo_timestamp,1,nchar(photo_timestamp)-3)) %>%
+  mutate(Date = as.Date(timestamp)) %>%
+  group_by(Date, Username, area_m2) %>%
+  summarise(Intensity = n()) %>%
+  arrange(Date) %>%
+  group_by(Username) %>%
+  mutate(DateDiff = as.numeric(Date) - dplyr::lag(as.numeric(Date), order_by = Username)) %>%
+  mutate(generationrate = Intensity/DateDiff/area_m2) %>%
+  ungroup() %>%
+  filter(Username != "litterati-92684", Username != "andhika-hammond") #Maybe shouldn't remove andhika
+  
+ggplot(input_rate) + geom_boxplot(aes(x = Username, y = generationrate), notch = T) + scale_y_log10()
+
+ggplot(input_rate) + 
+  geom_point(aes(x = Date, y = generationrate)) + 
+  facet_grid(Username ~.) + 
+  theme_bw() + 
+  labs(y = "Generation Rate #/Day/m2") + 
+  scale_y_log10()
+
+#Material Types By Site and Date
+material_composition <- data_2018 %>%
+  #filter(user_id == 92684) %>%
+  #mutate(Date = substr(photo_timestamp,1,nchar(photo_timestamp)-3)) %>%
+  mutate(Date = as.Date(timestamp)) %>%
+  group_by(Date, Username, Material) %>%
+  summarise(Intensity = n()) %>%
+  ungroup() %>%
+  filter(Username != "litterati-92684", Username != "andhika-hammond") #Maybe shouldn't remove andhika
+
+ggplot(material_composition, aes(fill=Material, y=Intensity, x=Date)) + 
+  geom_bar(position="fill", stat="identity")+
+  facet_grid(Username ~.) + 
+  theme_bw()
 
 #Trip Distances ----
 #Was thinking that we should limit this to work trips but I don't think so any more. 
@@ -68,7 +139,7 @@ IETrips <- Trips %>%
 #We got ourselves a double sided censorship here. End is greater than, and beginning is less than. 
 
 IEDistribution <- IETrips %>%
-  select(`Number of Trips`:`Number of Trips >=500`) %>%
+  dplyr::select(`Number of Trips`:`Number of Trips >=500`) %>%
   summarise(across(everything(), ~sum(.x, na.rm = T)))
 
 pdf_ie_dist <- IEDistribution %>%
@@ -131,15 +202,11 @@ ggplot() +
 
 
 #Might not be the best way to do this because the data set is synthesized.
-ks.test(x = montecarlo_vector * 1.60934 * 1000, y =  CompleteDataWithGoogle$DistanceFromLocation)
+#ks.test(x = montecarlo_vector * 1.60934 * 1000, y =  CompleteDataWithGoogle$DistanceFromLocation)
 
 #Wind and Rain ----
-Weather <- read.csv("RiversideMuniAirport_Cleaned.csv") %>%
-           na_if("M") %>%
-           mutate(Date = as.Date(Date, "%m/%d/%Y")) %>%
-           mutate(across(where(is.character), as.numeric))
 
-CompleteDataWithGoogle_Weather <- 
+#CompleteDataWithGoogle_Weather <- 
 #Receipt Distances ----
 
 for(row in 1:nrow(CompleteDataWithGoogle)){ #This is the inverse of what we would think because wind direction is the inverse. This will tell us what direction the trash came from.
