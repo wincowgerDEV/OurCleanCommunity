@@ -1,0 +1,2406 @@
+[
+  {
+    "op": "core/column-removal",
+    "columnName": "begin",
+    "description": "Remove column begin"
+  },
+  {
+    "op": "core/column-removal",
+    "columnName": "end",
+    "description": "Remove column end"
+  },
+  {
+    "op": "core/column-removal",
+    "columnName": "altitudeMode",
+    "description": "Remove column altitudeMode"
+  },
+  {
+    "op": "core/column-removal",
+    "columnName": "tessellate",
+    "description": "Remove column tessellate"
+  },
+  {
+    "op": "core/column-removal",
+    "columnName": "extrude",
+    "description": "Remove column extrude"
+  },
+  {
+    "op": "core/column-removal",
+    "columnName": "visibility",
+    "description": "Remove column visibility"
+  },
+  {
+    "op": "core/column-removal",
+    "columnName": "drawOrder",
+    "description": "Remove column drawOrder"
+  },
+  {
+    "op": "core/column-removal",
+    "columnName": "icon",
+    "description": "Remove column icon"
+  },
+  {
+    "op": "core/text-transform",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material",
+    "expression": "join ([coalesce(cells['Material'].value,''),coalesce(cells['Materials'].value,'')],'')",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10,
+    "description": "Text transform on cells in column Material using expression join ([coalesce(cells['Material'].value,''),coalesce(cells['Materials'].value,'')],'')"
+  },
+  {
+    "op": "core/column-removal",
+    "columnName": "challengeId",
+    "description": "Remove column challengeId"
+  },
+  {
+    "op": "core/text-transform",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item",
+    "expression": "join ([coalesce(cells['Item'].value,''),coalesce(cells['Items'].value,'')],'')",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10,
+    "description": "Text transform on cells in column Item using expression join ([coalesce(cells['Item'].value,''),coalesce(cells['Items'].value,'')],'')"
+  },
+  {
+    "op": "core/text-transform",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Brand",
+    "expression": "join ([coalesce(cells['Brand'].value,''),coalesce(cells['Brands'].value,'')],'')",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10,
+    "description": "Text transform on cells in column Brand using expression join ([coalesce(cells['Brand'].value,''),coalesce(cells['Brands'].value,'')],'')"
+  },
+  {
+    "op": "core/column-reorder",
+    "columnNames": [
+      "File",
+      "Name",
+      "description",
+      "timestamp",
+      "id",
+      "url",
+      "lon",
+      "lat",
+      "photo_url",
+      "thumbnail_url",
+      "photo_timestamp",
+      "Material",
+      "Item",
+      "Brand",
+      "Notes",
+      "litterjoinId",
+      "litterId",
+      "litterTimestamp",
+      "litterDatestamp",
+      "user_id",
+      "username",
+      "tags",
+      "Materials",
+      "Items"
+    ],
+    "description": "Reorder columns"
+  },
+  {
+    "op": "core/column-removal",
+    "columnName": "Items",
+    "description": "Remove column Items"
+  },
+  {
+    "op": "core/column-removal",
+    "columnName": "Materials",
+    "description": "Remove column Materials"
+  },
+  {
+    "op": "core/text-transform",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "tags",
+    "expression": "join ([coalesce(cells['tags'].value,''),coalesce(cells['Name'].value,'')],'')",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10,
+    "description": "Text transform on cells in column tags using expression join ([coalesce(cells['tags'].value,''),coalesce(cells['Name'].value,'')],'')"
+  },
+  {
+    "op": "core/column-reorder",
+    "columnNames": [
+      "File",
+      "description",
+      "timestamp",
+      "id",
+      "url",
+      "lon",
+      "lat",
+      "photo_url",
+      "thumbnail_url",
+      "photo_timestamp",
+      "Material",
+      "Item",
+      "Brand",
+      "Notes",
+      "litterjoinId",
+      "litterId",
+      "litterTimestamp",
+      "litterDatestamp",
+      "user_id",
+      "username",
+      "tags"
+    ],
+    "description": "Reorder columns"
+  },
+  {
+    "op": "core/column-addition",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "baseColumnName": "Material",
+    "expression": "grel:isNonBlank(value) | isNonBlank(cells[\"Item\"]) | isNonBlank(cells[\"Brand\"])",
+    "onError": "set-to-blank",
+    "newColumnName": "input_valid",
+    "columnInsertIndex": 11,
+    "description": "Create column input_valid at index 11 based on column Material using expression grel:isNonBlank(value) | isNonBlank(cells[\"Item\"]) | isNonBlank(cells[\"Brand\"])"
+  },
+  {
+    "op": "core/column-move",
+    "columnName": "input_valid",
+    "index": 12,
+    "description": "Move column input_valid to position 12"
+  },
+  {
+    "op": "core/column-move",
+    "columnName": "input_valid",
+    "index": 13,
+    "description": "Move column input_valid to position 13"
+  },
+  {
+    "op": "core/text-transform",
+    "engineConfig": {
+      "facets": [
+        {
+          "type": "text",
+          "name": "input_valid",
+          "columnName": "input_valid",
+          "query": "true",
+          "mode": "text",
+          "caseSensitive": false,
+          "invert": false
+        }
+      ],
+      "mode": "row-based"
+    },
+    "columnName": "Material",
+    "expression": "value.toLowercase()",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10,
+    "description": "Text transform on cells in column Material using expression value.toLowercase()"
+  },
+  {
+    "op": "core/text-transform",
+    "engineConfig": {
+      "facets": [
+        {
+          "type": "text",
+          "name": "input_valid",
+          "columnName": "input_valid",
+          "query": "true",
+          "mode": "text",
+          "caseSensitive": false,
+          "invert": false
+        }
+      ],
+      "mode": "row-based"
+    },
+    "columnName": "Item",
+    "expression": "value.toLowercase()",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10,
+    "description": "Text transform on cells in column Item using expression value.toLowercase()"
+  },
+  {
+    "op": "core/text-transform",
+    "engineConfig": {
+      "facets": [
+        {
+          "type": "text",
+          "name": "input_valid",
+          "columnName": "input_valid",
+          "query": "true",
+          "mode": "text",
+          "caseSensitive": false,
+          "invert": false
+        }
+      ],
+      "mode": "row-based"
+    },
+    "columnName": "Brand",
+    "expression": "value.toLowercase()",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10,
+    "description": "Text transform on cells in column Brand using expression value.toLowercase()"
+  },
+  {
+    "op": "core/text-transform",
+    "engineConfig": {
+      "facets": [
+        {
+          "type": "text",
+          "name": "input_valid",
+          "columnName": "input_valid",
+          "query": "true",
+          "mode": "text",
+          "caseSensitive": false,
+          "invert": false
+        }
+      ],
+      "mode": "row-based"
+    },
+    "columnName": "id",
+    "expression": "value.toNumber()",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10,
+    "description": "Text transform on cells in column id using expression value.toNumber()"
+  },
+  {
+    "op": "core/text-transform",
+    "engineConfig": {
+      "facets": [
+        {
+          "type": "text",
+          "name": "input_valid",
+          "columnName": "input_valid",
+          "query": "true",
+          "mode": "text",
+          "caseSensitive": false,
+          "invert": false
+        }
+      ],
+      "mode": "row-based"
+    },
+    "columnName": "id",
+    "expression": "join ([coalesce(cells['id'].value,''),coalesce(cells['litterId'].value,'')],'')",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10,
+    "description": "Text transform on cells in column id using expression join ([coalesce(cells['id'].value,''),coalesce(cells['litterId'].value,'')],'')"
+  },
+  {
+    "op": "core/column-reorder",
+    "columnNames": [
+      "File",
+      "description",
+      "timestamp",
+      "id",
+      "url",
+      "lon",
+      "lat",
+      "photo_url",
+      "thumbnail_url",
+      "photo_timestamp",
+      "Material",
+      "Item",
+      "Brand",
+      "input_valid",
+      "Notes",
+      "litterjoinId",
+      "litterTimestamp",
+      "litterDatestamp",
+      "user_id",
+      "username",
+      "tags"
+    ],
+    "description": "Reorder columns"
+  },
+  {
+    "op": "core/text-transform",
+    "engineConfig": {
+      "facets": [
+        {
+          "type": "text",
+          "name": "input_valid",
+          "columnName": "input_valid",
+          "query": "true",
+          "mode": "text",
+          "caseSensitive": false,
+          "invert": false
+        }
+      ],
+      "mode": "row-based"
+    },
+    "columnName": "id",
+    "expression": "value.toNumber()",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10,
+    "description": "Text transform on cells in column id using expression value.toNumber()"
+  },
+  {
+    "op": "core/column-removal",
+    "columnName": "litterjoinId",
+    "description": "Remove column litterjoinId"
+  },
+  {
+    "op": "core/column-addition",
+    "engineConfig": {
+      "facets": [
+        {
+          "type": "text",
+          "name": "input_valid",
+          "columnName": "input_valid",
+          "query": "true",
+          "mode": "text",
+          "caseSensitive": false,
+          "invert": false
+        }
+      ],
+      "mode": "row-based"
+    },
+    "baseColumnName": "url",
+    "expression": "grel:if(isBlank(cells[\"photo_url\"]), value, cells[\"photo_url\"])",
+    "onError": "set-to-blank",
+    "newColumnName": "Image URL",
+    "columnInsertIndex": 5,
+    "description": "Create column Image URL at index 5 based on column url using expression grel:if(isBlank(cells[\"photo_url\"]), value, cells[\"photo_url\"])"
+  },
+  {
+    "op": "core/column-removal",
+    "columnName": "url",
+    "description": "Remove column url"
+  },
+  {
+    "op": "core/column-removal",
+    "columnName": "thumbnail_url",
+    "description": "Remove column thumbnail_url"
+  },
+  {
+    "op": "core/column-removal",
+    "columnName": "photo_url",
+    "description": "Remove column photo_url"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [
+        {
+          "type": "text",
+          "name": "input_valid",
+          "columnName": "input_valid",
+          "query": "true",
+          "mode": "text",
+          "caseSensitive": false,
+          "invert": false
+        }
+      ],
+      "mode": "row-based"
+    },
+    "columnName": "Material",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "tin foil",
+          "tinfoil"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "tin foil"
+      },
+      {
+        "from": [
+          "expandedpolystyrene",
+          "expanded polystyrene"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "expanded polystyrene"
+      }
+    ],
+    "description": "Mass edit cells in column Material"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [
+        {
+          "type": "text",
+          "name": "input_valid",
+          "columnName": "input_valid",
+          "query": "true",
+          "mode": "text",
+          "caseSensitive": false,
+          "invert": false
+        }
+      ],
+      "mode": "row-based"
+    },
+    "columnName": "Material",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "plastic",
+          "plastic ",
+          "plasitc"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "plastic"
+      },
+      {
+        "from": [
+          "metal",
+          "metal "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "metal"
+      },
+      {
+        "from": [
+          "expanded polystyrene",
+          "expanded polystyrene "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "expanded polystyrene"
+      },
+      {
+        "from": [
+          "paper",
+          "paper "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "paper"
+      },
+      {
+        "from": [
+          "glass",
+          "glass "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "glass"
+      },
+      {
+        "from": [
+          "rubber",
+          "rubber "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "rubber"
+      },
+      {
+        "from": [
+          "plastic, paper",
+          "plastic, paper "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "plastic, paper"
+      },
+      {
+        "from": [
+          "styrofoam",
+          "styrofoam "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "styrofoam"
+      },
+      {
+        "from": [
+          "fabric",
+          "fabric "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "fabric"
+      },
+      {
+        "from": [
+          "cloth",
+          "cloth "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cloth"
+      },
+      {
+        "from": [
+          "wood",
+          "wood "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "wood"
+      },
+      {
+        "from": [
+          "aluminum",
+          "aluminum "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "aluminum"
+      }
+    ],
+    "description": "Mass edit cells in column Material"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [
+        {
+          "type": "text",
+          "name": "input_valid",
+          "columnName": "input_valid",
+          "query": "true",
+          "mode": "text",
+          "caseSensitive": false,
+          "invert": false
+        }
+      ],
+      "mode": "row-based"
+    },
+    "columnName": "Material",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "cotton",
+          "cottonbud"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cotton"
+      }
+    ],
+    "description": "Mass edit cells in column Material"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [
+        {
+          "type": "text",
+          "name": "input_valid",
+          "columnName": "input_valid",
+          "query": "true",
+          "mode": "text",
+          "caseSensitive": false,
+          "invert": false
+        }
+      ],
+      "mode": "row-based"
+    },
+    "columnName": "Item",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "lid, straw",
+          "straw, lid"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "lid, straw"
+      },
+      {
+        "from": [
+          "misc. wrapper",
+          "misc wrapper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "misc. wrapper"
+      }
+    ],
+    "description": "Mass edit cells in column Item"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [
+        {
+          "type": "text",
+          "name": "input_valid",
+          "columnName": "input_valid",
+          "query": "true",
+          "mode": "text",
+          "caseSensitive": false,
+          "invert": false
+        }
+      ],
+      "mode": "row-based"
+    },
+    "columnName": "Item",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "sauce packet",
+          "saucepacket"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "sauce packet"
+      },
+      {
+        "from": [
+          "food container",
+          "foodcontainer"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "food container"
+      },
+      {
+        "from": [
+          "candy wrapper",
+          "candywrapper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "candy wrapper"
+      },
+      {
+        "from": [
+          "miscwrapper",
+          "misc. wrapper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "misc. wrapper"
+      }
+    ],
+    "description": "Mass edit cells in column Item"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [
+        {
+          "type": "text",
+          "name": "input_valid",
+          "columnName": "input_valid",
+          "query": "true",
+          "mode": "text",
+          "caseSensitive": false,
+          "invert": false
+        }
+      ],
+      "mode": "row-based"
+    },
+    "columnName": "Item",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "misc wrapper ",
+          "miscwrapper "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "misc. wrapper "
+      },
+      {
+        "from": [
+          "beverage bottle",
+          "beveragebottle"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "beverage bottle"
+      },
+      {
+        "from": [
+          "beverage can",
+          "beveragecan"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "beverage can"
+      },
+      {
+        "from": [
+          "cottonbudstick",
+          "cotton bud stick"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cotton bud stick"
+      },
+      {
+        "from": [
+          "packing peanut",
+          "packingpeanut"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "packing peanut"
+      },
+      {
+        "from": [
+          "hairtie",
+          "hair tie"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "hairtie"
+      },
+      {
+        "from": [
+          "bottlecap",
+          "bottle cap"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "bottle cap"
+      },
+      {
+        "from": [
+          "food wrapper",
+          "foodwrapper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "food wrapper"
+      },
+      {
+        "from": [
+          "paper clip",
+          "paperclip"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "paper clip"
+      },
+      {
+        "from": [
+          "paper towel",
+          "papertowel"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "paper towel"
+      },
+      {
+        "from": [
+          "lollipopstick",
+          "lollipop stick"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "lollipop stick"
+      },
+      {
+        "from": [
+          "gum wrapper",
+          "gumwrapper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "gum wrapper"
+      },
+      {
+        "from": [
+          "condiment wrapper",
+          "condimentwrapper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "condiment wrapper"
+      },
+      {
+        "from": [
+          "pricetag",
+          "price tag"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "price tag"
+      },
+      {
+        "from": [
+          "twisttie",
+          "twist tie"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "twist tie"
+      },
+      {
+        "from": [
+          "drink pouch",
+          "drinkpouch"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "drink pouch"
+      },
+      {
+        "from": [
+          "food stick",
+          "foodstick"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "food stick"
+      }
+    ],
+    "description": "Mass edit cells in column Item"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [
+        {
+          "type": "text",
+          "name": "input_valid",
+          "columnName": "input_valid",
+          "query": "true",
+          "mode": "text",
+          "caseSensitive": false,
+          "invert": false
+        }
+      ],
+      "mode": "row-based"
+    },
+    "columnName": "Item",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "cigarette",
+          "cigarette ",
+          "cigarete"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cigarette"
+      },
+      {
+        "from": [
+          "toothbrush",
+          "toothbrush "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "toothbrush"
+      },
+      {
+        "from": [
+          "straw",
+          "straw "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "straw"
+      },
+      {
+        "from": [
+          "styrofoam",
+          "styrofoam "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "styrofoam"
+      },
+      {
+        "from": [
+          "receipt",
+          "receipt "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "receipt"
+      },
+      {
+        "from": [
+          "stirrer ",
+          "stirrer"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "stirrer "
+      },
+      {
+        "from": [
+          "food wrapper",
+          "food wrapper "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "food wrapper"
+      },
+      {
+        "from": [
+          "floss",
+          "floss "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "floss"
+      },
+      {
+        "from": [
+          "misc. wrapper",
+          "misc. wrapper "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "misc. wrapper"
+      },
+      {
+        "from": [
+          "food container",
+          "food container "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "food container"
+      },
+      {
+        "from": [
+          "water bottle",
+          "water bottle "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "water bottle"
+      },
+      {
+        "from": [
+          "towel",
+          "towel "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "towel"
+      },
+      {
+        "from": [
+          "wetwipe",
+          "wet wipe "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "wet wipe"
+      },
+      {
+        "from": [
+          "napkin",
+          "napkin "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "napkin"
+      },
+      {
+        "from": [
+          "candy wrapper",
+          "candy wrapper "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "candy wrapper"
+      },
+      {
+        "from": [
+          "cotton bud stick",
+          "cottonbudsticks"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cotton bud stick"
+      },
+      {
+        "from": [
+          "container",
+          "container "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "container"
+      },
+      {
+        "from": [
+          "shard",
+          "shirt"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "shard"
+      },
+      {
+        "from": [
+          "bottle cap",
+          "bottle cap "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "bottle cap"
+      },
+      {
+        "from": [
+          "foil",
+          "foil "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "foil"
+      },
+      {
+        "from": [
+          "foam",
+          "foam "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "foam"
+      },
+      {
+        "from": [
+          "bottle",
+          "bottle "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "bottle"
+      },
+      {
+        "from": [
+          "packaging",
+          "packaging "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "packaging"
+      },
+      {
+        "from": [
+          "label",
+          "label "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "label"
+      },
+      {
+        "from": [
+          "confetti",
+          "confetti "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "confetti"
+      },
+      {
+        "from": [
+          "misc",
+          "misc "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "misc"
+      },
+      {
+        "from": [
+          "gum wrapper",
+          "gum wrapper "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "gum wrapper"
+      },
+      {
+        "from": [
+          "condiment wrapper",
+          "condiment wrapper "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "condiment wrapper"
+      },
+      {
+        "from": [
+          "lid",
+          "lid "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "lid"
+      },
+      {
+        "from": [
+          "cigarette box",
+          "cigarette box "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cigarette box"
+      },
+      {
+        "from": [
+          "rubberband",
+          "rubberband "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "rubberband"
+      },
+      {
+        "from": [
+          "card",
+          "card "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "card"
+      },
+      {
+        "from": [
+          "wrapper",
+          "wrapper "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "wrapper"
+      },
+      {
+        "from": [
+          "lid, straw",
+          "lid, straw "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "lid, straw"
+      }
+    ],
+    "description": "Mass edit cells in column Item"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [
+        {
+          "type": "text",
+          "name": "input_valid",
+          "columnName": "input_valid",
+          "query": "true",
+          "mode": "text",
+          "caseSensitive": false,
+          "invert": false
+        }
+      ],
+      "mode": "row-based"
+    },
+    "columnName": "Item",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "receipt",
+          "reciept"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "receipt"
+      }
+    ],
+    "description": "Mass edit cells in column Item"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [
+        {
+          "type": "text",
+          "name": "input_valid",
+          "columnName": "input_valid",
+          "query": "true",
+          "mode": "text",
+          "caseSensitive": false,
+          "invert": false
+        }
+      ],
+      "mode": "row-based"
+    },
+    "columnName": "Item",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "bag",
+          "bag "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "bag"
+      },
+      {
+        "from": [
+          "cap",
+          "cap "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cap"
+      },
+      {
+        "from": [
+          "cup",
+          "cup "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cup"
+      },
+      {
+        "from": [
+          "hairtie",
+          "hair tie "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "hair tie"
+      },
+      {
+        "from": [
+          "can",
+          "can "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "can"
+      }
+    ],
+    "description": "Mass edit cells in column Item"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [
+        {
+          "type": "text",
+          "name": "input_valid",
+          "columnName": "input_valid",
+          "query": "true",
+          "mode": "text",
+          "caseSensitive": false,
+          "invert": false
+        }
+      ],
+      "mode": "row-based"
+    },
+    "columnName": "Item",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "cosmetic container ",
+          "cosmetics container "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cosmetic container "
+      },
+      {
+        "from": [
+          "earbud",
+          "earbuds"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "earbud"
+      },
+      {
+        "from": [
+          "fragment",
+          "fragments"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "fragment"
+      }
+    ],
+    "description": "Mass edit cells in column Item"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [
+        {
+          "type": "text",
+          "name": "input_valid",
+          "columnName": "input_valid",
+          "query": "true",
+          "mode": "text",
+          "caseSensitive": false,
+          "invert": false
+        }
+      ],
+      "mode": "row-based"
+    },
+    "columnName": "Item",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "wet wipe",
+          "wet wipes "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "wet wipe"
+      },
+      {
+        "from": [
+          "cigarette",
+          "cigarettes "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cigarette"
+      }
+    ],
+    "description": "Mass edit cells in column Item"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [
+        {
+          "type": "text",
+          "name": "input_valid",
+          "columnName": "input_valid",
+          "query": "true",
+          "mode": "text",
+          "caseSensitive": false,
+          "invert": false
+        }
+      ],
+      "mode": "row-based"
+    },
+    "columnName": "Brand",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "welch's",
+          "welchs"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "welch's"
+      },
+      {
+        "from": [
+          "jackinthebox",
+          "jack-in-the-box"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "jack in the box"
+      },
+      {
+        "from": [
+          "kool-aid",
+          "koolaid"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "kool-aid"
+      },
+      {
+        "from": [
+          "bakers",
+          "baker's"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "baker's"
+      },
+      {
+        "from": [
+          "mcdonalds",
+          "mcdonald's"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "mcdonald's"
+      },
+      {
+        "from": [
+          "wrigleys",
+          "wrigley's"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "wrigley's"
+      },
+      {
+        "from": [
+          "dumdums",
+          "dum-dums"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "dum-dums"
+      },
+      {
+        "from": [
+          "reeses",
+          "reese's"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "reese's"
+      },
+      {
+        "from": [
+          "mms",
+          "m&ms"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "m&ms"
+      },
+      {
+        "from": [
+          "kitkat",
+          "kit-kat"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "kit-kat"
+      }
+    ],
+    "description": "Mass edit cells in column Brand"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [
+        {
+          "type": "text",
+          "name": "input_valid",
+          "columnName": "input_valid",
+          "query": "true",
+          "mode": "text",
+          "caseSensitive": false,
+          "invert": false
+        }
+      ],
+      "mode": "row-based"
+    },
+    "columnName": "Brand",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "riteaid",
+          "rite aid"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "rite aid"
+      },
+      {
+        "from": [
+          "dutch masters",
+          "dutchmasters"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "dutch masters"
+      },
+      {
+        "from": [
+          "natural light",
+          "naturallight"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "natural light"
+      },
+      {
+        "from": [
+          "circle k",
+          "circlek"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "circle k"
+      },
+      {
+        "from": [
+          "taco bell",
+          "tacobell"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "taco bell"
+      },
+      {
+        "from": [
+          "nature valley",
+          "naturevalley"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "nature valley"
+      },
+      {
+        "from": [
+          "little caesars",
+          "littlecaesars"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "little caesars"
+      },
+      {
+        "from": [
+          "tootsieroll",
+          "tootsie roll"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "tootsie roll"
+      },
+      {
+        "from": [
+          "nowandlater",
+          "now and later"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "now and later"
+      },
+      {
+        "from": [
+          "jolly rancher",
+          "jollyrancher"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "jolly rancher"
+      },
+      {
+        "from": [
+          "dosequis",
+          "dos equis"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "dos equis"
+      },
+      {
+        "from": [
+          "good will",
+          "goodwill"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "good will"
+      }
+    ],
+    "description": "Mass edit cells in column Brand"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [
+        {
+          "type": "text",
+          "name": "input_valid",
+          "columnName": "input_valid",
+          "query": "true",
+          "mode": "text",
+          "caseSensitive": false,
+          "invert": false
+        }
+      ],
+      "mode": "row-based"
+    },
+    "columnName": "Brand",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "milky way",
+          "milkyway"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "milky way"
+      },
+      {
+        "from": [
+          "bud light",
+          "budlight"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "bud light"
+      },
+      {
+        "from": [
+          "raising canes",
+          "raisingcanes"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "raising canes"
+      },
+      {
+        "from": [
+          "burger king",
+          "burgerking"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "burger king"
+      },
+      {
+        "from": [
+          "chick-fil-a",
+          "chick fil a"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "chick-fil-a"
+      },
+      {
+        "from": [
+          "bank of america",
+          "bankofamerica"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "bank of america"
+      },
+      {
+        "from": [
+          "7 eleven",
+          "7-eleven"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "7 eleven"
+      },
+      {
+        "from": [
+          "kit-kat",
+          "kit kat"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "kit-kat"
+      },
+      {
+        "from": [
+          "panda express",
+          "pandaexpress"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "panda express"
+      },
+      {
+        "from": [
+          "casa cardenas",
+          "casacardenas"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "casa cardenas"
+      },
+      {
+        "from": [
+          "lemonhead",
+          "lemon head"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "lemon head"
+      },
+      {
+        "from": [
+          "kool aid",
+          "kool-aid"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "kool aid"
+      },
+      {
+        "from": [
+          "coca cola",
+          "cocacola"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "coca cola"
+      },
+      {
+        "from": [
+          "stater bros",
+          "staterbros"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "stater bros"
+      }
+    ],
+    "description": "Mass edit cells in column Brand"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [
+        {
+          "type": "text",
+          "name": "input_valid",
+          "columnName": "input_valid",
+          "query": "true",
+          "mode": "text",
+          "caseSensitive": false,
+          "invert": false
+        }
+      ],
+      "mode": "row-based"
+    },
+    "columnName": "Brand",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "hershes",
+          "hershey's ",
+          "hersheys"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "hershey's"
+      },
+      {
+        "from": [
+          "wrigley's",
+          "wriggley's",
+          "wrigleys "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "wrigley's"
+      },
+      {
+        "from": [
+          "reese's",
+          "reese's ",
+          "resess"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "reese's"
+      },
+      {
+        "from": [
+          "wienerschnitzel",
+          "weinerschnitzle",
+          "wienerschnitzel "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "wienerschnitzel"
+      },
+      {
+        "from": [
+          "3musketeers",
+          "3 musketeers "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "3 musketeers"
+      },
+      {
+        "from": [
+          "kirkland",
+          "kirkland "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "kirkland"
+      },
+      {
+        "from": [
+          "starbucks",
+          "starbucks "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "starbucks"
+      },
+      {
+        "from": [
+          "welch's",
+          "welches"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "welch's"
+      },
+      {
+        "from": [
+          "ralphs",
+          "ralphs "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "ralphs"
+      },
+      {
+        "from": [
+          "ziplock",
+          "ziploc"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "ziplock"
+      },
+      {
+        "from": [
+          "cheetos",
+          "cheetos "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cheetos"
+      },
+      {
+        "from": [
+          "gatorade",
+          "gatorade "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "gatorade"
+      },
+      {
+        "from": [
+          "baker's",
+          "bakers "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "baker's"
+      },
+      {
+        "from": [
+          "trolli",
+          "troli"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "trolli"
+      },
+      {
+        "from": [
+          "mcdonald's",
+          "mcdonalds "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "mcdonald's"
+      },
+      {
+        "from": [
+          "hollens",
+          "hollens "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "hollens"
+      },
+      {
+        "from": [
+          "orbit",
+          "orbit "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "orbit"
+      },
+      {
+        "from": [
+          "7 eleven",
+          "7 eleven "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "7 eleven"
+      },
+      {
+        "from": [
+          "marbolo ",
+          "marbolo"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "marlboro"
+      },
+      {
+        "from": [
+          "time",
+          "time "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "time"
+      },
+      {
+        "from": [
+          "taco bell",
+          "taco bell "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "taco bell"
+      },
+      {
+        "from": [
+          "colgate",
+          "colgate "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "colgate"
+      },
+      {
+        "from": [
+          "kelloggs",
+          "kellogs"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "kelloggs"
+      },
+      {
+        "from": [
+          "del taco",
+          "del taco "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "del taco"
+      },
+      {
+        "from": [
+          "jack in the box",
+          "jack in the box "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "jack in the box"
+      },
+      {
+        "from": [
+          "coca cola",
+          "coca cola "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "coca cola"
+      },
+      {
+        "from": [
+          "snickers",
+          "snickers "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "snickers"
+      },
+      {
+        "from": [
+          "camel",
+          "camel "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "camel"
+      },
+      {
+        "from": [
+          "little caesars",
+          "little caesars "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "little caesars"
+      },
+      {
+        "from": [
+          "maruchan",
+          "maruchan "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "maruchan"
+      },
+      {
+        "from": [
+          "tootsie roll",
+          "tootsierool"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "tootsie roll"
+      },
+      {
+        "from": [
+          "burger king",
+          "burger king "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "burger king"
+      },
+      {
+        "from": [
+          "mentos ",
+          "mentos"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "mentos "
+      }
+    ],
+    "description": "Mass edit cells in column Brand"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [
+        {
+          "type": "text",
+          "name": "input_valid",
+          "columnName": "input_valid",
+          "query": "true",
+          "mode": "text",
+          "caseSensitive": false,
+          "invert": false
+        }
+      ],
+      "mode": "row-based"
+    },
+    "columnName": "Brand",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "butter finger ",
+          "butterfinger"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "butter finger "
+      }
+    ],
+    "description": "Mass edit cells in column Brand"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [
+        {
+          "type": "text",
+          "name": "input_valid",
+          "columnName": "input_valid",
+          "query": "true",
+          "mode": "text",
+          "caseSensitive": false,
+          "invert": false
+        }
+      ],
+      "mode": "row-based"
+    },
+    "columnName": "Brand",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "stella artois",
+          "stella artois "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "stella artois"
+      }
+    ],
+    "description": "Mass edit cells in column Brand"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [
+        {
+          "type": "text",
+          "name": "input_valid",
+          "columnName": "input_valid",
+          "query": "true",
+          "mode": "text",
+          "caseSensitive": false,
+          "invert": false
+        }
+      ],
+      "mode": "row-based"
+    },
+    "columnName": "Brand",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "halls",
+          "halls ",
+          "hauls"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "halls"
+      },
+      {
+        "from": [
+          "little caesars",
+          "little ceasars"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "little caesars"
+      },
+      {
+        "from": [
+          "niagara",
+          "niagra"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "niagara"
+      },
+      {
+        "from": [
+          "air heads",
+          "airheads "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "air heads"
+      },
+      {
+        "from": [
+          "fresh and ready foods",
+          "fresh and ready "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "fresh and ready foods"
+      }
+    ],
+    "description": "Mass edit cells in column Brand"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [
+        {
+          "type": "text",
+          "name": "input_valid",
+          "columnName": "input_valid",
+          "query": "true",
+          "mode": "text",
+          "caseSensitive": false,
+          "invert": false
+        }
+      ],
+      "mode": "row-based"
+    },
+    "columnName": "Brand",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "gobstopper",
+          "gobstoppers "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "gobstopper"
+      }
+    ],
+    "description": "Mass edit cells in column Brand"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [
+        {
+          "type": "text",
+          "name": "input_valid",
+          "columnName": "input_valid",
+          "query": "true",
+          "mode": "text",
+          "caseSensitive": false,
+          "invert": false
+        }
+      ],
+      "mode": "row-based"
+    },
+    "columnName": "Brand",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "tootsie",
+          "tootsiepop"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "tootsie"
+      }
+    ],
+    "description": "Mass edit cells in column Brand"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [
+        {
+          "type": "text",
+          "name": "input_valid",
+          "columnName": "input_valid",
+          "query": "true",
+          "mode": "text",
+          "caseSensitive": false,
+          "invert": false
+        }
+      ],
+      "mode": "row-based"
+    },
+    "columnName": "Brand",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "conchas",
+          "conchas, bimbo"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "conchas, bimbo"
+      },
+      {
+        "from": [
+          "7 eleven",
+          "seven eleven "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "7-eleven"
+      }
+    ],
+    "description": "Mass edit cells in column Brand"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [
+        {
+          "type": "text",
+          "name": "input_valid",
+          "columnName": "input_valid",
+          "query": "true",
+          "mode": "text",
+          "caseSensitive": false,
+          "invert": false
+        }
+      ],
+      "mode": "row-based"
+    },
+    "columnName": "Brand",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "tootsie roll",
+          "tootsie"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "tootsie"
+      },
+      {
+        "from": [
+          "quaker",
+          "quaker oats "
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "quaker"
+      }
+    ],
+    "description": "Mass edit cells in column Brand"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [
+        {
+          "type": "text",
+          "name": "input_valid",
+          "columnName": "input_valid",
+          "query": "true",
+          "mode": "text",
+          "caseSensitive": false,
+          "invert": false
+        }
+      ],
+      "mode": "row-based"
+    },
+    "columnName": "Brand",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "corona",
+          "coronaextra"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "corona"
+      }
+    ],
+    "description": "Mass edit cells in column Brand"
+  }
+]

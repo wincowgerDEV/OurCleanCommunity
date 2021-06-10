@@ -1,0 +1,13 @@
+I converted all kml files from the students who shared their cleaned data with me to csv files using qgis. Then I merged the datasets manually to maintain the litter id, material, item, and brand input by the students. 
+Next I merged that dataset with the total pull from litterati. some of the records were incomplete in the full pull and I had to fill in the gaps manually from the kml file data. 
+I copy and pasted a timestamp with the correct date info for those records. Only trust the date, don't trust the times on all records. 
+Next I manually went through all the images to remove duplicates, copy records down so that every item has its own row, add records for bottle caps separate from bottles even if the bottle cap was on the bottle. 
+I also added records for lids, and straws when they were present. 
+Trevors data for one day was brought in from another dataset in the drive because it was missing from his litterati record. 
+Then I brought the dataset into open refine to reconcile the material, item, and brand types. I tried to match the most similar category in the trash taxonomy, even when that category seemed like a higher level of classification. The goal was to merge to the trash taxonomy and not make more work for myself by adding new records. 
+I still need to remove the first two days from Hannah's record, will do that in R when I bring the data down. 
+I also still need to reconcile the brand data to similar brands and perhaps try to merge to the TT brand manufacturer dataset. 
+It is going to be hard to visualize anything but the materials category because there are so many categories. Probably will just summarize the diversity indices for the other ones and then do a full merge to demonstrate the hierarchy levels and how that lumps the data. Could also discuss the top 10. Should definitely do that for brands. 
+One note, some people are calling cigarette butts paper and others are calling it plastic. 
+After reconciling I made the datasheet Total Merge Reconcile. 
+Need to set any brand that doesn't match to "other" but not NA values. 

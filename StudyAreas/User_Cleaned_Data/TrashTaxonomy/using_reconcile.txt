@@ -1,0 +1,20 @@
+1) Open the windows powershell.
+
+1.5) add a column for the row number (ID) to the dataset that will be used for reconciling. 
+
+2) navigate to the folder where the jar file is. Should also be where the csv file is. 
+https://docs.microsoft.com/en-us/powershell/scripting/samples/managing-current-location?view=powershell-7.1
+cd 'G:\My Drive\GrayLab\Projects\Plastics\ActiveProjects\TrackingTrashReceipts\Code\Github\StudyAreas\User_Cleaned_Data\TrashTaxonomy'
+
+
+3) run the command below. 
+java -Xmx2g -jar reconcile-csv-0.1.2.jar <CSV-File> <Search Column> <ID Column>
+java -Xmx2g -jar reconcile-csv-0.1.2.jar Brand_Manufacturer_Relation.csv Brand ID
+
+4) follow steps for open refine reconciling. 
+http://okfnlabs.org/reconcile-csv/
+
+4.5) use cell.recon.match.id to add column based on column. 
+
+
+5) need to join the datasets using another service (R)

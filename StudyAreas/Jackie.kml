@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
+<Document>
+	<name>RCleanCommunity</name>
+	<gx:CascadingStyle kml:id="__managed_style_22D85B492D1B0D9E7D2F">
+		<Style>
+			<IconStyle>
+				<scale>1.2</scale>
+				<Icon>
+					<href>https://earth.google.com/earth/rpc/cc/icon?color=1976d2&amp;id=2000&amp;scale=4</href>
+				</Icon>
+				<hotSpot x="64" y="128" xunits="pixels" yunits="insetPixels"/>
+			</IconStyle>
+			<LabelStyle>
+			</LabelStyle>
+			<LineStyle>
+				<color>ff2dc0fb</color>
+				<width>4.8</width>
+			</LineStyle>
+			<PolyStyle>
+				<color>40ffffff</color>
+			</PolyStyle>
+			<BalloonStyle>
+				<displayMode>hide</displayMode>
+			</BalloonStyle>
+		</Style>
+	</gx:CascadingStyle>
+	<gx:CascadingStyle kml:id="__managed_style_1CD6DAD7C61B0D9E7D2F">
+		<Style>
+			<IconStyle>
+				<Icon>
+					<href>https://earth.google.com/earth/rpc/cc/icon?color=1976d2&amp;id=2000&amp;scale=4</href>
+				</Icon>
+				<hotSpot x="64" y="128" xunits="pixels" yunits="insetPixels"/>
+			</IconStyle>
+			<LabelStyle>
+			</LabelStyle>
+			<LineStyle>
+				<color>ff2dc0fb</color>
+				<width>3.2</width>
+			</LineStyle>
+			<PolyStyle>
+				<color>40ffffff</color>
+			</PolyStyle>
+			<BalloonStyle>
+				<displayMode>hide</displayMode>
+			</BalloonStyle>
+		</Style>
+	</gx:CascadingStyle>
+	<StyleMap id="__managed_style_0217DBDC011B0D9E7D2F">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#__managed_style_1CD6DAD7C61B0D9E7D2F</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#__managed_style_22D85B492D1B0D9E7D2F</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Placemark id="05EBEF6B841B0D9E7D2E">
+		<name>Jackie_s</name>
+		<LookAt>
+			<longitude>-117.2969875219716</longitude>
+			<latitude>34.05497409493524</latitude>
+			<altitude>297.7193537064408</altitude>
+			<heading>0.0002998338299377083</heading>
+			<tilt>0</tilt>
+			<gx:fovy>35</gx:fovy>
+			<range>338.8495030048216</range>
+			<altitudeMode>absolute</altitudeMode>
+		</LookAt>
+		<styleUrl>#__managed_style_0217DBDC011B0D9E7D2F</styleUrl>
+		<Polygon>
+			<outerBoundaryIs>
+				<LinearRing>
+					<coordinates>
+						-117.2982564375854,34.05459267691704,296.6484318721603 -117.2978518105249,34.05449441385979,296.6640215818553 -117.2946592178618,34.0545134525407,299.423889746843 -117.2943734105933,34.05448311302403,300.3028145852119 -117.2943910771211,34.05457999551886,300.0395036951307 -117.2944803184692,34.05466431817124,299.7730332416084 -117.2946157444074,34.05468321160205,299.6208869023977 -117.2947487486368,34.05465757360865,299.4268351155409 -117.2978730512905,34.0546425194185,296.3791417499381 -117.2981708659672,34.05473677124906,296.7713586557749 -117.2982564375854,34.05459267691704,296.6484318721603 
+					</coordinates>
+				</LinearRing>
+			</outerBoundaryIs>
+		</Polygon>
+	</Placemark>
+</Document>
+</kml>

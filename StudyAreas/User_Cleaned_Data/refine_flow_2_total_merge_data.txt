@@ -1,0 +1,7574 @@
+[
+  {
+    "op": "core/column-addition",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "baseColumnName": "Date",
+    "expression": "grel:value.toDate('dd/MM/yy').toString('yyyy-MM-dd')",
+    "onError": "set-to-blank",
+    "newColumnName": "Day",
+    "columnInsertIndex": 5,
+    "description": "Create column Day at index 5 based on column Date using expression grel:value.toDate('dd/MM/yy').toString('yyyy-MM-dd')"
+  },
+  {
+    "op": "core/column-addition",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "baseColumnName": "Material",
+    "expression": "grel:value",
+    "onError": "set-to-blank",
+    "newColumnName": "Material_TT",
+    "columnInsertIndex": 9,
+    "description": "Create column Material_TT at index 9 based on column Material using expression grel:value"
+  },
+  {
+    "op": "core/column-addition",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "baseColumnName": "Item",
+    "expression": "grel:value",
+    "onError": "set-to-blank",
+    "newColumnName": "Item_TT",
+    "columnInsertIndex": 11,
+    "description": "Create column Item_TT at index 11 based on column Item using expression grel:value"
+  },
+  {
+    "op": "core/column-addition",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "baseColumnName": "Brand",
+    "expression": "grel:value",
+    "onError": "set-to-blank",
+    "newColumnName": "Brand_TT",
+    "columnInsertIndex": 13,
+    "description": "Create column Brand_TT at index 13 based on column Brand using expression grel:value"
+  },
+  {
+    "op": "core/text-transform",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value.toLowercase()",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10,
+    "description": "Text transform on cells in column Material_TT using expression value.toLowercase()"
+  },
+  {
+    "op": "core/text-transform",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value.trim()",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10,
+    "description": "Text transform on cells in column Material_TT using expression value.trim()"
+  },
+  {
+    "op": "core/text-transform",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value.toLowercase()",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10,
+    "description": "Text transform on cells in column Item_TT using expression value.toLowercase()"
+  },
+  {
+    "op": "core/text-transform",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value.trim()",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10,
+    "description": "Text transform on cells in column Item_TT using expression value.trim()"
+  },
+  {
+    "op": "core/text-transform",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "columnName": "Brand_TT",
+    "expression": "value.toLowercase()",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10,
+    "description": "Text transform on cells in column Brand_TT using expression value.toLowercase()"
+  },
+  {
+    "op": "core/text-transform",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "columnName": "Brand_TT",
+    "expression": "value.trim()",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10,
+    "description": "Text transform on cells in column Brand_TT using expression value.trim()"
+  },
+  {
+    "op": "core/column-addition",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "baseColumnName": "Location (Lat / Long)",
+    "expression": "grel:value.split(\"/\")[0]",
+    "onError": "set-to-blank",
+    "newColumnName": "Lat",
+    "columnInsertIndex": 2,
+    "description": "Create column Lat at index 2 based on column Location (Lat / Long) using expression grel:value.split(\"/\")[0]"
+  },
+  {
+    "op": "core/column-addition",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "baseColumnName": "Location (Lat / Long)",
+    "expression": "grel:value.split(\"/\")[1]",
+    "onError": "set-to-blank",
+    "newColumnName": "Lon",
+    "columnInsertIndex": 2,
+    "description": "Create column Lon at index 2 based on column Location (Lat / Long) using expression grel:value.split(\"/\")[1]"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "expandedpolystyrene"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "expanded polystyrene"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "metal, paper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "metal"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "metal, plastic"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "plastic"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "paper, aluminum"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "paper"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "paper, cardboard"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cardboard"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "paper, cellulose acetate"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "plastic"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "plasitc"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "plastic"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "paper, filter"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "plastic"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "paper, foil"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "paper"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "paper, glitter"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "paper"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "paper, tinfoil"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "paper"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "plastic wrapper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "plastic"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "plastic, aluminum"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "plastic"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "plastic, cloth"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "plastic"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "plastic, foam"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "foam"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "plastic, metal"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "plastic"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "polyisobutylene"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "plastic"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "tin foil"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "metal"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "tinfoil"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "metal"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "aluminum"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "metal"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "expanded polystyrene"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "foam"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "fabric"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cloth"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "cotton"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cloth"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "cottonbud"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cloth"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "cardboard"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "paper/cardboard"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "foil"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "metal"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "cellulose acetate"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "plastic"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "cigarette"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "plastic"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "banana"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "food"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "bag of trash"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "plastic"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "rope"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "organic"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "stone"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "concrete/asphalt"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "styrofoam"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "foam"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "styrofoam, paper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "foam"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "straw"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "organic"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "sugar"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "food"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "tobacco"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "organic"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "wax"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "unknown"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [],
+        "fromBlank": true,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "filter"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "plastic"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "fiber"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "organic"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "beverage bottle"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "beverage bottles"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "beveragebottle"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "beverage bottles"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "beveragecan"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "beverage can"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "(ice) bag"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "small plastic bags, e.g., freezer bags"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "ad"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "paper"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "adhesivebacking"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "apple core"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "food"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "automobile part, hubcap"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "car part"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "bag"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "bags"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "bag of trash"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "bags"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "ball"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "balls"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "balloon"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "balloons"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "balloonscrap"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "balloons"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "banana"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "food"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "band"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "rubber bands"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "bandaid"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "bandages"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "bar"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "bar, pipe, or wire"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "baseball"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "balls"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "battery"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "batteries"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "bead"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "beauty product"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "personal care products"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "binder clip"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "bobby pin"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "personal care products"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "bobbypin"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "personal care products"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "bolt"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "bolts, nails, and screws"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "book"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "books"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "bookend"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "bottlecap"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "bottle cap"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "bottle"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "bottles & jars"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "bottle cap"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "bottle cap"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "bottle tab"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "pull tabs: beverages"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "bottlering"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "bottle caps, lids, and pull tabs"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "bottle caps, lids, and pull tabs"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "bottle caps, lids, & pull tabs"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "box"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "bracelet"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "bullet"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "bus pass"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "paper"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "business card"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "paper"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "can"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cans"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "candy"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "food"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "candy cup"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "disposable food & beverage ware"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "candybox"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "disposable food & beverage ware"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "candy wrapper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "food wrappers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "candywrapper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "food wrappers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "canpulltabs"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "pull tabs: beverages"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "bottle cap"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "bottle caps"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "car piece"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "car parts"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "car part"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "car parts"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "card"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "paper"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "catalog"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "paper"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "caution tape"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "tape"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "cd"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cd, cd-box"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "cd case"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cd, cd-box"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "cigaette"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cigarette"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "cigarete"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cigarette"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "cigar tip"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cigar tips"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "cigarette filter"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cigarette filters"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "cigarette filters"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cigarette filters"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "cigarette butt"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cigarette butts"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "cigarette"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cigarettes OR cigar tips"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "cigarette box"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cigarette packets"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "cigarette pack"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cigarette packets"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "cigarette package"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cigarette packets"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "cigarette wrapper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "tobacco packaging & wrappers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "cigarettes"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cigarettes OR cigar tips"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "cigarwrapper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "tobacco packaging & wrappers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "coffee lid"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "coffee cup lid"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "coin"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "condiment wrapper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "sauce packet"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "condimentwrapper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "sauce packet"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "condomwrapper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "sanitary product"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "confetti"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "toys & party poppers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "cosmetic container"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cosmetics(bottles&containerse.g.sunlotion,shampoo,showergel,deodorant)"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "cosmetics container"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cosmetics(bottles&containerse.g.sunlotion,shampoo,showergel,deodorant)"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "container"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "condiment"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "sauce packet"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "cotton bud stick"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cotton bud sticks"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "cottonbudstick"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cotton bud sticks"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "cottonbudsticks"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cotton bud sticks"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "cotton"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cloth fragments"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "cotton swab"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "personal care products"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "cottonpad"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "personal care products"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "coupon"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "paper"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "crayon"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "cup"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cups"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "cup container"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "beverage containers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "cup holder"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "beverage containers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "decoration"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "desiccantbag"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "bag (ziplock, produce, other)"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "diaper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "diapers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "dime"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "dogtag"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "drink box"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cardboard cartons"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "drink lids"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "lids"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "drink pouch"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "juice packet"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "drinkpouch"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "juice packet"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "drink holder"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cups, food trays, food wrappers, drink containers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "drug bag"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "dryer sheets"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "drying sheet"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "duct tape"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "tape"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "earbud"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "ear plugs"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "earplugs"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "ear plugs"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "earbuds"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "ear plugs"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "earring"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "envelope"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "paper"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "fencing"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "large debris items"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "film"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "film (think OR flexible e.g. straw wrapper)"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "film-like plastic"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "film (think OR flexible e.g. straw wrapper)"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "filter"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "flosspick"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "dental flossers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "floss"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "sanitary product"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "flyer"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "paper"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "foam"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "foam cup"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cups"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "foam packaging"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "foamsponge"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "foil wrapper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "foil"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "food container"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "food wrappers or containers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "foodcontainer"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "food wrappers or containers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "food wrapper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "food wrappers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "foodwrapper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "food wrappers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "food container lid"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "food wrappers or containers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "food label"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cups, food trays, food wrappers, drink containers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "food packaging"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "food wrappers or containers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "food stick"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "ice-cream sticks, chip forks, chopsticks, toothpicks"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "foodstick"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "ice-cream sticks, chip forks, chopsticks, toothpicks"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "fork"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "\tutensil"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "form"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "paper"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "fortune"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "paper"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "fragment"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "fragments"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "fruit"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "food"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "fruit label"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cups, food trays, food wrappers, drink containers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "fruitpeel"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "food"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "garden mesh"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "large debris items"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "gauss"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "bandages"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "glass"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "glass shard"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "fragment"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "fragment"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "fragments"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "glove"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "gloves"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "glowstick"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "toys, balls, party poppers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "grocery ad"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "paper"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "grocery bag"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "bag (grocery)"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "gum"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "food"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "gum container"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cups, food trays, food wrappers, drink containers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "gum package"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "food wrappers or containers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "gum packaging"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "food wrappers or containers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "gum wrapper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "food wrappers or containers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "gumwrapper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "food wrappers or containers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "hairpin"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "personal care products"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "hairtie"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "hair tie"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "hanger"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [
+        {
+          "type": "list",
+          "name": "Item_TT",
+          "expression": "value",
+          "columnName": "Item_TT",
+          "invert": false,
+          "omitBlank": false,
+          "omitError": false,
+          "selection": [
+            {
+              "v": {
+                "v": "hard",
+                "l": "hard"
+              }
+            }
+          ],
+          "selectBlank": false,
+          "selectError": false
+        }
+      ],
+      "mode": "row-based"
+    },
+    "columnName": "Material_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "plastic"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "hard plastic"
+      }
+    ],
+    "description": "Mass edit cells in column Material_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "hard"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "hat"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "clothing, hats, gloves & towels"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "headband"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "clothing, hats, gloves & towels"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "householdbattery"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "batteries"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "ice cream cone wrapper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "food wrappers or containers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "ice cream container"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "food wrappers or containers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "industrialscrap"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "industrial packaging OR crates OR sheeting"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "informational"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "paper"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "instructions"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "paper"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "insulatedwire"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "wire"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "iphone case"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "telephone(incl.parts)"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "jacket"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "clothing"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "jar"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other bottles, containers and drums"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "jewels"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "juice box"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "juice carton"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "knife"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "utensil"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "label"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "paper"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "lead pencil"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "pens OR pencils"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "lid"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "lids"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "light stick connector"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "lightbulb"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "light globes: bulbs, etc"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "lighter"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cigarette lighters"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "line paper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "paper"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "lipbalm tube"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "personal care products"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "lollipop"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "lollipop sticks & cotton buds"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "lollipop stick"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "lollipop sticks & cotton buds"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "lollipopstick"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "lollipop sticks & cotton buds"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "lollipop sticks & cotton buds"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "lolly sticks"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "lottery"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "paper"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "lottery ticket"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "paper"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "lollipop wrapper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "food wrappers or containers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "marble"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "toys, balls"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "medicine"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "drugs"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "metrolink card"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "paper"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "misc"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "misc. bag"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "bags"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "misc wrapper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "wrappers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "misc. wrapper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "wrappers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "misccontainer"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other bottles, containers and drums"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "miscellaneous"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "miscwrapper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "wrappers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "movie ticket"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "paper"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "nail"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "bolts, nails, and screws"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "name tag"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "paper"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "napkin"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "napkins"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "newspaper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "newspapers & magazines"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "newspaper ad"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "newspapers & magazines"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "nonfood wrapper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other bottles, containers and drums"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "note"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "paper"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "nut"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "bolts, nails, and screws"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "nutshell"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "food"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "officepapermail"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "paper"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "orange"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "food"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "orange peel"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "food"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "ornament"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "other toys"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "toys"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "packaging peanut"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "packaging"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "packet"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "food wrappers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "packing material"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "packing"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "packing"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "packaging"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "packing peanut"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "packaging"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "packingpeanut"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "packaging"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "pad"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "paper bag"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "bags"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "paper clip"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "paper fringe"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "paper"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "paper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "napkin"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "napkin"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "napkins"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "paper towel"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "napkins"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "papertowel"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "napkins"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "paperclip"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "part"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "peach"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "food"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "peanut shells"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "food"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "pen"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "pens OR pencils"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "pencil"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "pens OR pencils"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "phone"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "telephone(incl.parts)"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "piece"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "fragments"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "pipe"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "piping"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "pipefragment"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "piping"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "pizza"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "food"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "plastic bag"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "bags"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "plastic cup"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cups"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "plastic fork"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "utensil"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "plastic lid"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "lids"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "plastic straw"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "straws"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "plate"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "plates"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "playingcard"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "toys"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "plywood"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "lumber OR building material"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "price tag"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "paper"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "pricetag"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "paper"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "qtip"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cotton bud sticks"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "rag"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "towels OR rags"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "razerblade head"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "personal care products"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "razor"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "personal care products"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "razorblade"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "receipt"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "reciepts"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "reciept"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "reciepts"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "rewardscard"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "ribbon"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "ring"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "saucepacket"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "sauce packet"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "sauce container"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "sauce packet"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "rubber brand"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "rubber bands"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "rubberband"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "rubber bands"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "safety cone"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "traffic cones"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "safetypin"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "sandpaper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "sanitary product"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "sanitary product"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "scap"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "fragments"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "scrap"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "fragments"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "scraps"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "fragments"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "screw"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "bolts, nails, and screws"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "sensor housing"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "shard"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "fragments"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "shards"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "fragments"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "sheet"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "paper"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "shirt"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "clothing"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "shirt scrap"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cloth fragments"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "shopping bag"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "bag (grocery)"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "sock"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "clothing"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "spoon"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "utensil"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "spork"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "utensil"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "sprinkler"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "sprinkler head"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "staple"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "sticker"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "stirrer"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "straws, stirrers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "straw"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "straws"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "sticky note"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "paper"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "straw wrapper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "wrappers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "straw, wrapper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "wrappers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "strawwrapper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "wrappers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "styrofoam"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "fragment"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "styrofoam cup"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "cups"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "tag"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "paper"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "takeout box"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "singlue use food container"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "teabag"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "food"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "thread"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "string"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "ticket"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "parking tickets & reciepts"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "tinfoil"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "foil"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "tissue"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "paper OR napkins OR tissues"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "tobacco packaging"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "tobacco packaging & wrappers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "tobacco wrapper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "tobacco packaging & wrappers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "toilet roll"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "toilet paper"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "toiletpaperroll"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "toilet paper"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "toothbrush"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "toothbrushes"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "toothpick"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "tooth pick"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "towel"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "towels OR rags"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "towelette"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "towels OR rags"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "toy"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "toys"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "tubing"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "twist tie"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "twisttie"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "unknown wrapper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "wrapper"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "utensil handle"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "utensil"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "wapper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "wrapper"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "washer"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "bolts, nails, and screws"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "water bottle"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "water bottles"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "water bottle wrapper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "wrapper"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "wet wipe"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "wet wipes"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "wetwipe"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "wet wipes"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "wipe"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "wet wipe"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "wet wipe"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "wet wipes"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "wire"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "bar, pipe, or wire"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "workgloves"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "gloves"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "worksheet"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "paper"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "wrappedfood"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "food wrappers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "wrapper with food"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "food wrappers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "ziplock bag"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "bag (zip-lock, produce, other)"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "ziptie"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "strapping bands OR zip-ties"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [],
+        "fromBlank": true,
+        "fromError": false,
+        "to": "other"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "\tutensil"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "utensil"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "fragment"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "fragments"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Item_TT",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "food wrapper"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "food wrappers"
+      }
+    ],
+    "description": "Mass edit cells in column Item_TT"
+  }
+]

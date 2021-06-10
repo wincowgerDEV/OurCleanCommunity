@@ -1,0 +1,3 @@
+I merged the brands using the reconcile-csv script to the trash taxonomy brand list. 
+If the brand didn't exist, it didn't merge and we assume that those are manufacturers. 
+I also removed one brand that said "paper" because the brand didn't exist in the dataset so I think it was a typo. 
