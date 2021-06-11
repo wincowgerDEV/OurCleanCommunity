@@ -25,7 +25,7 @@ library(fitdistrplus) #https://cran.r-project.org/web/packages/fitdistrplus/vign
 library(swfscMisc)
 library(circular)
 library(geosphere)
-devtools::install_github(repo = "michaelmalick/r-malick")
+#devtools::install_github(repo = "michaelmalick/r-malick")
 library(malick)
 
 #Functions ----
@@ -73,16 +73,18 @@ full_data <- fread("Litterati-Partners.csv") %>%
 
 vechaversine <- Vectorize(haversine)
 
-data_2018 <- fread("CleanedData2018.csv") %>%
-  dplyr::select(ID:Brand) %>%
-  rename(Litter = ID, date_unformatted = Date) %>%
-  inner_join(full_data) %>%
-  dplyr::select(Litter, Longitude, Latitude, timestamp, Username, Name, Material, Item, Brand) %>%
-  group_by(Username) %>%
-  mutate(minlat = min(Latitude), maxlat = max(Latitude), minlon = min(Longitude), maxlon = max(Longitude)) %>%
-  ungroup()%>%
-  mutate(horizdist = vechaversine(lon1 = minlon, lat1 = maxlat, lon2 = maxlon, lat2 = maxlat), vertdist = vechaversine(lon1 = minlon, lat1 = minlat, lon2 = minlon, lat2 = maxlat)) %>%
-  mutate(area_m2 = horizdist * vertdist)
+#data_2018 <- fread("CleanedData2018.csv") %>%
+#  dplyr::select(ID:Brand) %>%
+#  rename(Litter = ID, date_unformatted = Date) %>%
+#  inner_join(full_data) %>%
+#  dplyr::select(Litter, Longitude, Latitude, timestamp, Username, Name, Material, Item, Brand) %>%
+#  group_by(Username) %>%
+#  mutate(minlat = min(Latitude), maxlat = max(Latitude), minlon = min(Longitude), maxlon = max(Longitude)) %>%
+#  ungroup()%>%
+#  mutate(horizdist = vechaversine(lon1 = minlon, lat1 = maxlat, lon2 = maxlon, lat2 = maxlat), vertdist = vechaversine(lon1 = minlon, lat1 = minlat, lon2 = minlon, lat2 = maxlat)) %>%
+#  mutate(area_m2 = horizdist * vertdist)
+
+site_data_cleaned <- fread("StudyAreas/User_Cleaned_Data/reconciled_cleaned.csv")
 
 #Dataset source
 #https://data.bts.gov/Research-and-Statistics/Trips-by-Distance/w96p-f2qv
@@ -91,42 +93,143 @@ data_2018 <- fread("CleanedData2018.csv") %>%
 #Basic Stats 2018 ----
 
 #Input Rate Changes
-input_rate <- data_2018 %>%
+input_rate <- site_data_cleaned %>%
   #filter(user_id == 92684) %>%
   #mutate(Date = substr(photo_timestamp,1,nchar(photo_timestamp)-3)) %>%
-  mutate(Date = as.Date(timestamp)) %>%
-  group_by(Date, Username, area_m2) %>%
+  mutate(Date = as.Date(Day, format = "%m/%d/%Y")) %>%
+  group_by(Date, Name, Site_Length_m) %>%
   summarise(Intensity = n()) %>%
   arrange(Date) %>%
-  group_by(Username) %>%
-  mutate(DateDiff = as.numeric(Date) - dplyr::lag(as.numeric(Date), order_by = Username)) %>%
-  mutate(generationrate = Intensity/DateDiff/area_m2) %>%
-  ungroup() %>%
-  filter(Username != "litterati-92684", Username != "andhika-hammond") #Maybe shouldn't remove andhika
-  
-ggplot(input_rate) + geom_boxplot(aes(x = Username, y = generationrate), notch = T) + scale_y_log10()
+  group_by(Name) %>%
+  mutate(DateDiff = as.numeric(Date) - dplyr::lag(as.numeric(Date), order_by = Name)) %>%
+  mutate(generationrate = Intensity/DateDiff/Site_Length_m) %>%
+  filter(Date != as.Date("3/23/2020", format = "%m/%d/%Y")) %>% #Bring back in for 2020 analysis.
+  ungroup() 
 
-ggplot(input_rate) + 
-  geom_point(aes(x = Date, y = generationrate)) + 
-  facet_grid(Username ~.) + 
+ggplot(input_rate) + geom_boxplot(aes(x = Name, y = generationrate), notch = T) + scale_y_log10()
+
+#ggplot(input_rate) + geom_point(aes(x = Date, y = generationrate), notch = T) + scale_y_log10()
+# get all the start and end points
+
+ggplot(input_rate, aes(x = Date, y = generationrate)) + 
+  geom_point() + 
+  geom_smooth(method = "lm") +
+  #geom_tile(aes(y=weekends$weekend*max(generationrate)), fill="yellow") +
+  facet_wrap(Name ~., scales = "free") + 
   theme_bw() + 
-  labs(y = "Generation Rate #/Day/m2") + 
-  scale_y_log10()
+  labs(y = "Generation Rate #/Day/m") + 
+  scale_y_log10() + 
+  scale_x_date(date_minor_breaks = "1 week")
 
-#Material Types By Site and Date
-material_composition <- data_2018 %>%
+ggplot(input_rate, aes(x = Date, y = Name)) + 
+  geom_point(alpha = 0.5, size = 4) + 
+  #geom_smooth(method = "lm") +
+  #facet_wrap(Name ~., scales = "free") + 
+  theme_bw() + 
+  labs(y = "Site") + 
+  scale_x_date(date_minor_breaks = "1 month")
+
+#Input Rate Correlation
+mean_input_rate <- site_data_cleaned %>%
   #filter(user_id == 92684) %>%
   #mutate(Date = substr(photo_timestamp,1,nchar(photo_timestamp)-3)) %>%
-  mutate(Date = as.Date(timestamp)) %>%
-  group_by(Date, Username, Material) %>%
+  mutate(Date = as.Date(Day, format = "%m/%d/%Y")) %>%
+  group_by(Date, Name, Site_Length_m, `Mean Income_households_2019_5year_census`, `Median Income_households`, Cal_Enviro_Screen, Road_Width_m, Landuse_Type) %>%
   summarise(Intensity = n()) %>%
+  arrange(Date) %>%
+  group_by(Name) %>%
+  mutate(DateDiff = as.numeric(Date) - dplyr::lag(as.numeric(Date), order_by = Name)) %>%
+  mutate(generationrate = Intensity/DateDiff/Site_Length_m) %>%
+  filter(Date != as.Date("3/23/2020", format = "%m/%d/%Y")) %>% #Bring back in for 2020 analysis.
   ungroup() %>%
-  filter(Username != "litterati-92684", Username != "andhika-hammond") #Maybe shouldn't remove andhika
+  group_by(Name, `Mean Income_households_2019_5year_census`, `Median Income_households`, Cal_Enviro_Screen, Road_Width_m, Landuse_Type) %>%
+  summarise(mean = mean(generationrate, na.rm = T)) %>%
+  ungroup() %>%
+  dplyr::select(-Name) %>%
+  mutate(Cal_Enviro_Screen = case_when(
+    Cal_Enviro_Screen == "40-45" ~ 42.5,
+    Cal_Enviro_Screen == "65-70" ~ 67.5,
+    Cal_Enviro_Screen == "80-85" ~ 82.5,
+    Cal_Enviro_Screen == "85-90" ~ 87.5,
+    Cal_Enviro_Screen == "90-95" ~ 92.5,
+    Cal_Enviro_Screen == "95-100" ~ 97.5,
+  )) %>%
+  mutate(Landuse_Type = case_when(
+    Landuse_Type == "Residential" ~ 1,
+    Landuse_Type == "Mixed" ~0
+  )) %>%
+  gather(key, value, -mean) %>%
+  mutate(value = as.numeric(value))
 
-ggplot(material_composition, aes(fill=Material, y=Intensity, x=Date)) + 
-  geom_bar(position="fill", stat="identity")+
-  facet_grid(Username ~.) + 
+ggplot(mean_input_rate) + 
+  geom_point(aes(x = value, y = mean)) + 
+  facet_wrap(key~., scales = "free") + 
+  labs(y = "Mean Trash Generation (#/m/day") + 
   theme_bw()
+
+#Material Types By Site and Date
+material_composition <- site_data_cleaned %>%
+  #filter(user_id == 92684) %>%
+  #mutate(Date = substr(photo_timestamp,1,nchar(photo_timestamp)-3)) %>%
+  mutate(Date = as.Date(Day, format = "%m/%d/%Y")) %>%
+  #mutate(Date = as.Date(timestamp)) %>%
+  group_by(Date, Name, Material_TT) %>%
+  summarise(Intensity = n()) %>%
+  ungroup()
+
+ggplot(arrange(material_composition, Date, Name, Intensity), aes(fill=Material_TT, y=Intensity, x=Date)) + 
+  geom_bar(position="fill", stat="identity")+
+  #scale_fill_viridis_d() +
+  facet_wrap(Name ~. , scales = "free") + 
+  theme_bw()
+
+
+#Trash Diversity
+#https://www.flutterbys.com.au/stats/tut/tut13.2.html
+calc_shannon <- function(community) {
+  p <- table(community)/length(community) # Find proportions
+  p <- p[p > 0] # Get rid of zero proportions (log zero is undefined)
+  -sum(p * log(p)) # Calculate index
+}
+
+calc_simpson <- function(community) {
+  p <- table(community)/length(community) # Find proportions
+  1 / sum(p^2) # Calculate index
+}
+
+calc_menshinicks <- function(community) {
+  p <- length(unique(community))/sqrt(length(community)) # Find proportions
+  p # Calculate index
+}
+
+calc_numgroups <- function(community) {
+  p <- length(unique(community)) # Find proportions
+  p # Calculate index
+}
+
+material_diversity <- site_data_cleaned %>%
+  #filter(user_id == 92684) %>%
+  #mutate(Date = substr(photo_timestamp,1,nchar(photo_timestamp)-3)) %>%
+  mutate(Date = as.Date(Day, format = "%m/%d/%Y")) %>%
+  group_by(Date, Name) %>%
+  dplyr::summarise(shannon = calc_shannon(Item_TT),
+                   simpson = calc_simpson(Item_TT),
+                   menhincks = calc_menshinicks(Item_TT),
+                   numgroups = calc_numgroups(Item_TT))
+
+ggplot(material_diversity) + 
+  geom_point(aes(x = Date, y = shannon)) + 
+  geom_point(aes(x = Date, y = simpson), color = "red") + 
+  geom_point(aes(x = Date, y = menhincks), color = "blue") + 
+  geom_point(aes(x = Date, y = numgroups), color = "green") +
+  
+  #geom_smooth(method = "lm") +
+  #geom_tile(aes(y=weekends$weekend*max(generationrate)), fill="yellow") +
+  facet_wrap(Name ~., scales = "free") + 
+  theme_bw() + 
+  labs(y = "Diversity") + 
+  #scale_y_log10() + 
+  scale_x_date(date_minor_breaks = "1 week")
 
 #Trip Distances ----
 #Was thinking that we should limit this to work trips but I don't think so any more. 

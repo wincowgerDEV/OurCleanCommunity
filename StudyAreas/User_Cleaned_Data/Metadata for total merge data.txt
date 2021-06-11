@@ -10,4 +10,8 @@ I also still need to reconcile the brand data to similar brands and perhaps try 
 It is going to be hard to visualize anything but the materials category because there are so many categories. Probably will just summarize the diversity indices for the other ones and then do a full merge to demonstrate the hierarchy levels and how that lumps the data. Could also discuss the top 10. Should definitely do that for brands. 
 One note, some people are calling cigarette butts paper and others are calling it plastic. 
 After reconciling I made the datasheet Total Merge Reconcile. 
-Need to set any brand that doesn't match to "other" but not NA values. 
+Need to set any brand that doesn't match to "other" and NA values. 
+Removed Hannah's days. 
+
+Lookup census data
+https://www.census.gov/data/academy/data-gems/2020/how-to-access-data-for-your-neighborhood.html
