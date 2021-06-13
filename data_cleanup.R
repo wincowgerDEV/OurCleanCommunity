@@ -50,6 +50,11 @@ data_reconciled_cleaned <- data_reconciled %>%
 
 fwrite(data_reconciled_cleaned, "StudyAreas/User_Cleaned_Data/reconciled_cleaned.csv")
 
+data_site_weekend <- data_reconciled_cleaned %>%
+    distinct(Name, Day, `Street Sweeping Schedule`)
+
+fwrite(data_site_weekend, "StudyAreas/User_Cleaned_Data/weekend_sweep.csv")
+
 data_reconciled %>%
     filter(Name == "Win Cowger") %>%
     pull(Day) %>%

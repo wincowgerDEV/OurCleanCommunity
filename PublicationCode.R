@@ -71,7 +71,7 @@ full_data <- fread("Litterati-Partners.csv") %>%
   mutate(week = strftime(timestamp, format = "%W")) %>%
   mutate(day = strftime(timestamp, format = "%D"))
 
-vechaversine <- Vectorize(haversine)
+#vechaversine <- Vectorize(haversine)
 
 #data_2018 <- fread("CleanedData2018.csv") %>%
 #  dplyr::select(ID:Brand) %>%
@@ -84,11 +84,13 @@ vechaversine <- Vectorize(haversine)
 #  mutate(horizdist = vechaversine(lon1 = minlon, lat1 = maxlat, lon2 = maxlon, lat2 = maxlat), vertdist = vechaversine(lon1 = minlon, lat1 = minlat, lon2 = minlon, lat2 = maxlat)) %>%
 #  mutate(area_m2 = horizdist * vertdist)
 
-site_data_cleaned <- fread("StudyAreas/User_Cleaned_Data/reconciled_cleaned.csv")
+site_data_cleaned <- fread("StudyAreas/User_Cleaned_Data/reconciled_cleaned.csv") %>%
+  left_join(fread("StudyAreas/User_Cleaned_Data/weekend_sweep.csv")) %>%
+  mutate(Date = as.Date(Day, format = "%m/%d/%Y"))
+  
 
 #Dataset source
 #https://data.bts.gov/Research-and-Statistics/Trips-by-Distance/w96p-f2qv
-
 
 #Basic Stats 2018 ----
 
@@ -96,8 +98,7 @@ site_data_cleaned <- fread("StudyAreas/User_Cleaned_Data/reconciled_cleaned.csv"
 input_rate <- site_data_cleaned %>%
   #filter(user_id == 92684) %>%
   #mutate(Date = substr(photo_timestamp,1,nchar(photo_timestamp)-3)) %>%
-  mutate(Date = as.Date(Day, format = "%m/%d/%Y")) %>%
-  group_by(Date, Name, Site_Length_m) %>%
+  group_by(Date, Name, Site_Length_m, Weekend, Sweeping) %>%
   summarise(Intensity = n()) %>%
   arrange(Date) %>%
   group_by(Name) %>%
@@ -106,14 +107,17 @@ input_rate <- site_data_cleaned %>%
   filter(Date != as.Date("3/23/2020", format = "%m/%d/%Y")) %>% #Bring back in for 2020 analysis.
   ungroup() 
 
-ggplot(input_rate) + geom_boxplot(aes(x = Name, y = generationrate), notch = T) + scale_y_log10()
+ggplot(input_rate) + geom_boxplot(aes(x = Name, y = generationrate, color = Weekend), notch = T) + scale_y_log10()
+
+ggplot(input_rate) + geom_boxplot(aes(y = generationrate, color = Weekend), notch = T) + scale_y_log10()
+ggplot(input_rate) + geom_boxplot(aes(y = generationrate, color = Sweeping), notch = T) + scale_y_log10()
 
 #ggplot(input_rate) + geom_point(aes(x = Date, y = generationrate), notch = T) + scale_y_log10()
 # get all the start and end points
 
-ggplot(input_rate, aes(x = Date, y = generationrate)) + 
+ggplot(input_rate, aes(x = Date, y = generationrate, color = Sweeping, shape = Weekend)) + 
   geom_point() + 
-  geom_smooth(method = "lm") +
+  #geom_smooth(method = "lm") +
   #geom_tile(aes(y=weekends$weekend*max(generationrate)), fill="yellow") +
   facet_wrap(Name ~., scales = "free") + 
   theme_bw() + 
@@ -303,6 +307,20 @@ ggplot() +
   stat_ecdf(aes(x = montecarlo_vector * 1.60934 * 1000), color = "blue") + 
   scale_x_log10()
 
+montecarlo_meters = montecarlo_vector * 1.60934 * 1000
+
+receipt_distance_quantiles = quantile(CompleteDataWithGoogle$DistanceFromLocation, probs = seq(0.01, 0.99, by = 0.01), na.rm = T)
+montecarlo_distance_quantiles = quantile(montecarlo_meters, probs = seq(0.01, 0.99, by = 0.01), na.rm = T)
+
+# Plot Quantiles against one another. 
+ggplot() + 
+geom_point(aes(y = receipt_distance_quantiles, x = montecarlo_distance_quantiles)) + 
+  geom_smooth(aes(y = receipt_distance_quantiles, x = montecarlo_distance_quantiles),
+              method = "lm") + 
+  scale_x_log10() + 
+  scale_y_log10()
+
+linear_quantile_regression = lm(log10(receipt_distance_quantiles) ~ log10(montecarlo_distance_quantiles))
 
 #Might not be the best way to do this because the data set is synthesized.
 #ks.test(x = montecarlo_vector * 1.60934 * 1000, y =  CompleteDataWithGoogle$DistanceFromLocation)
