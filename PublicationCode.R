@@ -91,13 +91,12 @@ jointohierarchy <- function(DF, Hierarchy, Alias, ColNum) {
   DF <- mutate_all(DF, cleantext) %>%
     mutate(Count = as.numeric(Count))
   Hierarchy <- mutate_all(Hierarchy, cleantext)
-  Alias <- mutate_all(Alias, cleantext) %>%
-    mutate(RowID = as.integer(RowID))
+  Alias <- mutate_all(Alias, cleantext) 
   
   DF$RowID <- unlist(apply(DF, 1, function(x) which(Alias == as.character(x[ColNum]), arr.ind = TRUE)[1]))
   
   DF <- DF %>%
-    left_join(dplyr::select(Alias, RowID, Key)) %>%
+    left_join(dplyr::select(Alias, Key)) %>%
     dplyr::select(Key, Count) %>%
     mutate(Key = ifelse(is.na(Key), "other", Key))
   
@@ -147,43 +146,57 @@ jointohierarchy <- function(DF, Hierarchy, Alias, ColNum) {
   
 }
 
-removeslash <- function(x){
-  gsub("/", " OR ", x)
-}
 
-converttotree <- function(x){
-  #x[is.na(x)] <- ""
-  x <- mutate_all(x, removeslash) %>%
-    mutate(key = "trash") %>%
-    mutate(sum = as.numeric(sum)) %>%
-    dplyr::relocate(key) %>%
-    dplyr::group_by(across(c(-sum))) %>%
-    dplyr::summarise(sum = sum(sum)) %>%
-    unite(pathString, sep = "/", na.rm = T, -sum) ##Seems like we may be losing some of the sums here, would expect original values to be equal to the summed.
-  FromDataFrameTable(x)
-}
 
 #check out this: https://stackoverflow.com/questions/45225671/aggregating-values-on-a-data-tree-with-r
 myApply <- function(node) {
   node$totalsum <- 
-    sum(c(node$sum, purrr::map_dbl(node$children, myApply)), na.rm = TRUE)
+    sum(c(node$Count, purrr::map_dbl(node$children, myApply)), na.rm = TRUE)
 }
 
+
+
+removeslash <- function(x){
+  gsub("/", " OR ", x)
+}
 #DF2 <- SMC
 #Hierarchy <- ItemsHierarchy
 #Alias <- ItemsAlias
 #ColNum <- 2
 
 
-AggregateTrees <- function(DF1, Alias, Hierarchy, ColNum){
-  DFA <- jointohierarchy(DF = DF1, Hierarchy = Hierarchy, Alias = Alias, ColNum = ColNum)%>%
-    add_row(Level.1 = "missing", sum = sum(DF1$Count) - sum(.$sum)) #May need to be changed to X1 or Level.1 depending on the hierarchy dataset. Should clean them up.
+AggregateTrees <- function(DF, Alias, Hierarchy){
   
-  bindedtree <- converttotree(DFA)  
+  DF <- mutate_all(DF, cleantext) %>%
+    mutate(Count = as.numeric(Count))
   
-  myApply(bindedtree)
+  colnames(DF) <- c("Alias", "Count")
   
-  bindedtree
+  Hierarchy <- mutate_all(Hierarchy, cleantext)
+  
+  colnames(Hierarchy) <- c("from", "Key")
+  
+  Alias <- mutate_all(Alias, cleantext) 
+  
+  DF_v2 <- DF %>%
+    left_join(Alias) %>%
+    dplyr::select(Key, Count) %>%
+    mutate(Key = ifelse(is.na(Key), "other", Key)) %>%
+    right_join(Hierarchy) %>%
+    select(from, Key, Count) %>%
+    add_row(from = "trash", Key = "missing", Count = sum(DF$Count, na.rm = T) - sum(.$Count, na.rm = T))
+  
+  DF_network <- FromDataFrameNetwork(DF_v2)
+  
+  myApply(DF_network)
+  
+  Treedf <- ToDataFrameNetwork(DF_network, "totalsum") 
+  
+  Treedf %>%
+    add_row(from = "trash", to = "", totalsum = sum(Treedf %>%
+                                                      filter(from == "trash") %>% 
+                                                      pull(totalsum)))
+  
   
 }
 
@@ -432,8 +445,6 @@ ggplot(cv_input_rate) +
   theme_bw()
 
 
-
-
 #Material Types By Site and Date
 material_composition <- site_data_cleaned %>%
   #filter(user_id == 92684) %>%
@@ -484,65 +495,66 @@ ggplot(material_diversity) +
 
 
 #Taxonomy Data sets ----
-ItemsHierarchy <- read.csv("Taxonomy/Website/Items_Hierarchy.csv")
+ItemsHierarchy <- read.csv("Taxonomy/Website/Items_Hierarchy_V2.csv")
 
 #Test items not matched 
 
-MaterialsHierarchy <- read.csv("Taxonomy/Website/Materials_Hierarchy.csv") 
+MaterialsHierarchy <- read.csv("Taxonomy/Website/Materials_Hierarchy_V2.csv") 
 
 ItemsAlias <- read.csv("Taxonomy/Website/Items_Alias_V2.csv")%>%
-  mutate(RowID = 1:nrow(.)) %>%
+  #mutate(RowID = 1:nrow(.)) %>%
   rename(Key = Item)
 
-MaterialsAlias <- read.csv("Taxonomy/Website/Materials_Alias.csv") %>%
-  mutate(RowID = 1:nrow(.)) %>%
+MaterialsAlias <- read.csv("Taxonomy/Website/Materials_Alias_V2.csv") %>%
+  #mutate(RowID = 1:nrow(.)) %>%
   rename(Key = Material)
 
 #Data Processing ----
 
-DF <- site_data_cleaned %>%
+Material_DF <- site_data_cleaned %>%
+  mutate_all(removeslash) %>%
   group_by(Material_TT) %>%
   summarise(Count = n()) %>%
   ungroup()
 
-DF2 <- site_data_cleaned %>%
+Item_DF <- site_data_cleaned %>%
+  mutate_all(removeslash) %>%
   group_by(Item_TT) %>%
   summarise(Count = n()) %>%
-  ungroup()
+  ungroup() 
 
-unmatched <- DF2 %>%
+unmatched <- Item_DF %>%
   mutate_all(cleantext) %>%
-  anti_join(ItemsAlias, by = c("Item_TT" = "Alias"))
+  anti_join(ItemsAlias %>%
+              mutate_all(cleantext), by = c("Item_TT" = "Alias"))
 
-#Output for lumping analysis ----
-DFA <- jointohierarchy(DF2, Hierarchy = ItemsHierarchy, Alias = ItemsAlias, ColNum = 1)%>%
-  add_row(Level.1 = "missing", sum = sum(DF2$Count) - sum(.$sum)) #May need to be changed to X1 or Level.1 depending on the hierarchy dataset. Should clean them up.
+MaterialTreeDF <- AggregateTrees(DF = Material_DF, Alias = MaterialsAlias, Hierarchy = MaterialsHierarchy)
 
-
-ItemTree <- AggregateTrees(DF2,  Alias = ItemsAlias, Hierarchy = ItemsHierarchy, ColNum = 1)
-ItemTreedf <- ToDataFrameNetwork(ItemTree, "totalsum") 
-
-ItemTreedf_clean <- ItemTreedf %>%
-  add_row(from = "trash", to = "", totalsum = sum(ItemTreedf %>%
-                                                    filter(from == "trash") %>% 
-                                                    pull(totalsum)))
 
 plot_ly() %>%
   add_trace(
     #ids = d2$ids,
-    labels = ItemTreedf_clean$to,
-    parents = ItemTreedf_clean$from,
+    labels = MaterialTreeDF$to,
+    parents = MaterialTreeDF$from,
     type = 'sunburst',
-    maxdepth = 2,
+    maxdepth = 4,
     domain = list(column = 1), 
     branchvalues = 'total',
-    values = ItemTreedf_clean$totalsum)
+    values = MaterialTreeDF$totalsum)
 
-df_test = read.csv('https://raw.githubusercontent.com/plotly/datasets/718417069ead87650b90472464c7565dc8c2cb1c/coffee-flavors.csv')
-#Next add plotly figure with this df. 
+ItemTreeDF <- AggregateTrees(DF = Item_DF, Alias = ItemsAlias, Hierarchy = ItemsHierarchy)
 
-MaterialTree <- AggregateTrees(DF,  Alias = MaterialsAlias, Hierarchy = MaterialsHierarchy, ColNum = 1)
-MaterialTreedf <- ToDataFrameNetwork(MaterialTree, "totalsum")
+
+plot_ly() %>%
+  add_trace(
+    #ids = d2$ids,
+    labels = ItemTreeDF$to,
+    parents = ItemTreeDF$from,
+    type = 'sunburst',
+    maxdepth = 4,
+    domain = list(column = 1), 
+    branchvalues = 'total',
+    values = ItemTreeDF$totalsum)
 
 #Figures of the hierarchy trees ----
 collapsibleTree(

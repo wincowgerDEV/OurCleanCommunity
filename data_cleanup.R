@@ -1,5 +1,25 @@
 library(data.table)
 library(dplyr)
+library(data.tree)
+
+
+#Functions ----
+converttotree <- function(x){
+    #x[is.na(x)] <- ""
+    x <-mutate(x, key = "trash") %>%
+        #mutate(sum = as.numeric(sum)) %>%
+        dplyr::relocate(key) %>%
+        #dplyr::group_by(across(c(-sum))) %>%
+        #dplyr::summarise(sum = sum(sum)) %>%
+        unite(pathString, sep = "||", na.rm = T) ##Seems like we may be losing some of the sums here, would expect original values to be equal to the summed.
+    y <- FromDataFrameTable(x, pathDelimiter = "||")
+    ToDataFrameNetwork(y)
+}
+
+removeslash <- function(x){
+    gsub("/", " OR ", x)
+}
+
 
 #Find valid users ----
 data <- fread("Litterati-Partners.csv")
@@ -66,6 +86,10 @@ data_reconciled_cleaned <- data_reconciled %>%
         Item_TT == "tubecontainer" ~ "containers/tubes",                
         Item_TT == "wrapper" ~ "wrappers",
         TRUE ~ Item_TT
+    )) %>%
+    mutate(Material_TT = case_when(
+        Material_TT == "hard plastic" ~ "hard plastics",
+        TRUE ~ Material_TT
     ))
 
 fwrite(data_reconciled_cleaned, "StudyAreas/User_Cleaned_Data/reconciled_cleaned.csv")
@@ -85,7 +109,14 @@ data_reconciled_cleaned %>%
     pull(Name) %>%
     unique()
 
-#Item Alias Cleanup
+#Alias Cleanup
+
+MaterialsAlias <- read.csv("Taxonomy/Website/Materials_Alias.csv") %>%
+    mutate_all(removeslash)
+
+fwrite(MaterialsAlias, "Taxonomy/Website/Materials_Alias_V2.csv")
+
+
 ItemsAlias <- read.csv("Taxonomy/Website/Items_Alias.csv")
 
 SameItemsAlias <- read.csv("Taxonomy/Website/Items_Alias.csv") %>%
@@ -99,6 +130,26 @@ AddItemsAlias <- read.csv("Taxonomy/Website/Items_Alias.csv") %>%
     anti_join(SameItemsAlias) %>%
     mutate(Alias = Item) 
 
-ItemsAlias_V2 <- bind_rows(ItemsAlias, AddItemsAlias)
+ItemsAlias_V2 <- bind_rows(ItemsAlias, AddItemsAlias) %>%
+    mutate_all(removeslash)
 
 fwrite(ItemsAlias_V2, "Taxonomy/Website/Items_Alias_V2.csv")
+
+#Hierarchy reform to tree merge easy
+
+ItemsHierarchy <- read.csv("Taxonomy/Website/Items_Hierarchy.csv")
+
+ItemsHierarchy_new <- converttotree(ItemsHierarchy)
+
+fwrite(ItemsHierarchy_new, "Taxonomy/Website/Items_Hierarchy_V2.csv")
+
+#Test items not matched 
+
+MaterialsHierarchy <- read.csv("Taxonomy/Website/Materials_Hierarchy.csv") %>%
+    mutate_all(removeslash)
+
+MaterialsHierarchy_new <- converttotree(MaterialsHierarchy)
+
+fwrite(MaterialsHierarchy_new, "Taxonomy/Website/Materials_Hierarchy_V2.csv")
+
+
