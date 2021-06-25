@@ -12,6 +12,8 @@ One note, some people are calling cigarette butts paper and others are calling i
 After reconciling I made the datasheet Total Merge Reconcile. 
 Need to set any brand that doesn't match to "other" and NA values. 
 Removed Hannah's days. 
+Removed Hinas first day, was in a different location, only one piece of litter found compared to tens other days. 
+
 
 Lookup census data
 https://www.census.gov/data/academy/data-gems/2020/how-to-access-data-for-your-neighborhood.html

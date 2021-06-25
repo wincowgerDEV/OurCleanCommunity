@@ -1,88 +1,87 @@
-Name,Day,Street Sweeping Schedule,Weekend,Sweeping
-Site 1,10/28/2018,1st and 3rd Tuesday PM,,
-Site 1,10/31/2018,1st and 3rd Tuesday PM,Y,N
-Site 1,11/2/2018,1st and 3rd Tuesday PM,N,N
-Site 1,11/3/2018,1st and 3rd Tuesday PM,Y,N
-Site 1,11/7/2018,1st and 3rd Tuesday PM,Y,Y
-Site 1,11/9/2018,1st and 3rd Tuesday PM,N,N
-Site 1,11/11/2018,1st and 3rd Tuesday PM,Y,N
-Site 1,11/13/2018,1st and 3rd Tuesday PM,Y,N
-Site 1,11/15/2018,1st and 3rd Tuesday PM,N,N
-Site 1,11/18/2018,1st and 3rd Tuesday PM,Y,N
-Site 1,11/21/2018,1st and 3rd Tuesday PM,Y,Y
-Site 1,11/22/2018,1st and 3rd Tuesday PM,N,N
-Site 1,11/24/2018,1st and 3rd Tuesday PM,Y,N
-Site 2,10/24/2019,2nd and 4th Wednesday AM,,
-Site 2,11/2/2019,2nd and 4th Wednesday AM,Y,N
-Site 2,11/7/2019,2nd and 4th Wednesday AM,Y,N
-Site 2,11/9/2019,2nd and 4th Wednesday AM,Y,N
-Site 2,11/10/2019,2nd and 4th Wednesday AM,Y,N
-Site 2,11/11/2019,2nd and 4th Wednesday AM,Y,N
-Site 2,11/14/2019,2nd and 4th Wednesday AM,N,Y
-Site 3,10/28/2019,2nd and 4th Tuesday AM,,
-Site 3,11/1/2019,2nd and 4th Tuesday AM,N,Y
-Site 3,11/2/2019,2nd and 4th Tuesday AM,Y,N
-Site 3,11/6/2019,2nd and 4th Tuesday AM,Y,N
-Site 3,11/8/2019,2nd and 4th Tuesday AM,N,N
-Site 3,11/9/2019,2nd and 4th Tuesday AM,Y,N
-Site 3,11/11/2019,2nd and 4th Tuesday AM,Y,N
-Site 3,11/15/2019,2nd and 4th Tuesday AM,N,Y
-Site 3,11/16/2019,2nd and 4th Tuesday AM,Y,N
-Site 3,11/18/2019,2nd and 4th Tuesday AM,Y,N
-Site 3,11/20/2019,2nd and 4th Tuesday AM,N,N
-Site 3,11/22/2019,2nd and 4th Tuesday AM,N,N
-Site 4,10/27/2018,"weird Wednesday 1st and 3rd and 5th if available Zone 1A, https://sandimasca.gov/street-sweeping-calendar/2021-10/ second and forth unless 5 weeks then 1st third and 5th. ",,
-Site 4,11/1/2018,"weird Wednesday 1st and 3rd and 5th if available Zone 1A, https://sandimasca.gov/street-sweeping-calendar/2021-10/",Y,Y
-Site 4,11/8/2018,"weird Wednesday 1st and 3rd and 5th if available Zone 1A, https://sandimasca.gov/street-sweeping-calendar/2021-10/",Y,N
-Site 4,11/9/2018,"weird Wednesday 1st and 3rd and 5th if available Zone 1A, https://sandimasca.gov/street-sweeping-calendar/2021-10/",N,N
-Site 4,11/13/2018,"weird Wednesday 1st and 3rd and 5th if available Zone 1A, https://sandimasca.gov/street-sweeping-calendar/2021-10/",Y,N
-Site 4,11/16/2018,"weird Wednesday 1st and 3rd and 5th if available Zone 1A, https://sandimasca.gov/street-sweeping-calendar/2021-10/",N,Y
-Site 4,11/25/2018,"weird Wednesday 1st and 3rd and 5th if available Zone 1A, https://sandimasca.gov/street-sweeping-calendar/2021-10/",Y,N
-Site 4,11/26/2018,"weird Wednesday 1st and 3rd and 5th if available Zone 1A, https://sandimasca.gov/street-sweeping-calendar/2021-10/",Y,N
-Site 5,10/29/2018,2nd and 4th Wednesday AM,,
-Site 5,10/30/2018,2nd and 4th Wednesday AM,N,N
-Site 5,10/31/2018,2nd and 4th Wednesday AM,N,N
-Site 5,11/6/2018,2nd and 4th Wednesday AM,Y,N
-Site 5,11/11/2018,2nd and 4th Wednesday AM,Y,N
-Site 5,11/17/2018,2nd and 4th Wednesday AM,Y,Y
-Site 5,11/21/2018,2nd and 4th Wednesday AM,Y,N
-Site 5,11/24/2018,2nd and 4th Wednesday AM,Y,N
-Site 5,11/25/2018,2nd and 4th Wednesday AM,Y,N
-Site 5,11/26/2018,2nd and 4th Wednesday AM,Y,N
-Site 5,11/28/2018,2nd and 4th Wednesday AM,N,Y
-Site 5,12/1/2018,2nd and 4th Wednesday AM,Y,Y
-Site 5,12/3/2018,2nd and 4th Wednesday AM,Y,N
-Site 5,12/4/2018,2nd and 4th Wednesday AM,N,N
-Site 5,12/5/2018,2nd and 4th Wednesday AM,N,N
-Site 5,12/9/2018,2nd and 4th Wednesday AM,Y,N
-Site 6,10/25/2018,? 2nd and 4th Friday am? Area not colored on map.,,
-Site 6,10/26/2018,? 2nd and 4th Friday am? Area not colored on map.,,
-Site 6,10/31/2018,? 2nd and 4th Friday am? Area not colored on map.,,
-Site 6,11/1/2018,? 2nd and 4th Friday am? Area not colored on map.,,
-Site 6,11/2/2018,? 2nd and 4th Friday am? Area not colored on map.,,
-Site 6,11/7/2018,? 2nd and 4th Friday am? Area not colored on map.,,
-Site 6,11/9/2018,? 2nd and 4th Friday am? Area not colored on map.,,
-Site 6,11/10/2018,? 2nd and 4th Friday am? Area not colored on map.,,
-Site 6,11/16/2018,? 2nd and 4th Friday am? Area not colored on map.,,
-Site 6,11/17/2018,? 2nd and 4th Friday am? Area not colored on map.,,
-Site 6,11/21/2018,? 2nd and 4th Friday am? Area not colored on map.,,
-Site 6,11/27/2018,? 2nd and 4th Friday am? Area not colored on map.,,
-Site 6,11/29/2018,? 2nd and 4th Friday am? Area not colored on map.,,
-Site 7A,9/16/2018,2nd and 4th Friday AM,,
-Site 7A,9/18/2018,2nd and 4th Friday AM,Y,N
-Site 7A,9/21/2018,2nd and 4th Friday AM,N,N
-Site 7A,9/25/2018,2nd and 4th Friday AM,Y,N
-Site 7A,9/26/2018,2nd and 4th Friday AM,N,N
-Site 7A,9/28/2018,2nd and 4th Friday AM,N,Y
-Site 7A,10/1/2018,2nd and 4th Friday AM,Y,Y
-Site 7A,10/3/2018,2nd and 4th Friday AM,N,N
-Site 7A,10/6/2018,2nd and 4th Friday AM,Y,N
-Site 7A,10/8/2018,2nd and 4th Friday AM,Y,N
-Site 7A,10/11/2018,2nd and 4th Friday AM,N,N
-Site 7A,10/12/2018,2nd and 4th Friday AM,N,Y
-Site 7B,3/23/2020,2nd and 4th Friday AM,,
-Site 7B,3/26/2020,2nd and 4th Friday AM,N,N
-Site 7B,3/30/2020,2nd and 4th Friday AM,Y,Y
-Site 7B,4/2/2020,2nd and 4th Friday AM,N,N
-Site 7B,4/3/2020,2nd and 4th Friday AM,N,N
-Site 7B,4/5/2020,2nd and 4th Friday AM,Y,N
+Name,Day,Street Sweeping Schedule
+Site 7A,10/1/2018,2nd and 4th Friday AM
+Site 4,11/1/2018,"weird Wednesday 1st and 3rd and 5th if available Zone 1A, https://sandimasca.gov/street-sweeping-calendar/2021-10/"
+Site 3,11/1/2019,2nd and 4th Tuesday AM
+Site 5,12/1/2018,2nd and 4th Wednesday AM
+Site 2,11/2/2019,2nd and 4th Wednesday AM
+Site 3,11/2/2019,2nd and 4th Tuesday AM
+Site 7A,10/3/2018,2nd and 4th Friday AM
+Site 5,12/3/2018,2nd and 4th Wednesday AM
+Site 5,12/4/2018,2nd and 4th Wednesday AM
+Site 5,12/5/2018,2nd and 4th Wednesday AM
+Site 7A,10/6/2018,2nd and 4th Friday AM
+Site 5,11/6/2018,2nd and 4th Wednesday AM
+Site 3,11/6/2019,2nd and 4th Tuesday AM
+Site 1,11/7/2018,1st and 3rd Tuesday PM
+Site 2,11/7/2019,2nd and 4th Wednesday AM
+Site 7A,10/8/2018,2nd and 4th Friday AM
+Site 4,11/8/2018,"weird Wednesday 1st and 3rd and 5th if available Zone 1A, https://sandimasca.gov/street-sweeping-calendar/2021-10/"
+Site 3,11/8/2019,2nd and 4th Tuesday AM
+Site 1,11/9/2018,1st and 3rd Tuesday PM
+Site 4,11/9/2018,"weird Wednesday 1st and 3rd and 5th if available Zone 1A, https://sandimasca.gov/street-sweeping-calendar/2021-10/"
+Site 3,11/9/2019,2nd and 4th Tuesday AM
+Site 2,11/9/2019,2nd and 4th Wednesday AM
+Site 5,12/9/2018,2nd and 4th Wednesday AM
+Site 2,11/10/2019,2nd and 4th Wednesday AM
+Site 7A,10/11/2018,2nd and 4th Friday AM
+Site 1,11/11/2018,1st and 3rd Tuesday PM
+Site 5,11/11/2018,2nd and 4th Wednesday AM
+Site 2,11/11/2019,2nd and 4th Wednesday AM
+Site 3,11/11/2019,2nd and 4th Tuesday AM
+Site 7A,10/12/2018,2nd and 4th Friday AM
+Site 1,11/13/2018,1st and 3rd Tuesday PM
+Site 4,11/13/2018,"weird Wednesday 1st and 3rd and 5th if available Zone 1A, https://sandimasca.gov/street-sweeping-calendar/2021-10/"
+Site 2,11/14/2019,2nd and 4th Wednesday AM
+Site 1,11/15/2018,1st and 3rd Tuesday PM
+Site 3,11/15/2019,2nd and 4th Tuesday AM
+Site 7A,9/16/2018,2nd and 4th Friday AM
+Site 6,11/16/2018,? 2nd and 4th Friday am? Area not colored on map.
+Site 4,11/16/2018,"weird Wednesday 1st and 3rd and 5th if available Zone 1A, https://sandimasca.gov/street-sweeping-calendar/2021-10/"
+Site 3,11/16/2019,2nd and 4th Tuesday AM
+Site 5,11/17/2018,2nd and 4th Wednesday AM
+Site 6,11/17/2018,? 2nd and 4th Friday am? Area not colored on map.
+Site 7A,9/18/2018,2nd and 4th Friday AM
+Site 1,11/18/2018,1st and 3rd Tuesday PM
+Site 3,11/18/2019,2nd and 4th Tuesday AM
+Site 3,11/20/2019,2nd and 4th Tuesday AM
+Site 7A,9/21/2018,2nd and 4th Friday AM
+Site 6,11/21/2018,? 2nd and 4th Friday am? Area not colored on map.
+Site 1,11/21/2018,1st and 3rd Tuesday PM
+Site 5,11/21/2018,2nd and 4th Wednesday AM
+Site 1,11/22/2018,1st and 3rd Tuesday PM
+Site 3,11/22/2019,2nd and 4th Tuesday AM
+Site 1,11/24/2018,1st and 3rd Tuesday PM
+Site 5,11/24/2018,2nd and 4th Wednesday AM
+Site 7A,9/25/2018,2nd and 4th Friday AM
+Site 5,11/25/2018,2nd and 4th Wednesday AM
+Site 4,11/25/2018,"weird Wednesday 1st and 3rd and 5th if available Zone 1A, https://sandimasca.gov/street-sweeping-calendar/2021-10/"
+Site 7A,9/26/2018,2nd and 4th Friday AM
+Site 5,11/26/2018,2nd and 4th Wednesday AM
+Site 4,11/26/2018,"weird Wednesday 1st and 3rd and 5th if available Zone 1A, https://sandimasca.gov/street-sweeping-calendar/2021-10/"
+Site 4,10/27/2018,"weird Wednesday 1st and 3rd and 5th if available Zone 1A, https://sandimasca.gov/street-sweeping-calendar/2021-10/"
+Site 6,11/27/2018,? 2nd and 4th Friday am? Area not colored on map.
+Site 7A,9/28/2018,2nd and 4th Friday AM
+Site 3,10/28/2019,2nd and 4th Tuesday AM
+Site 5,11/28/2018,2nd and 4th Wednesday AM
+Site 5,10/29/2018,2nd and 4th Wednesday AM
+Site 6,11/29/2018,? 2nd and 4th Friday am? Area not colored on map.
+Site 5,10/30/2018,2nd and 4th Wednesday AM
+Site 5,10/31/2018,2nd and 4th Wednesday AM
+Site 6,11/1/2018,? 2nd and 4th Friday am? Area not colored on map.
+Site 6,11/2/2018,? 2nd and 4th Friday am? Area not colored on map.
+Site 1,11/2/2018,1st and 3rd Tuesday PM
+Site 1,11/3/2018,1st and 3rd Tuesday PM
+Site 6,11/7/2018,? 2nd and 4th Friday am? Area not colored on map.
+Site 6,11/9/2018,? 2nd and 4th Friday am? Area not colored on map.
+Site 6,11/10/2018,? 2nd and 4th Friday am? Area not colored on map.
+Site 6,10/25/2018,? 2nd and 4th Friday am? Area not colored on map.
+Site 6,10/26/2018,? 2nd and 4th Friday am? Area not colored on map.
+Site 1,10/28/2018,1st and 3rd Tuesday PM
+Site 6,10/31/2018,? 2nd and 4th Friday am? Area not colored on map.
+Site 1,10/31/2018,1st and 3rd Tuesday PM
+Site 7B,4/2/2020,2nd and 4th Friday AM
+Site 7B,4/5/2020,2nd and 4th Friday AM
+Site 7B,3/23/2020,2nd and 4th Friday AM
+Site 7B,3/26/2020,2nd and 4th Friday AM
+Site 7B,3/30/2020,2nd and 4th Friday AM
+Site 7B,4/3/2020,2nd and 4th Friday AM

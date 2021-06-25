@@ -3,7 +3,7 @@
 
 #Libraries ----
 library(readxl)
-library(dplyr)
+#library(dplyr)
 library(ggplot2)
 library(ggmap)
 library(cowplot)
@@ -27,6 +27,12 @@ library(circular)
 library(geosphere)
 #devtools::install_github(repo = "michaelmalick/r-malick")
 library(malick)
+library(collapsibleTree)
+#library(dplyr)
+#library(tidyr)
+library(data.tree)
+library(plotly)
+library(ggdark)
 
 #Functions ----
 #Function returns the difference between two bearings
@@ -52,7 +58,208 @@ differenceofmean <- function(startdate, enddate){
     ifelse(.<0, .+360, .)
 }
 
+#https://www.flutterbys.com.au/stats/tut/tut13.2.html
+calc_shannon <- function(community) {
+  p <- table(community)/length(community) # Find proportions
+  p <- p[p > 0] # Get rid of zero proportions (log zero is undefined)
+  -sum(p * log(p)) # Calculate index
+}
+
+calc_simpson <- function(community) {
+  p <- table(community)/length(community) # Find proportions
+  1 / sum(p^2) # Calculate index
+}
+
+calc_menshinicks <- function(community) {
+  p <- length(unique(community))/sqrt(length(community)) # Find proportions
+  p # Calculate index
+}
+
+calc_numgroups <- function(community) {
+  p <- length(unique(community)) # Find proportions
+  p # Calculate index
+}
+
+cleantext <- function(x) {
+  tolower(gsub("[[:space:]]", "", x))
+}
+
+not_all_na <- function(x) any(!is.na(x))
+
+#requires alias to have Alias, RowID and Key columns, requires DF to have a count column and some column to match
+jointohierarchy <- function(DF, Hierarchy, Alias, ColNum) {
+  DF <- mutate_all(DF, cleantext) %>%
+    mutate(Count = as.numeric(Count))
+  Hierarchy <- mutate_all(Hierarchy, cleantext)
+  Alias <- mutate_all(Alias, cleantext) %>%
+    mutate(RowID = as.integer(RowID))
+  
+  DF$RowID <- unlist(apply(DF, 1, function(x) which(Alias == as.character(x[ColNum]), arr.ind = TRUE)[1]))
+  
+  DF <- DF %>%
+    left_join(dplyr::select(Alias, RowID, Key)) %>%
+    dplyr::select(Key, Count) %>%
+    mutate(Key = ifelse(is.na(Key), "other", Key))
+  
+  list <- apply(DF, 1, function(x) which(Hierarchy == as.character(x[1]), arr.ind = TRUE))
+  
+  for(n in 1:length(list)){
+    if(length(list[[n]]) == 0) next
+    DF[n, "Row"] <- unname(list[[n]][1,1])
+    DF[n, "Column"] <- unname(list[[n]][1,2])
+  }
+  
+  RowColSum <- DF %>%
+    group_by(Row, Column) %>%
+    summarise(sum = sum(Count)) %>%
+    filter(!is.na(Row)) #This one of the culprits, the rows aren't being matched so they are being dropped and we need some backup mechanism. 
+  
+  HierarcyFinalForm <- Hierarchy[0,]
+  HierarcyFinalForm$sum <- numeric()
+  
+  row = 25
+  for(row in 1:nrow(RowColSum)){
+    filter1 <- Hierarchy %>%
+      filter(.[[1]] == Hierarchy[unlist(RowColSum[row, "Row"]),1])
+    filter2 <- filter1 %>%
+      filter_all(any_vars(. == Hierarchy[unlist(RowColSum[row, "Row"]),unlist(RowColSum[row, "Column"])])) %>%
+      dplyr::select(where(not_all_na)) %>%
+      mutate(sum = unlist(RowColSum[row, "sum"]))
+    
+    if(unlist(RowColSum[row, "Column"]) < ncol(filter2)-1) {
+      filter2[,(unlist(RowColSum[row, "Column"])+1):(ncol(filter2)-1)] <- NA
+    }
+    filter2 <- filter2 %>%
+      distinct()
+    
+    #print(sum(filter2$sum) == sum(RowColSum[row, "sum"]))
+    
+    HierarcyFinalForm <- bind_rows(HierarcyFinalForm, filter2)
+  }
+  
+  test <-  HierarcyFinalForm %>%
+    mutate_if(is.character, as.factor) %>%
+    mutate(sum = as.numeric(unname(sum))) %>%
+    dplyr::group_by(across(c(-sum))) %>%
+    summarise(sum = sum(sum)) %>%
+    ungroup() %>%
+    mutate_if(is.factor, as.character) 
+  
+}
+
+removeslash <- function(x){
+  gsub("/", " OR ", x)
+}
+
+converttotree <- function(x){
+  #x[is.na(x)] <- ""
+  x <- mutate_all(x, removeslash) %>%
+    mutate(key = "trash") %>%
+    mutate(sum = as.numeric(sum)) %>%
+    dplyr::relocate(key) %>%
+    dplyr::group_by(across(c(-sum))) %>%
+    dplyr::summarise(sum = sum(sum)) %>%
+    unite(pathString, sep = "/", na.rm = T, -sum) ##Seems like we may be losing some of the sums here, would expect original values to be equal to the summed.
+  FromDataFrameTable(x)
+}
+
+#check out this: https://stackoverflow.com/questions/45225671/aggregating-values-on-a-data-tree-with-r
+myApply <- function(node) {
+  node$totalsum <- 
+    sum(c(node$sum, purrr::map_dbl(node$children, myApply)), na.rm = TRUE)
+}
+
+#DF2 <- SMC
+#Hierarchy <- ItemsHierarchy
+#Alias <- ItemsAlias
+#ColNum <- 2
+
+
+AggregateTrees <- function(DF1, Alias, Hierarchy, ColNum){
+  DFA <- jointohierarchy(DF = DF1, Hierarchy = Hierarchy, Alias = Alias, ColNum = ColNum)%>%
+    add_row(X1 = "missing", sum = sum(DF1$Count) - sum(.$sum)) #May need to be changed to X1 or Level.1 depending on the hierarchy dataset. Should clean them up.
+  
+  bindedtree <- converttotree(DFA)  
+  
+  myApply(bindedtree)
+  
+  bindedtree
+  
+}
+
+theme_rainplot<- function (base_size = 11, base_family = "Arial") 
+{
+  half_line <- base_size/2
+  theme(
+    line = element_line(colour = "black", size = rel(1.5), 
+                        linetype = 1, lineend = "butt"), 
+    rect = element_rect(fill = NA, colour = "black",
+                        size = 0.5, linetype = 1),
+    text = element_text(family = base_family, face = "plain",
+                        colour = "black", size = base_size,
+                        lineheight = 0.9,  hjust = 0.5,
+                        vjust = 0.5, angle = 0, 
+                        margin = margin(), debug = FALSE), 
+    
+    axis.line = element_line(size = 2, color = "black"), 
+    axis.text = element_text(family= "Arial", size = rel(1.5), colour = "grey10"),
+    axis.text.x = element_text(margin = margin(t = half_line/2), 
+                               vjust = 1), 
+    axis.text.y = element_blank(),
+    axis.ticks = element_line(colour = "black", size=1), 
+    axis.ticks.length = unit(half_line*0.75, "pt"), 
+    axis.title = element_text(family="Arial",size = rel(1.5), colour = "black"),
+    axis.title.x = element_text(margin = margin(t = half_line*5,
+                                                b = half_line)),
+    axis.title.y = element_text(angle = 90, 
+                                margin = margin(r = half_line*5,
+                                                l = half_line)),
+    
+    legend.background = element_rect(colour = NA), 
+    legend.key = element_rect(colour = NA),
+    legend.key.size = unit(2, "lines"), 
+    legend.key.height = NULL,
+    legend.key.width = NULL, 
+    legend.text = element_text(family = "Arial", size = rel(1)),
+    legend.text.align = NULL,
+    legend.title = element_text(family = "Arial", size = rel(1)), 
+    legend.title.align = NULL, 
+    legend.position = "right", 
+    legend.direction = NULL,
+    legend.justification = "center", 
+    legend.box = NULL, 
+    
+    panel.background = element_blank(),
+    panel.border = element_blank(),
+    panel.grid.major = element_blank(), 
+    panel.grid.minor = element_blank(), 
+    panel.spacing = unit(half_line, "pt"), panel.margin.x = NULL, 
+    panel.spacing.y = NULL, panel.ontop = FALSE, 
+    
+    #Facet Labels
+    strip.background = element_blank(),
+    strip.text = element_text(family = "Arial",face="bold",colour = "black", size = rel(1.5)),
+    strip.text.x = element_text(margin = margin(t = half_line,
+                                                b = half_line)), 
+    strip.text.y = element_text(angle = 0, 
+                                margin = margin(l = half_line, 
+                                                r = half_line)),
+    strip.switch.pad.grid = unit(5, "lines"),
+    strip.switch.pad.wrap = unit(5, "lines"), 
+    
+    
+    plot.background = element_blank(), 
+    plot.title = element_text(size = rel(1.5), 
+                              margin = margin(b = half_line * 1.2)),
+    plot.margin = margin(4*half_line, 4*half_line, 4*half_line, 4*half_line),
+    complete = TRUE)
+}
+
+
 #Datasets ----
+
+source("https://gist.githubusercontent.com/benmarwick/2a1bb0133ff568cbe28d/raw/fb53bd97121f7f9ce947837ef1a4c65a73bffb3f/geom_flat_violin.R")
+
 
 CompleteDataWithGoogle <- read.csv("CompleteDataWithGoogle.csv") %>%
   mutate(startdate = as.Date(dateprintedcleaned, "%Y-%m-%d"), enddate =  as.Date(TimestampDatecleaned, "%Y-%m-%d"))
@@ -108,6 +315,8 @@ input_rate <- site_data_cleaned %>%
   ungroup() 
 
 ggplot(input_rate) + geom_boxplot(aes(x = Name, y = generationrate, color = Weekend), notch = T) + scale_y_log10()
+ggplot(input_rate) + geom_boxplot(aes(x = Name, y = generationrate, color = Sweeping), notch = T) + scale_y_log10()
+
 
 ggplot(input_rate) + geom_boxplot(aes(y = generationrate, color = Weekend), notch = T) + scale_y_log10()
 ggplot(input_rate) + geom_boxplot(aes(y = generationrate, color = Sweeping), notch = T) + scale_y_log10()
@@ -115,11 +324,20 @@ ggplot(input_rate) + geom_boxplot(aes(y = generationrate, color = Sweeping), not
 #ggplot(input_rate) + geom_point(aes(x = Date, y = generationrate), notch = T) + scale_y_log10()
 # get all the start and end points
 
-ggplot(input_rate, aes(x = Date, y = generationrate, color = Sweeping, shape = Weekend)) + 
+ggplot(input_rate, aes(x = Name, y = generationrate)) + 
+  geom_boxplot(notch = T) + 
+  #geom_smooth(method = "lm") +
+  #geom_tile(aes(y=weekends$weekend*max(generationrate)), fill="yellow") +
+  #facet_wrap(Name ~., scales = "free_x") + 
+  theme_bw() + 
+  labs(y = "Generation Rate #/Day/m") + 
+  scale_y_log10() 
+
+ggplot(input_rate, aes(x = Date, y = generationrate)) + 
   geom_point() + 
   #geom_smooth(method = "lm") +
   #geom_tile(aes(y=weekends$weekend*max(generationrate)), fill="yellow") +
-  facet_wrap(Name ~., scales = "free") + 
+  facet_wrap(Name ~., scales = "free_x") + 
   theme_bw() + 
   labs(y = "Generation Rate #/Day/m") + 
   scale_y_log10() + 
@@ -175,7 +393,7 @@ ggplot(mean_input_rate) +
 material_composition <- site_data_cleaned %>%
   #filter(user_id == 92684) %>%
   #mutate(Date = substr(photo_timestamp,1,nchar(photo_timestamp)-3)) %>%
-  mutate(Date = as.Date(Day, format = "%m/%d/%Y")) %>%
+  #mutate(Date = as.Date(Day, format = "%m/%d/%Y")) %>%
   #mutate(Date = as.Date(timestamp)) %>%
   group_by(Date, Name, Material_TT) %>%
   summarise(Intensity = n()) %>%
@@ -189,37 +407,21 @@ ggplot(arrange(material_composition, Date, Name, Intensity), aes(fill=Material_T
 
 
 #Trash Diversity
-#https://www.flutterbys.com.au/stats/tut/tut13.2.html
-calc_shannon <- function(community) {
-  p <- table(community)/length(community) # Find proportions
-  p <- p[p > 0] # Get rid of zero proportions (log zero is undefined)
-  -sum(p * log(p)) # Calculate index
-}
-
-calc_simpson <- function(community) {
-  p <- table(community)/length(community) # Find proportions
-  1 / sum(p^2) # Calculate index
-}
-
-calc_menshinicks <- function(community) {
-  p <- length(unique(community))/sqrt(length(community)) # Find proportions
-  p # Calculate index
-}
-
-calc_numgroups <- function(community) {
-  p <- length(unique(community)) # Find proportions
-  p # Calculate index
-}
-
 material_diversity <- site_data_cleaned %>%
   #filter(user_id == 92684) %>%
   #mutate(Date = substr(photo_timestamp,1,nchar(photo_timestamp)-3)) %>%
   mutate(Date = as.Date(Day, format = "%m/%d/%Y")) %>%
   group_by(Date, Name) %>%
-  dplyr::summarise(shannon = calc_shannon(Item_TT),
-                   simpson = calc_simpson(Item_TT),
-                   menhincks = calc_menshinicks(Item_TT),
-                   numgroups = calc_numgroups(Item_TT))
+  dplyr::summarise(shannon = calc_shannon(Material_TT),
+                   simpson = calc_simpson(Material_TT),
+                   menhincks = calc_menshinicks(Material_TT),
+                   numgroups = calc_numgroups(Material_TT)) %>%
+  mutate(evenness = shannon/log(numgroups))
+
+ggplot(material_diversity, aes(x = evenness, y = numgroups, color = Name)) +
+  geom_point() + 
+  scale_color_viridis_d(option = "B") + 
+  theme_bw()
 
 ggplot(material_diversity) + 
   geom_point(aes(x = Date, y = shannon)) + 
@@ -234,6 +436,53 @@ ggplot(material_diversity) +
   labs(y = "Diversity") + 
   #scale_y_log10() + 
   scale_x_date(date_minor_breaks = "1 week")
+
+
+#Data sets ----
+ItemsHierarchy <- read.csv("Taxonomy/ITEMSHierarchyLower.csv")
+
+MaterialsHierarchy <- read.csv("Taxonomy/MaterialsHierarchyLower.csv") 
+
+ItemsAlias <- read.csv("Taxonomy/PrimeItems.csv")%>%
+  mutate(RowID = 1:nrow(.)) %>%
+  rename(Key = Item)
+
+MaterialsAlias <- read.csv("Taxonomy/PrimeMaterials.csv") %>%
+  mutate(RowID = 1:nrow(.)) %>%
+  rename(Key = Material)
+
+ItemsHierarchy <- ItemsHierarchy %>%
+  rename(X1 = Level.1)
+#Data Processing ----
+
+DF <- site_data_cleaned %>%
+  group_by(Material_TT) %>%
+  summarise(Count = n())
+
+DF2 <- site_data_cleaned %>%
+  group_by(Item_TT) %>%
+  summarise(Count = n())
+
+#Output for lumping analysis ----
+DFA <- jointohierarchy(DF2, Hierarchy = ItemsHierarchy, Alias = ItemsAlias, ColNum = 1)%>%
+  add_row(X1 = "missing", sum = sum(DF2$Count) - sum(.$sum)) #May need to be changed to X1 or Level.1 depending on the hierarchy dataset. Should clean them up.
+
+
+ItemTree <- AggregateTrees(DF2,  Alias = ItemsAlias, Hierarchy = ItemsHierarchy, ColNum = 1)
+ItemTreedf <- ToDataFrameNetwork(ItemTree, "totalsum")
+#Next add plotly figure with this df. 
+
+MaterialTree <- AggregateTrees(DF,  Alias = MaterialsAlias, Hierarchy = MaterialsHierarchy, ColNum = 1)
+MaterialTreedf <- ToDataFrameNetwork(MaterialTree, "totalsum")
+
+#Figures of the hierarchy trees ----
+collapsibleTree(
+  MaterialsHierarchy, hierarchy = c(names(MaterialsHierarchy)), collapsed = F, fontSize = 30, zoomable = T
+)
+
+collapsibleTree(
+  ItemsHierarchy, hierarchy = c(names(ItemsHierarchy)), fontSize = 20, zoomable = T, width = 3000, height = 1000
+)
 
 #Trip Distances ----
 #Was thinking that we should limit this to work trips but I don't think so any more. 
@@ -427,86 +676,15 @@ ggplot(CompleteDataWithGoogle, aes(x = "differnce", y = differencebearings)) + g
 CompleteDataWithGoogle %>%
   filter(!is.na(dateprintedcleaned) & !is.na(TimestampDatecleaned)) %>%
   group_by(precip) %>%
-  summarise(count = n())
+  summarise(count = n()) %>%
+  ggplot() + geom_col(aes(x = precip, y = count))
 
-library(ggdark)
 ggplot(CompleteDataWithGoogle, aes(x = differencebearings)) + geom_histogram(bins = 10) + scale_x_continuous(breaks = c(seq(0,180, by = 20)))+ dark_theme_classic(base_size = 20, base_line_size = 2) + labs(x = "Direction Angle Difference")
 ggplot(CompleteDataWithGoogle, aes(x = DistanceFromLocation/Timedifference)) + geom_histogram(bins = 10) + scale_x_continuous()+ dark_theme_classic(base_size = 20, base_line_size = 2) + scale_x_log10() + labs(x = "Meters Traveled per Day")
 
 #hist(CompleteDataWithGoogle$differencebearings)
 
 write.csv(CompleteDataWithGoogle, "CompleteDataWithGoogle.csv")
-
-source("https://gist.githubusercontent.com/benmarwick/2a1bb0133ff568cbe28d/raw/fb53bd97121f7f9ce947837ef1a4c65a73bffb3f/geom_flat_violin.R")
-
-theme_rainplot<- function (base_size = 11, base_family = "Arial") 
-{
-  half_line <- base_size/2
-  theme(
-    line = element_line(colour = "black", size = rel(1.5), 
-                        linetype = 1, lineend = "butt"), 
-    rect = element_rect(fill = NA, colour = "black",
-                        size = 0.5, linetype = 1),
-    text = element_text(family = base_family, face = "plain",
-                        colour = "black", size = base_size,
-                        lineheight = 0.9,  hjust = 0.5,
-                        vjust = 0.5, angle = 0, 
-                        margin = margin(), debug = FALSE), 
-    
-    axis.line = element_line(size = 2, color = "black"), 
-    axis.text = element_text(family= "Arial", size = rel(1.5), colour = "grey10"),
-    axis.text.x = element_text(margin = margin(t = half_line/2), 
-                               vjust = 1), 
-    axis.text.y = element_blank(),
-    axis.ticks = element_line(colour = "black", size=1), 
-    axis.ticks.length = unit(half_line*0.75, "pt"), 
-    axis.title = element_text(family="Arial",size = rel(1.5), colour = "black"),
-    axis.title.x = element_text(margin = margin(t = half_line*5,
-                                                b = half_line)),
-    axis.title.y = element_text(angle = 90, 
-                                margin = margin(r = half_line*5,
-                                                l = half_line)),
-    
-    legend.background = element_rect(colour = NA), 
-    legend.key = element_rect(colour = NA),
-    legend.key.size = unit(2, "lines"), 
-    legend.key.height = NULL,
-    legend.key.width = NULL, 
-    legend.text = element_text(family = "Arial", size = rel(1)),
-    legend.text.align = NULL,
-    legend.title = element_text(family = "Arial", size = rel(1)), 
-    legend.title.align = NULL, 
-    legend.position = "right", 
-    legend.direction = NULL,
-    legend.justification = "center", 
-    legend.box = NULL, 
-    
-    panel.background = element_blank(),
-    panel.border = element_blank(),
-    panel.grid.major = element_blank(), 
-    panel.grid.minor = element_blank(), 
-    panel.spacing = unit(half_line, "pt"), panel.margin.x = NULL, 
-    panel.spacing.y = NULL, panel.ontop = FALSE, 
-    
-    #Facet Labels
-    strip.background = element_blank(),
-    strip.text = element_text(family = "Arial",face="bold",colour = "black", size = rel(1.5)),
-    strip.text.x = element_text(margin = margin(t = half_line,
-                                                b = half_line)), 
-    strip.text.y = element_text(angle = 0, 
-                                margin = margin(l = half_line, 
-                                                r = half_line)),
-    strip.switch.pad.grid = unit(5, "lines"),
-    strip.switch.pad.wrap = unit(5, "lines"), 
-    
-    
-    plot.background = element_blank(), 
-    plot.title = element_text(size = rel(1.5), 
-                              margin = margin(b = half_line * 1.2)),
-    plot.margin = margin(4*half_line, 4*half_line, 4*half_line, 4*half_line),
-    complete = TRUE)
-}
-
 
 ggplot(data = CompleteData, 
        aes(x = 0, y = Timedifference)) +
@@ -607,7 +785,7 @@ Data2018Cleaned <- Data2018Complete %>% #New table to generate coordinates of re
   mutate(paymentmethodcleaned = as.character(Payment.Method)) %>%
   mutate(Value = as.numeric(as.character(Total.Value..US.dollars.))) %>%
   mutate(litterID = as.character(ï..LitterID)) %>%
-  select(litterID, username, user_id, dateprintedcleaned, TimestampDatecleaned, Timedifference, Locationaddresscleaned, Non.Specific.Location.Address, Manual.Lat, Manual.Lon, Locationnamecleaned, Itemized, paymentmethodcleaned, Value, lat, lon)
+  dplyr::select(litterID, username, user_id, dateprintedcleaned, TimestampDatecleaned, Timedifference, Locationaddresscleaned, Non.Specific.Location.Address, Manual.Lat, Manual.Lon, Locationnamecleaned, Itemized, paymentmethodcleaned, Value, lat, lon)
 
 
 Data20182019 <- read.csv("All_Receipts.csv")
@@ -628,7 +806,7 @@ Data20182019cleaned <- Data20182019 %>% #Data from both 2018 & 2019
   mutate(paymentmethodcleaned = as.character(Payment.Method)) %>%
   mutate(Value = as.numeric(as.character(Total.Value..US.dollars.))) %>%
   mutate(litterID = as.character(LitterID)) %>%
-  select(litterID, username, user_id, dateprintedcleaned, TimestampDatecleaned, Timedifference, Locationaddresscleaned, Non.Specific.Location.Address, Manual.Lat, Manual.Lon, Locationnamecleaned, Itemized, paymentmethodcleaned, Value, lat, lon)
+  dplyr::select(litterID, username, user_id, dateprintedcleaned, TimestampDatecleaned, Timedifference, Locationaddresscleaned, Non.Specific.Location.Address, Manual.Lat, Manual.Lon, Locationnamecleaned, Itemized, paymentmethodcleaned, Value, lat, lon)
 
 JacquelinesSiteData <- read.csv("JacquelinesSiteReceiptData.csv")
 
@@ -645,7 +823,7 @@ JacquelinesSiteDataCleaned <- JacquelinesSiteData %>% #2019 data not included in
   mutate(paymentmethodcleaned = as.character(Payment.Method)) %>%
   mutate(Value = as.numeric(as.character(Total.Value..US.dollars.))) %>%
   mutate(litterID = as.character(litterId)) %>%
-  select(litterID, username, user_id, dateprintedcleaned, TimestampDatecleaned, Timedifference, Locationaddresscleaned, Non.Specific.Location.Address, Manual.Lat, Manual.Lon, Locationnamecleaned, Itemized, paymentmethodcleaned, Value, lat, lon)
+  dplyr::select(litterID, username, user_id, dateprintedcleaned, TimestampDatecleaned, Timedifference, Locationaddresscleaned, Non.Specific.Location.Address, Manual.Lat, Manual.Lon, Locationnamecleaned, Itemized, paymentmethodcleaned, Value, lat, lon)
 
 CombinedData <- rbind(Data2018Cleaned, Data20182019cleaned, JacquelinesSiteDataCleaned) #all 3 data sets combined into 1
 
