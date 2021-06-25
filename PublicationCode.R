@@ -177,7 +177,7 @@ myApply <- function(node) {
 
 AggregateTrees <- function(DF1, Alias, Hierarchy, ColNum){
   DFA <- jointohierarchy(DF = DF1, Hierarchy = Hierarchy, Alias = Alias, ColNum = ColNum)%>%
-    add_row(X1 = "missing", sum = sum(DF1$Count) - sum(.$sum)) #May need to be changed to X1 or Level.1 depending on the hierarchy dataset. Should clean them up.
+    add_row(Level.1 = "missing", sum = sum(DF1$Count) - sum(.$sum)) #May need to be changed to X1 or Level.1 depending on the hierarchy dataset. Should clean them up.
   
   bindedtree <- converttotree(DFA)  
   
@@ -292,7 +292,7 @@ full_data <- fread("Litterati-Partners.csv") %>%
 #  mutate(area_m2 = horizdist * vertdist)
 
 site_data_cleaned <- fread("StudyAreas/User_Cleaned_Data/reconciled_cleaned.csv") %>%
-  left_join(fread("StudyAreas/User_Cleaned_Data/weekend_sweep.csv")) %>%
+  left_join(fread("StudyAreas/User_Cleaned_Data/weekend_sweep_manual.csv")) %>%
   mutate(Date = as.Date(Day, format = "%m/%d/%Y"))
   
 
@@ -351,6 +351,10 @@ ggplot(input_rate, aes(x = Date, y = Name)) +
   labs(y = "Site") + 
   scale_x_date(date_minor_breaks = "1 month")
 
+##
+two <- site_data_cleaned %>%
+  filter(Name == "Site 2")
+
 #Input Rate Correlation
 mean_input_rate <- site_data_cleaned %>%
   #filter(user_id == 92684) %>%
@@ -365,7 +369,7 @@ mean_input_rate <- site_data_cleaned %>%
   filter(Date != as.Date("3/23/2020", format = "%m/%d/%Y")) %>% #Bring back in for 2020 analysis.
   ungroup() %>%
   group_by(Name, `Mean Income_households_2019_5year_census`, `Median Income_households`, Cal_Enviro_Screen, Road_Width_m, Landuse_Type) %>%
-  summarise(mean = mean(generationrate, na.rm = T)) %>%
+  summarise(mean = mean(generationrate, na.rm = T), cv = sd(generationrate, na.rm = T)/mean(generationrate, na.rm = T)) %>%
   ungroup() %>%
   dplyr::select(-Name) %>%
   mutate(Cal_Enviro_Screen = case_when(
@@ -388,6 +392,47 @@ ggplot(mean_input_rate) +
   facet_wrap(key~., scales = "free") + 
   labs(y = "Mean Trash Generation (#/m/day") + 
   theme_bw()
+
+#Input Rate Correlation
+cv_input_rate <- site_data_cleaned %>%
+  #filter(user_id == 92684) %>%
+  #mutate(Date = substr(photo_timestamp,1,nchar(photo_timestamp)-3)) %>%
+  mutate(Date = as.Date(Day, format = "%m/%d/%Y")) %>%
+  group_by(Date, Name, Site_Length_m, `Mean Income_households_2019_5year_census`, `Median Income_households`, Cal_Enviro_Screen, Road_Width_m, Landuse_Type) %>%
+  summarise(Intensity = n()) %>%
+  arrange(Date) %>%
+  group_by(Name) %>%
+  mutate(DateDiff = as.numeric(Date) - dplyr::lag(as.numeric(Date), order_by = Name)) %>%
+  mutate(generationrate = Intensity/DateDiff/Site_Length_m) %>%
+  filter(Date != as.Date("3/23/2020", format = "%m/%d/%Y")) %>% #Bring back in for 2020 analysis.
+  ungroup() %>%
+  group_by(Name, `Mean Income_households_2019_5year_census`, `Median Income_households`, Cal_Enviro_Screen, Road_Width_m, Landuse_Type) %>%
+  summarise(mean = mean(generationrate, na.rm = T), cv = sd(generationrate, na.rm = T)/mean(generationrate, na.rm = T)) %>%
+  ungroup() %>%
+  dplyr::select(-Name) %>%
+  mutate(Cal_Enviro_Screen = case_when(
+    Cal_Enviro_Screen == "40-45" ~ 42.5,
+    Cal_Enviro_Screen == "65-70" ~ 67.5,
+    Cal_Enviro_Screen == "80-85" ~ 82.5,
+    Cal_Enviro_Screen == "85-90" ~ 87.5,
+    Cal_Enviro_Screen == "90-95" ~ 92.5,
+    Cal_Enviro_Screen == "95-100" ~ 97.5,
+  )) %>%
+  mutate(Landuse_Type = case_when(
+    Landuse_Type == "Residential" ~ 1,
+    Landuse_Type == "Mixed" ~0
+  )) %>%
+  gather(key, value, -cv) %>%
+  mutate(value = as.numeric(value))
+
+ggplot(cv_input_rate) + 
+  geom_point(aes(x = value, y = cv)) + 
+  facet_wrap(key~., scales = "free") + 
+  labs(y = "Coeficient of Variation Trash Generation (#/m/day") + 
+  theme_bw()
+
+
+
 
 #Material Types By Site and Date
 material_composition <- site_data_cleaned %>%
@@ -438,38 +483,62 @@ ggplot(material_diversity) +
   scale_x_date(date_minor_breaks = "1 week")
 
 
-#Data sets ----
-ItemsHierarchy <- read.csv("Taxonomy/ITEMSHierarchyLower.csv")
+#Taxonomy Data sets ----
+ItemsHierarchy <- read.csv("Taxonomy/Website/Items_Hierarchy.csv")
 
-MaterialsHierarchy <- read.csv("Taxonomy/MaterialsHierarchyLower.csv") 
+#Test items not matched 
 
-ItemsAlias <- read.csv("Taxonomy/PrimeItems.csv")%>%
+MaterialsHierarchy <- read.csv("Taxonomy/Website/Materials_Hierarchy.csv") 
+
+ItemsAlias <- read.csv("Taxonomy/Website/Items_Alias_V2.csv")%>%
   mutate(RowID = 1:nrow(.)) %>%
   rename(Key = Item)
 
-MaterialsAlias <- read.csv("Taxonomy/PrimeMaterials.csv") %>%
+MaterialsAlias <- read.csv("Taxonomy/Website/Materials_Alias.csv") %>%
   mutate(RowID = 1:nrow(.)) %>%
   rename(Key = Material)
 
-ItemsHierarchy <- ItemsHierarchy %>%
-  rename(X1 = Level.1)
 #Data Processing ----
 
 DF <- site_data_cleaned %>%
   group_by(Material_TT) %>%
-  summarise(Count = n())
+  summarise(Count = n()) %>%
+  ungroup()
 
 DF2 <- site_data_cleaned %>%
   group_by(Item_TT) %>%
-  summarise(Count = n())
+  summarise(Count = n()) %>%
+  ungroup()
+
+unmatched <- DF2 %>%
+  mutate_all(cleantext) %>%
+  anti_join(ItemsAlias, by = c("Item_TT" = "Alias"))
 
 #Output for lumping analysis ----
 DFA <- jointohierarchy(DF2, Hierarchy = ItemsHierarchy, Alias = ItemsAlias, ColNum = 1)%>%
-  add_row(X1 = "missing", sum = sum(DF2$Count) - sum(.$sum)) #May need to be changed to X1 or Level.1 depending on the hierarchy dataset. Should clean them up.
+  add_row(Level.1 = "missing", sum = sum(DF2$Count) - sum(.$sum)) #May need to be changed to X1 or Level.1 depending on the hierarchy dataset. Should clean them up.
 
 
 ItemTree <- AggregateTrees(DF2,  Alias = ItemsAlias, Hierarchy = ItemsHierarchy, ColNum = 1)
-ItemTreedf <- ToDataFrameNetwork(ItemTree, "totalsum")
+ItemTreedf <- ToDataFrameNetwork(ItemTree, "totalsum") 
+
+ItemTreedf_clean <- ItemTreedf %>%
+  add_row(from = "trash", to = "", totalsum = sum(ItemTreedf %>%
+                                                    filter(from == "trash") %>% 
+                                                    pull(totalsum)))
+
+plot_ly() %>%
+  add_trace(
+    #ids = d2$ids,
+    labels = ItemTreedf_clean$to,
+    parents = ItemTreedf_clean$from,
+    type = 'sunburst',
+    maxdepth = 2,
+    domain = list(column = 1), 
+    branchvalues = 'total',
+    values = ItemTreedf_clean$totalsum)
+
+df_test = read.csv('https://raw.githubusercontent.com/plotly/datasets/718417069ead87650b90472464c7565dc8c2cb1c/coffee-flavors.csv')
 #Next add plotly figure with this df. 
 
 MaterialTree <- AggregateTrees(DF,  Alias = MaterialsAlias, Hierarchy = MaterialsHierarchy, ColNum = 1)
