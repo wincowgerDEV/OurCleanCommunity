@@ -1,0 +1,26 @@
+from,to
+trash,glass OR ceramic
+trash,plastic
+trash,biohazard
+trash,organic
+trash,metal
+trash,other
+trash,concrete OR asphalt
+glass OR ceramic,glass
+glass OR ceramic,ceramic
+plastic,foam
+plastic,rubber
+plastic,soft plastics
+plastic,hard plastics
+plastic,vinyl
+biohazard,sanitary waste
+biohazard,faeces
+organic,leather
+organic,food
+organic,wood and paper
+organic,cloth
+glass,fibreglass
+wood and paper,wood
+wood and paper,paper OR cardboard
+wood,processed wood
+paper OR cardboard,paper

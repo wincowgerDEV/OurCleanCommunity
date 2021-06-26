@@ -544,7 +544,7 @@ plot_ly() %>%
 
 ItemTreeDF <- AggregateTrees(DF = Item_DF, Alias = ItemsAlias, Hierarchy = ItemsHierarchy)
 
-
+#Add uncertainties to this by bootstrapping each days observations for the percent.
 plot_ly() %>%
   add_trace(
     #ids = d2$ids,

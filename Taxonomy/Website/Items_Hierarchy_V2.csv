@@ -1,0 +1,418 @@
+from,to
+trash,pottery or ceramic
+trash,auto products
+trash,bags
+trash,batteries
+trash,"bolts, nails, and screws"
+trash,cable ties
+trash,clothing OR towels OR gloves OR shoes
+trash,computer equiptment & other electronic devices
+trash,corks
+trash,"cups, food trays, food wrappers, drink containers"
+trash,"cups, plates, tableware, dishes"
+trash,film (think OR flexible e.g. straw wrapper)
+trash,filmstrip
+trash,fishing related
+trash,foil
+trash,fragments
+trash,hooksett disks
+trash,industrialpackaging OR crates OR sheeting
+trash,large debris items
+trash,light bulbs OR tubes
+trash,lumber OR building material
+trash,macroplastics
+trash,medium plastics
+trash,miscellaneous items
+trash,non-food related plastic packaging
+trash,"other bottles, containers and drums"
+trash,other organic waste
+trash,packaging
+trash,paint brushes
+trash,paint tins
+trash,paper
+trash,paraffin OR wax
+trash,pellet
+trash,pens OR pencils
+trash,personal care products
+trash,rope OR fishing line
+trash,rubber bands
+trash,sheeting
+trash,shotgun cartridges
+trash,sponge
+trash,tangled nets OR cord OR rope and string
+trash,tobacco packaging & wrappers
+trash,toys OR party poppers OR fireworks OR dummies
+trash,trap
+trash,wire
+pottery or ceramic,flower pots
+auto products,batteries: car or boat
+auto products,car OR boat parts
+auto products,motorbikes OR parts
+auto products,"vehicle debris, large"
+auto products,"vehicle debris, small"
+bags,backpacks & bags
+bags,bag (grocery)
+bags,bag (trash)
+bags,"bag (zip-lock, produce, other)"
+bags,bulk bags
+bags,degraded bag
+bags,dog waste bags
+bags,mesh vegetable bags
+bags,sacking
+bags,take-out food bags
+batteries,batteries (acidic and alkaline)
+clothing OR towels OR gloves OR shoes,"clothing, hats, gloves & towels"
+clothing OR towels OR gloves OR shoes,clothing OR shoes OR beach towels
+computer equiptment & other electronic devices,"cd, cd-box"
+computer equiptment & other electronic devices,small electronic items
+"cups, food trays, food wrappers, drink containers",beverage conatiners
+"cups, food trays, food wrappers, drink containers","bottle caps, lids & pull tabs"
+"cups, food trays, food wrappers, drink containers",bottle label
+"cups, food trays, food wrappers, drink containers",bottle neck rings
+"cups, food trays, food wrappers, drink containers",cardboard cartons
+"cups, food trays, food wrappers, drink containers",cups & plates
+"cups, food trays, food wrappers, drink containers",fastfoodcontainers OR cups
+"cups, food trays, food wrappers, drink containers",food cans
+"cups, food trays, food wrappers, drink containers",food wrappers or containers
+"cups, food trays, food wrappers, drink containers",food OR beverage ware
+"cups, food trays, food wrappers, drink containers",home food packaging
+"cups, food trays, food wrappers, drink containers",juice packet
+"cups, food trays, food wrappers, drink containers",salt packaging
+"cups, food trays, food wrappers, drink containers",sauce packet
+"cups, food trays, food wrappers, drink containers",singlue use food container
+"cups, food trays, food wrappers, drink containers",straws
+"cups, plates, tableware, dishes",4 OR 6 pack yokes
+"cups, plates, tableware, dishes","cups, plastes, forks, knives, spoons"
+"cups, plates, tableware, dishes",cutlery OR trays OR straws OR cups
+"cups, plates, tableware, dishes",street food bowl
+"cups, plates, tableware, dishes",tableware
+film (think OR flexible e.g. straw wrapper),thin film
+fishing related,bait containers OR crates OR lures
+fishing related,bobbins (fishing)
+fishing related,fish aggregating devices
+fishing related,fish boxes
+fishing related,fish hook
+fishing related,fishing line
+fishing related,fishing line OR net
+fishing related,fishing lures & line
+fishing related,fishing rubbertail baits & weights
+fishing related,fishing traps and pots
+fishing related,"fishing: lures, rods OR poles"
+fishing related,"fishing: sinkers, lures, hooks"
+fishing related,fishingweights OR hooks OR lures
+fishing related,floats (fishing buoys) OR reels
+fishing related,lobster and fish tags
+fishing related,lobster claw bands
+fishing related,oyster nets or mussel bags including plastic stoppers
+fishing related,oyster trays (round from oyster cultures)
+fishing related,"sails, canvas"
+fishing related,scuba&snorkelgear
+fragments,fibre glass OR fragments
+large debris items,"advertisements, signs"
+large debris items,anchor
+large debris items,"appliances, bikes, carts"
+large debris items,beams OR dunnage
+large debris items,carpet & furnishing
+large debris items,carts OR parts
+large debris items,"constructionmaterial(brick,cement,pipes)"
+large debris items,fencing
+large debris items,fertilizer OR animal feed bags
+large debris items,filter box
+large debris items,inner-tubes & rubber sheets
+large debris items,mattress OR foam
+large debris items,plasters
+large debris items,scrap OR metal appliances OR paint tins
+large debris items,shopping trolleys
+large debris items,signs OR cones
+large debris items,"wire, wire mesh, barbed wire"
+light bulbs OR tubes,"light globes: bulbs, etc"
+light bulbs OR tubes,light sticks (tubes with fluid)
+lumber OR building material,wood boards
+miscellaneous items,other identifiable items
+miscellaneous items,other mixed
+miscellaneous items,toilet fresheners
+"other bottles, containers and drums",aerosol cans
+"other bottles, containers and drums",chemicals and chemical containers
+"other bottles, containers and drums","baskets, crates"
+"other bottles, containers and drums",barrels
+"other bottles, containers and drums","buckets, drums & jerry cans: 2 litres or more"
+"other bottles, containers and drums","cleaner(bottles,containersanddrums)"
+"other bottles, containers and drums",drums
+"other bottles, containers and drums","gas bottles, drums & buckets (>4L)"
+"other bottles, containers and drums",non-beverage containers OR bottles
+other organic waste,bagged dog faeces
+other organic waste,dog poop (unbagged)
+other organic waste,food
+other organic waste,oil OR tar
+other organic waste,slack OR coal
+packaging,shipping OR packaging
+paper,cardboard
+paper,"newspaper, books"
+paper,newspapers & magazines
+paper,paper OR napkins OR tissues
+paper,parking tickets & reciepts
+pellet,cylindrical pellets <5mm
+pellet,disks pellets <5mm
+pellet,flat pellets <5mm
+pellet,granules <5mm
+pellet,industrial pellets
+pellet,ovoid pellets <5mm
+pellet,resin pellets
+pellet,small industrial spheres (<5mm)
+pellet,spheruloids pellets <5mm
+pellet,threadlike user pellets
+pens OR pencils,pens
+personal care products,bandages
+personal care products,blister pack
+personal care products,combs OR hairbrushes OR sunglasses
+personal care products,contraceptives
+personal care products,cotton bud sticks
+personal care products,drugs
+personal care products,ear plugs
+personal care products,femininehygeneitems
+personal care products,hair tie
+personal care products,inhaler
+personal care products,medical OR pharmaceuticals containers OR tubes
+personal care products,personal care product tube
+personal care products,sanitary product
+personal care products,"sharp needles, lancets, metal catheters"
+personal care products,syringes
+personal care products,toiletries
+rope OR fishing line,rope
+rope OR fishing line,ropes OR strapping bands
+sheeting,sheeting <30cm
+sheeting,sheeting >60cm
+sheeting,sheeting 30-60 cm
+sheeting,"sheeting: tarpaulin, plastic sheets, palette wrap"
+sheeting,sheetlike user pellets
+sheeting,sheetlikeuserplastic(>1mm)
+tangled nets OR cord OR rope and string,rope & string
+tobacco packaging & wrappers,cigar tips
+tobacco packaging & wrappers,cigarette materials
+tobacco packaging & wrappers,cigarettes OR cigar tips
+toys OR party poppers OR fireworks OR dummies,"balloon, tennis ball, football, dog toy"
+toys OR party poppers OR fireworks OR dummies,fireworks
+toys OR party poppers OR fireworks OR dummies,"toys, balls, party poppers"
+trap,wooden trap
+wire,cables
+car OR boat parts,car parts
+car OR boat parts,boat parts
+bag (grocery),shopping bags incl. pieces
+"bag (zip-lock, produce, other)","small plastic bags, e.g., freezer bags"
+take-out food bags,single use plastic carryout bags
+"clothing, hats, gloves & towels",clothing OR towel OR gloves
+"clothing, hats, gloves & towels",hard hats
+clothing OR shoes OR beach towels,clothing & shoes
+clothing OR shoes OR beach towels,cloth fragments
+small electronic items,e-waste fragments
+small electronic items,telephone(incl.parts)
+beverage conatiners,bottles & jars
+beverage conatiners,cans OR tins
+beverage conatiners,cups
+"bottle caps, lids & pull tabs",pull tabs: beverages
+"bottle caps, lids & pull tabs",bottle caps
+"bottle caps, lids & pull tabs",caps OR lids
+cardboard cartons,juice carton
+cardboard cartons,milk carton
+cups & plates,plates
+food wrappers or containers,"ice-cream sticks, chip forks, chopsticks, toothpicks"
+food wrappers or containers,other food cans OR wrappers
+food wrappers or containers,wrappers
+food wrappers or containers,crisp OR sweet OR lolly OR sandwich wrappers
+food wrappers or containers,cover OR packaging
+food OR beverage ware,disposable food & beverage ware
+straws,degraded straws
+4 OR 6 pack yokes,"six-pack rings, ring carriers"
+"cups, plastes, forks, knives, spoons","cups, plates, utensils"
+cutlery OR trays OR straws OR cups,cutlery OR trays OR straws
+tableware,napkins
+thin film,filmfragments
+thin film,tape
+thin film,films <5mm
+bait containers OR crates OR lures,bait containers OR crates
+fishing line,fishing line (entangled)
+fishing line,fishing line (anglers)
+fishing line OR net,filament <5mm
+fishing line OR net,monofilament net OR fiber up to 5mm
+fishing line OR net,monofilament net OR fiber 5-30mm
+fishing line OR net,monofilament net OR fiber larger than 30mm
+fishing line OR net,nets and pieces of net
+fishing lures & line,fishing lures or light sticks
+fishing rubbertail baits & weights,fishing weights
+fishing traps and pots,fish pot
+fishing traps and pots,fishpot(eel)
+fishing traps and pots,octopus pots
+fishing traps and pots,trap OR pot pieces
+fishing traps and pots,crab or lobster or fish traps
+fishing traps and pots,derelicttraps OR trappieces
+fishing traps and pots,lobster OR crab pots & tops
+floats (fishing buoys) OR reels,"fishing bouys, pots & traps"
+scuba&snorkelgear,fin trees (from fins for scuba diving)
+"advertisements, signs",forsale posters
+"advertisements, signs",election posters
+"appliances, bikes, carts",appliances
+carpet & furnishing,carpet (synthetic)
+carpet & furnishing,floor cover
+carpet & furnishing,furniture
+"constructionmaterial(brick,cement,pipes)","bar, pipe, or wire"
+"constructionmaterial(brick,cement,pipes)","bricks, cinderblocks, chunks of cement"
+signs OR cones,traffic cones
+wood boards,pallets
+drums,drums: 55 gallon
+drums,oil drums
+non-beverage containers OR bottles,"beachuserelatedcosmeticbottlesand.containers,e.g.sunblock"
+non-beverage containers OR bottles,"bottles: bleach, cleaner"
+non-beverage containers OR bottles,bottles: oil OR lube
+non-beverage containers OR bottles,buckets
+non-beverage containers OR bottles,containers OR tubes
+non-beverage containers OR bottles,"cosmetics(bottles&containerse.g.sunlotion,shampoo,showergel,deodorant)"
+non-beverage containers OR bottles,crates and containers OR baskets
+non-beverage containers OR bottles,jerry cans (square plastic containers with handle)
+non-beverage containers OR bottles,middle size containers
+non-beverage containers OR bottles,oil or petrol can
+non-beverage containers OR bottles,other cans (<4l)
+non-beverage containers OR bottles,other jugs or containers
+food,drinks
+oil OR tar,oil
+shipping OR packaging,insulation & packaging
+"newspaper, books",books
+newspapers & magazines,magazines
+parking tickets & reciepts,reciepts
+combs OR hairbrushes OR sunglasses,combs OR hairbrushes
+combs OR hairbrushes OR sunglasses,sunglasses
+medical OR pharmaceuticals containers OR tubes,"other medical items (swabs, bandaging etc.)"
+sanitary product,condoms
+sanitary product,injection gun containers
+sanitary product,wet wipes
+sanitary product,diapers OR nappies
+sanitary product,tooth pick
+sanitary product,toilet paper
+sanitary product,toothbrushes
+sanitary product,dental flossers
+sanitary product,towels OR panty liners OR backing strips
+sanitary product,sanitary towel OR tampon
+syringes,drug paraphanalia OR syringes
+toiletries,deoderant
+toiletries,face mask
+rope,rope <1 meter
+rope,rope >1 meter
+rope,rope diameter <1 cm
+rope,rope diameter >1 cm
+rope,rope large
+rope,rope medium
+rope,rope small
+ropes OR strapping bands,strapping bands
+"sheeting: tarpaulin, plastic sheets, palette wrap",agricultural tarpaulin and packaging
+rope & string,string
+cigarette materials,cigarette butts and filters
+cigarette materials,cigarette lighters OR tobacco pouches
+"balloon, tennis ball, football, dog toy",balloons and balloon sticks
+fireworks,tubes for fireworks
+fireworks,matches (& fireworks)
+"toys, balls, party poppers","toys, balls"
+"toys, balls, party poppers",toys & party poppers
+"toys, balls, party poppers",toys
+car parts,fenders
+car parts,tyres and belts
+car parts,wheels
+shopping bags incl. pieces,bag ends
+clothing OR towel OR gloves,clothing OR rags
+clothing OR towel OR gloves,gloves
+clothing & shoes,shoes OR sandals
+bottles & jars,beverage bottles
+bottles & jars,foodjars
+cans OR tins,cans
+cups,"cups, lids, straws"
+cups,takeaway cup
+caps OR lids,lids
+"ice-cream sticks, chip forks, chopsticks, toothpicks",ice lolly sticks OR chip forks
+wrappers,sweet papers
+wrappers,food wrappers
+crisp OR sweet OR lolly OR sandwich wrappers,crisp packets OR sweets wrappers
+disposable food & beverage ware,disposablebbq's
+disposable food & beverage ware,rigid plastic disposable food and begerage ware
+"cups, plates, utensils",utensil
+"cups, plates, utensils",coffee cup
+cutlery OR trays OR straws,cutlery OR trays
+tape,masking tape
+bait containers OR crates,bait containers OR packaging
+nets and pieces of net,fishing nets
+nets and pieces of net,nets and pieces of net <50 cm
+nets and pieces of net,nets and pieces of net >50cm
+nets and pieces of net,fishingnetandnetpieces>50cm
+fishing lures or light sticks,fishing lures
+fishing weights,scuba weights
+crab or lobster or fish traps,crab trap in need of removal
+crab or lobster or fish traps,crab trap that has been removed
+"fishing bouys, pots & traps",buoys & floats
+"bar, pipe, or wire",pipes & rebar
+crates and containers OR baskets,crates and containers
+oil or petrol can,engine oil bottles & containers <50 cm
+oil or petrol can,engine oil bottles & containers >50 cm
+drinks,sports drink
+drinks,coffee other
+drinks,alcohol other
+diapers OR nappies,diapers
+towels OR panty liners OR backing strips,panty liners
+sanitary towel OR tampon,tampons OR tampon applicators
+sanitary towel OR tampon,sanitary towels
+strapping bands,strapping bands OR zip-ties
+strapping bands,strapping bands (open)
+strapping bands,strapping bands (closed)
+cigarette butts and filters,cigarette filters
+cigarette butts and filters,cigarette butts
+cigarette lighters OR tobacco pouches,cigarette packets
+cigarette lighters OR tobacco pouches,cigarette lighters
+cigarette lighters OR tobacco pouches,tobacco sachets
+balloons and balloon sticks,balloons
+"toys, balls",balls
+"toys, balls",pegs and chips
+tyres and belts,tires
+clothing OR rags,clothing
+clothing OR rags,towels OR rags
+shoes OR sandals,boots
+shoes OR sandals,flip-flops
+shoes OR sandals,shoe
+beverage bottles,drink bottles>0.5l
+beverage bottles,water bottles
+beverage bottles,sport drink bottles
+beverage bottles,wine bottle
+beverage bottles,soft drink bottles
+beverage bottles,juice bottles
+beverage bottles,"bottles, etc. >2L"
+beverage bottles,bottles <2L
+beverage bottles,liquor bottles
+beverage bottles,fizzy drink bottle
+beverage bottles,ice tea bottles
+beverage bottles,beer bottle
+beverage bottles,degraded bottle
+beverage bottles,drink bottles<=0.5l
+beverage bottles,milk bottle
+foodjars,jars incl. pieces
+cans,beverage cans
+"cups, lids, straws",cups and cup lids
+"cups, lids, straws","straws, stirrers"
+ice lolly sticks OR chip forks,lolly sticks
+ice lolly sticks OR chip forks,lollipop sticks & cotton buds
+ice lolly sticks OR chip forks,popsicle stick
+crisp packets OR sweets wrappers,crisp packets
+coffee cup,coffee cup lid
+bait containers OR packaging,bait containers
+buoys & floats,buoys
+buoys & floats,floats for fishing nets
+pipes & rebar,piping
+crates and containers,crates
+tampons OR tampon applicators,tampon applicators
+tampons OR tampon applicators,tampons
+cigarette lighters,degraded lighters
+balls,football
+balls,golf ball
+tires,tyres without holes OR wheels
+tires,tyres with holes
+clothing,thongs
+beverage cans,beer cans
+beverage cans,juices cans
+beverage cans,ice tea can
+beverage cans,energy can
+crisp packets,crisp large
+crisp packets,crisp small
