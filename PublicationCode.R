@@ -84,6 +84,20 @@ cleantext <- function(x) {
   tolower(gsub("[[:space:]]", "", x))
 }
 
+
+BootMean <- function(data) {
+  B <- 10000
+  mean <- numeric(B)
+  n = length(data)
+  
+  set.seed(34347)
+  for (i in 1:B) {
+    boot <- sample(1:n, size=n, replace = TRUE)
+    mean[i] <- mean(data[boot])
+  }
+  return(quantile(mean, c(0.025, 0.5, 0.975), na.rm = T))
+}
+
 not_all_na <- function(x) any(!is.na(x))
 
 #requires alias to have Alias, RowID and Key columns, requires DF to have a count column and some column to match
@@ -271,7 +285,7 @@ theme_rainplot<- function (base_size = 11, base_family = "Arial")
 
 #Datasets ----
 
-source("https://gist.githubusercontent.com/benmarwick/2a1bb0133ff568cbe28d/raw/fb53bd97121f7f9ce947837ef1a4c65a73bffb3f/geom_flat_violin.R")
+#source("https://gist.githubusercontent.com/benmarwick/2a1bb0133ff568cbe28d/raw/fb53bd97121f7f9ce947837ef1a4c65a73bffb3f/geom_flat_violin.R")
 
 
 CompleteDataWithGoogle <- read.csv("CompleteDataWithGoogle.csv") %>%
@@ -472,12 +486,32 @@ material_diversity <- site_data_cleaned %>%
                    simpson = calc_simpson(Material_TT),
                    menhincks = calc_menshinicks(Material_TT),
                    numgroups = calc_numgroups(Material_TT)) %>%
-  mutate(evenness = shannon/log(numgroups))
+  mutate(evenness = shannon/log(numgroups)) %>%
+  ungroup()
+ 
 
-ggplot(material_diversity, aes(x = evenness, y = numgroups, color = Name)) +
-  geom_point() + 
-  scale_color_viridis_d(option = "B") + 
-  theme_bw()
+material_diversity_boot <- site_data_cleaned %>%
+  #filter(user_id == 92684) %>%
+  #mutate(Date = substr(photo_timestamp,1,nchar(photo_timestamp)-3)) %>%
+  mutate(Date = as.Date(Day, format = "%m/%d/%Y")) %>%
+  group_by(Date, Name) %>%
+  dplyr::summarise(shannon = calc_shannon(Material_TT),
+                   simpson = calc_simpson(Material_TT),
+                   menhincks = calc_menshinicks(Material_TT),
+                   numgroups = calc_numgroups(Material_TT)) %>%
+  mutate(evenness = shannon/log(numgroups)) %>%
+  ungroup() %>%
+  group_by(Name) %>%
+  summarise(mean_even = mean(evenness), min_even = BootMean(evenness)[1], max_even = BootMean(evenness)[3], mean_numgroups = mean(numgroups), min_numgroups = BootMean(numgroups)[1], max_numgroups = BootMean(numgroups)[3]) %>%
+  ungroup()
+
+ggplot(material_diversity_boot, aes(x = mean_even, y = mean_numgroups, color = Name, label = Name)) +
+  geom_point() +
+  geom_errorbar(width=.1, aes(ymin=min_numgroups, ymax=max_numgroups)) +
+  geom_errorbar(width=.1, aes(xmin=min_even, xmax=max_even)) +
+  geom_label() +
+  scale_color_viridis_d(option = "C") + 
+  theme_classic()
 
 ggplot(material_diversity) + 
   geom_point(aes(x = Date, y = shannon)) + 
@@ -556,14 +590,6 @@ plot_ly() %>%
     branchvalues = 'total',
     values = ItemTreeDF$totalsum)
 
-#Figures of the hierarchy trees ----
-collapsibleTree(
-  MaterialsHierarchy, hierarchy = c(names(MaterialsHierarchy)), collapsed = F, fontSize = 30, zoomable = T
-)
-
-collapsibleTree(
-  ItemsHierarchy, hierarchy = c(names(ItemsHierarchy)), fontSize = 20, zoomable = T, width = 3000, height = 1000
-)
 
 #Trip Distances ----
 #Was thinking that we should limit this to work trips but I don't think so any more. 
@@ -722,24 +748,27 @@ CompleteDataWithGoogle$xcoordmeanbearing <- 1*cos(rad(CompleteDataWithGoogle$mea
 CompleteDataWithGoogle$row <- 1:nrow(CompleteDataWithGoogle)
 
 CompleteDataCoordPlot <- CompleteDataWithGoogle %>%
+  filter(!is.na(xcoordmeanbearing) & !is.na(xcoordbearing)) %>% #Removes data where we don't have wind or dont have receipt direction from the analysis.
   dplyr::select(xcoordmeanbearing, ycoordmeanbearing, row) %>%
   rename(x = xcoordmeanbearing, y = ycoordmeanbearing) %>%
-  bind_rows(CompleteDataWithGoogle %>% 
+  bind_rows(CompleteDataWithGoogle %>%
+              filter(!is.na(xcoordmeanbearing) & !is.na(xcoordbearing)) %>% 
               dplyr::select(ycoordbearing, xcoordbearing, row) %>%
-              rename(x = ycoordbearing, y = xcoordbearing))
+              rename(x = ycoordbearing, y = xcoordbearing)) 
   
 
 #360 (North) is on the right side.
 ggplot() + 
-  geom_point(data = CompleteDataCoordPlot, aes(x = x, y = y), alpha = 0.5, size = 2)+ 
+  geom_circle(aes(x0 = c(0,0), y0 = c(0,0), r = c(0.5,1), color = c("Receipt Transport Direction", "Average Wind Direction"))) + 
+  geom_point(data = CompleteDataCoordPlot, aes(x = x, y = y), alpha = 0.5, size = 2) + 
   geom_line(data = CompleteDataCoordPlot, aes(x = x, y = y, group = row)) +
-  geom_circle(aes(x0 = c(0,0), y0 = c(0,0), r = c(0.5,1))) + 
   theme_void() + 
-  theme(aspect.ratio = 1)
-
+  theme(aspect.ratio = 1) + 
+  geom_text(aes(x = c(0,1.1,0,-1.1), y = c(1.1, 0, -1.1, 0) , label = c("W", "N", "E", "S")))
+#What is row 144?
 
 plot(x.circ, stack = T)
-plotCircular(area1 = CompleteDataWithGoogle$bearing, area2 = CompleteDataWithGoogle$meanbearing, spokes = )
+#plotCircular(area1 = CompleteDataWithGoogle$bearing, area2 = CompleteDataWithGoogle$meanbearing, spokes = )
 
 ggplot(data = CompleteDataWithGoogle) +
   #geom_circle(aes(x))
