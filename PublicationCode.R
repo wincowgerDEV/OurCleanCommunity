@@ -502,7 +502,7 @@ material_diversity_boot <- site_data_cleaned %>%
   mutate(evenness = shannon/log(numgroups)) %>%
   ungroup() %>%
   group_by(Name) %>%
-  summarise(mean_even = mean(evenness), min_even = BootMean(evenness)[1], max_even = BootMean(evenness)[3], mean_numgroups = mean(numgroups), min_numgroups = BootMean(numgroups)[1], max_numgroups = BootMean(numgroups)[3]) %>%
+  summarise(mean_even = mean(evenness, na.rm = T), min_even = BootMean(evenness)[1], max_even = BootMean(evenness)[3], mean_numgroups = mean(numgroups, na.rm = T), min_numgroups = BootMean(numgroups)[1], max_numgroups = BootMean(numgroups)[3]) %>%
   ungroup()
 
 ggplot(material_diversity_boot, aes(x = mean_even, y = mean_numgroups, color = Name, label = Name)) +
@@ -526,7 +526,7 @@ item_diversity_boot <- site_data_cleaned %>%
   mutate(evenness = shannon/log(numgroups)) %>%
   ungroup() %>%
   group_by(Name) %>%
-  summarise(mean_even = mean(evenness), min_even = BootMean(evenness)[1], max_even = BootMean(evenness)[3], mean_numgroups = mean(numgroups), min_numgroups = BootMean(numgroups)[1], max_numgroups = BootMean(numgroups)[3]) %>%
+  summarise(mean_even = mean(evenness, na.rm = T), min_even = BootMean(evenness)[1], max_even = BootMean(evenness)[3], mean_numgroups = mean(numgroups, na.rm = T), min_numgroups = BootMean(numgroups)[1], max_numgroups = BootMean(numgroups)[3]) %>%
   ungroup()
 
 ggplot(item_diversity_boot, aes(x = mean_even, y = mean_numgroups, color = Name, label = Name)) +
@@ -537,6 +537,30 @@ ggplot(item_diversity_boot, aes(x = mean_even, y = mean_numgroups, color = Name,
   scale_color_viridis_d(option = "C") + 
   theme_classic()
 
+#ItemDiversity Boot
+brand_diversity_boot <- site_data_cleaned %>%
+  #filter(user_id == 92684) %>%
+  #mutate(Date = substr(photo_timestamp,1,nchar(photo_timestamp)-3)) %>%
+  mutate(Date = as.Date(Day, format = "%m/%d/%Y")) %>%
+  group_by(Date, Name) %>%
+  dplyr::summarise(shannon = calc_shannon(Manufacturer),
+                   simpson = calc_simpson(Manufacturer),
+                   menhincks = calc_menshinicks(Manufacturer),
+                   numgroups = calc_numgroups(Manufacturer)) %>%
+  mutate(evenness = shannon/log(numgroups)) %>%
+  ungroup() %>%
+  group_by(Name) %>%
+  summarise(mean_even = mean(evenness, na.rm = T), min_even = BootMean(evenness)[1], max_even = BootMean(evenness)[3], mean_numgroups = mean(numgroups, na.rm = T), min_numgroups = BootMean(numgroups)[1], max_numgroups = BootMean(numgroups)[3]) %>%
+  ungroup()
+
+ggplot(brand_diversity_boot, aes(x = mean_even, y = mean_numgroups, color = Name, label = Name)) +
+  geom_point() +
+  geom_errorbar(width=.1, aes(ymin=min_numgroups, ymax=max_numgroups)) +
+  geom_errorbar(width=.1, aes(xmin=min_even, xmax=max_even)) +
+  geom_label() +
+  scale_color_viridis_d(option = "C") + 
+  theme_classic()
+#Evenness goes down compared to the other analyses, also less diverse than items. 
 
 ggplot(material_diversity) + 
   geom_point(aes(x = Date, y = shannon)) + 
@@ -614,7 +638,33 @@ plot_ly() %>%
     domain = list(column = 1), 
     branchvalues = 'total',
     values = ItemTreeDF$totalsum)
+#Now some negative value appeared here. 
 
+
+#Brand tree df 
+BrandTreeDF <- site_data_cleaned %>%
+  group_by(Manufacturer, Brand_TT) %>%
+  summarize(totalsum = n()) %>%
+  ungroup() %>%
+  rename(to = Brand_TT, from = Manufacturer) %>%
+  bind_rows(site_data_cleaned %>%
+              group_by(Manufacturer) %>%
+              summarize(totalsum = n()) %>%
+              rename(from = Manufacturer) %>% 
+              ungroup()) %>%
+  dplyr::filter(!is.na(from)) %>%
+  mutate(to = ifelse(is.na(to), "", to))
+
+plot_ly() %>%
+  add_trace(
+    #ids = d2$ids,
+    labels = BrandTreeDF$to,
+    parents = BrandTreeDF$from,
+    type = 'sunburst',
+    #maxdepth = 2,
+    domain = list(column = 1), 
+  #  branchvalues = 'total',
+    values = BrandTreeDF$totalsum)
 
 #Trip Distances ----
 #Was thinking that we should limit this to work trips but I don't think so any more. 
