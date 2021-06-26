@@ -474,7 +474,7 @@ ggplot(arrange(material_composition, Date, Name, Intensity), aes(fill=Material_T
   #scale_fill_viridis_d() +
   facet_wrap(Name ~. , scales = "free") + 
   theme_bw()
-
+#Recognize critically that every day of the week at every site, plastic is the prevailing material type. 
 
 #Trash Diversity
 material_diversity <- site_data_cleaned %>%
@@ -512,6 +512,31 @@ ggplot(material_diversity_boot, aes(x = mean_even, y = mean_numgroups, color = N
   geom_label() +
   scale_color_viridis_d(option = "C") + 
   theme_classic()
+
+#ItemDiversity Boot
+item_diversity_boot <- site_data_cleaned %>%
+  #filter(user_id == 92684) %>%
+  #mutate(Date = substr(photo_timestamp,1,nchar(photo_timestamp)-3)) %>%
+  mutate(Date = as.Date(Day, format = "%m/%d/%Y")) %>%
+  group_by(Date, Name) %>%
+  dplyr::summarise(shannon = calc_shannon(Item_TT),
+                   simpson = calc_simpson(Item_TT),
+                   menhincks = calc_menshinicks(Item_TT),
+                   numgroups = calc_numgroups(Item_TT)) %>%
+  mutate(evenness = shannon/log(numgroups)) %>%
+  ungroup() %>%
+  group_by(Name) %>%
+  summarise(mean_even = mean(evenness), min_even = BootMean(evenness)[1], max_even = BootMean(evenness)[3], mean_numgroups = mean(numgroups), min_numgroups = BootMean(numgroups)[1], max_numgroups = BootMean(numgroups)[3]) %>%
+  ungroup()
+
+ggplot(item_diversity_boot, aes(x = mean_even, y = mean_numgroups, color = Name, label = Name)) +
+  geom_point() +
+  geom_errorbar(width=.1, aes(ymin=min_numgroups, ymax=max_numgroups)) +
+  geom_errorbar(width=.1, aes(xmin=min_even, xmax=max_even)) +
+  geom_label() +
+  scale_color_viridis_d(option = "C") + 
+  theme_classic()
+
 
 ggplot(material_diversity) + 
   geom_point(aes(x = Date, y = shannon)) + 
