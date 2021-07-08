@@ -1,8 +1,8 @@
-Name,Site Area_m2,Site_Length_m,Road_Width_m,Landuse_Type,Number_Road_Lanes,Both_Sides,Tract,Mean Income_households_2019_5year_census,Median Income_households,Cal_Enviro_Screen,Street Sweeping Schedule
-Win Cowger,2580.624,138.3,9.5,Residential,2,Yes,423,78166,57475,85-90,2nd and 4th Friday AM
-LokTrevor,6884.768,415.3,10.6,Residential,2,Yes,4004.03,119181,106875,40-45,"weird Wednesday 1st and 3rd and 5th if available Zone 1A, https://sandimasca.gov/street-sweeping-calendar/2021-10/"
-Stanley,11982.533,483.1,11.2,Mixed,2,Yes,301.04,92902,70270,95-100,? 2nd and 4th Friday am? Area not colored on map. 
-Hannah Hapich,4758,120.6,25.4,Mixed,4,Yes,509,97941,81583,65-70,1st and 3rd Tuesday PM
-Jacqueline Santiago,5839,349.5,11.6,Residential,2,Yes,71.1,93684,83211,80-85,2nd and 4th Tuesday AM
-Hina Nogi,4918,153.9,18.7,Residential,2,Yes,465,33092,22675,90-95,2nd and 4th Wednesday AM
-Melissa,7845.159,251.8,18.6,Mixed,2,Yes,465,33092,22675,90-95,2nd and 4th Wednesday AM
+Name,Site Area_m2,Site_Length_m,Road_Width_m,Landuse_Type,Number_Road_Lanes,Both_Sides,Tract,Mean Income_households_2019_5year_census,Median Income_households,Cal_Enviro_Screen,Street Sweeping Schedule,Area_m2,TractID
+Win Cowger,2580.624,138.3,9.5,Residential,2,Yes,423,78166,57475,85-90,2nd and 4th Friday AM,10008105,6065042300
+LokTrevor,6884.768,415.3,10.6,Residential,2,Yes,4004.03,119181,106875,40-45,"weird Wednesday 1st and 3rd and 5th if available Zone 1A, https://sandimasca.gov/street-sweeping-calendar/2021-10/",12909946,6037400403
+Stanley,11982.533,483.1,11.2,Mixed,2,Yes,301.04,92902,70270,95-100,? 2nd and 4th Friday am? Area not colored on map. ,3273473,6065030104
+Hannah Hapich,4758,120.6,25.4,Mixed,4,Yes,509,97941,81583,65-70,1st and 3rd Tuesday PM,5681060,6065050900
+Jacqueline Santiago,5839,349.5,11.6,Residential,2,Yes,71.1,93684,83211,80-85,2nd and 4th Tuesday AM,2480849,6071007110
+Hina Nogi,4918,153.9,18.7,Residential,2,Yes,465,33092,22675,90-95,2nd and 4th Wednesday AM,4727275,6065046500
+Melissa,7845.159,251.8,18.6,Mixed,2,Yes,465,33092,22675,90-95,2nd and 4th Wednesday AM,4727275,6065046500

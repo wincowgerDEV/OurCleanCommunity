@@ -5,4 +5,6 @@
 Trips_by_Distance.csv
 *.ini
 StudyAreas/User_Cleaned_Data/Photos/
+StudyAreas/Demographic_Site_Data/PDB_2015_Tract.csv
 *.gsheet
+Enviroscreen/

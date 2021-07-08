@@ -3,6 +3,7 @@
 
 #Libraries ----
 library(readxl)
+library(gridExtra)
 #library(dplyr)
 library(ggplot2)
 library(ggmap)
@@ -33,9 +34,23 @@ library(collapsibleTree)
 library(data.tree)
 library(plotly)
 library(ggdark)
+library(rWind)
+
 
 #Functions ----
 #Function returns the difference between two bearings
+vector_wind_average <- function(speed, direction){
+  complete_values = !is.na(direction) & !is.na(speed)
+  
+  NS = speed[complete_values] * cos(direction[complete_values]*pi/180)
+  EW = speed[complete_values] * sin(direction[complete_values]*pi/180)
+  
+  TotalNS = sum(NS)
+  TotalEW = sum(EW)
+  
+  atan2(TotalEW, TotalNS)*180/pi
+}
+
 angle_diff <- function(theta1, theta2){
   theta <- abs(theta1 - theta2) %% 360 
   return(ifelse(theta > 180, 360 - theta, theta))
@@ -49,12 +64,11 @@ rainpresabs <- function(startdate, enddate){
 }
 
 differenceofmean <- function(startdate, enddate){
-  Weather %>%
+date_range <-  Weather %>%
     dplyr::filter(Date >= as.Date(startdate, "%Y-%m-%d") & Date <= as.Date(enddate, "%Y-%m-%d")) %>%
-    dplyr::select(Mean.Wind.Dir..deg.) %>%
-    pull() %>%
-    circular(type="directions", units="degrees", template="geographics", rotation="clock") %>%
-    mean.circular(na.rm = T) %>%
+    dplyr::select(Mean.Wind.Dir..deg., Mean.Wind.Speed..mph.) #%>%
+    
+    vector_wind_average(date_range$Mean.Wind.Speed..mph., date_range$Mean.Wind.Dir..deg.) %>%
     ifelse(.<0, .+360, .)
 }
 
@@ -93,7 +107,7 @@ BootMean <- function(data) {
   set.seed(34347)
   for (i in 1:B) {
     boot <- sample(1:n, size=n, replace = TRUE)
-    mean[i] <- mean(data[boot])
+    mean[i] <- mean(data[boot], na.rm = T)
   }
   return(quantile(mean, c(0.025, 0.5, 0.975), na.rm = T))
 }
@@ -198,11 +212,13 @@ AggregateTrees <- function(DF, Alias, Hierarchy){
     mutate(Key = ifelse(is.na(Key), "other", Key)) %>%
     right_join(Hierarchy) %>%
     select(from, Key, Count) %>%
-    add_row(from = "trash", Key = "missing", Count = sum(DF$Count, na.rm = T) - sum(.$Count, na.rm = T))
+    add_row(from = "trash", Key = "missing", Count = sum(DF$Count, na.rm = T) - sum(.$Count, na.rm = T))%>%
+    mutate(Count = Count/sum(Count, na.rm = T))
+  
   
   DF_network <- FromDataFrameNetwork(DF_v2)
   
-  myApply(DF_network)
+  DF_network$Do(function(x) x$totalsum <- ifelse(is.null(x$Count), 0, x$Count) + sum(Get(x$children, "totalsum")), traversal = "post-order")
   
   Treedf <- ToDataFrameNetwork(DF_network, "totalsum") 
   
@@ -213,6 +229,54 @@ AggregateTrees <- function(DF, Alias, Hierarchy){
   
   
 }
+
+grouped_uncertainty <- function(DF_group, Group_Alias, Group_Hierarchy, type){
+  
+  groups <- DF_group %>%
+    distinct(Name, Day)
+  
+  df_join = data.frame(from = character(), 
+                       to = character(), 
+                       totalsum = numeric(), 
+                       Name = character(),
+                       Day = character())
+  
+  for(row in 1:nrow(groups)){
+    df_subset <- DF_group %>%
+      inner_join(groups[row,]) %>%
+      select(Class, Count)
+    
+    df_join <- AggregateTrees(DF = df_subset, Alias = Group_Alias, Hierarchy = Group_Hierarchy) %>%
+      mutate(from = ifelse(from == "trash", type, from)) %>%
+      mutate(Name = unname(unlist(groups[row,"Name"])), Day = unname(unlist(groups[row,"Day"]))) %>%
+      bind_rows(df_join)
+  }
+  
+  df_join_boot <- df_join %>%
+    #mutate(node_num = rep(1:27, times = nrow(groups))) %>%
+    group_by(from, to) %>%
+    summarise(mean_prop = mean(totalsum, na.rm = T), 
+              min_prop = BootMean(totalsum)[1], 
+              max_prop = BootMean(totalsum)[3])
+  
+  plot_ly() %>%
+    add_trace(
+      #ids = d2$ids,
+      labels = df_join_boot$to,
+      parents = df_join_boot$from,
+      type = 'sunburst',
+      maxdepth = 6,
+      domain = list(column = 1), 
+      branchvalues = 'total',
+      text = ~paste('</br> Mean: ', round(df_join_boot$mean_prop, 2),
+                    '</br> Min: ', round(df_join_boot$min_prop, 2),
+                    '</br> Max: ', round(df_join_boot$max_prop, 2)),
+      textinfo = "label+percent entry",
+      values = df_join_boot$mean_prop)
+}
+
+
+
 
 theme_rainplot<- function (base_size = 11, base_family = "Arial") 
 {
@@ -322,6 +386,52 @@ site_data_cleaned <- fread("StudyAreas/User_Cleaned_Data/reconciled_cleaned.csv"
   left_join(fread("StudyAreas/User_Cleaned_Data/weekend_sweep_manual.csv")) %>%
   mutate(Date = as.Date(Day, format = "%m/%d/%Y"))
   
+census_data <- fread("StudyAreas/Demographic_Site_Data/PDB_2015_Tract.csv")
+
+unique(site_data_cleaned$TractID) %in% unique(census_data$GIDTR)
+
+enviroscreen <- fread("Enviroscreen/enviroscreen_with_cols.csv")
+
+IE_Enviroscreen_Data <- census_data %>%
+  filter(County_name == "Riverside County" | County_name == "San Bernardino County") %>%
+  mutate(GIDTR = as.numeric(GIDTR)) %>%
+  dplyr::select(County_name, LAND_AREA, Tot_Population_CEN_2010, GIDTR) %>%
+  mutate(Pop_Density= Tot_Population_CEN_2010/LAND_AREA) %>%  #mutate(GIDTR = as.numeric(GIDTR)) %>%
+  inner_join(enviroscreen, by = c("GIDTR" = "tract"))
+
+dataset_enviroscreen <- census_data %>%
+  filter(County_name %in% c("Riverside County", "San Bernardino County", "Los Angeles County")) %>%
+  #dplyr::select(County_name, GIDTR) %>%
+  mutate(GIDTR = as.numeric(GIDTR)) %>%
+  dplyr::select(County_name, LAND_AREA, Tot_Population_CEN_2010, GIDTR) %>%
+  mutate(Pop_Density= Tot_Population_CEN_2010/LAND_AREA) %>% 
+  inner_join(enviroscreen, by = c("GIDTR" = "tract")) %>%
+  filter(GIDTR %in% as.numeric(site_data_cleaned$TractID))
+
+sum(IE_Enviroscreen_Data$Tot_Population_CEN_2010)/sum(IE_Enviroscreen_Data$LAND_AREA)
+sum(dataset_enviroscreen$Tot_Population_CEN_2010)/sum(dataset_enviroscreen$LAND_AREA)
+
+#skim mean values for enviroscreen
+IE_enviro_skim <- skimr::skim(IE_Enviroscreen_Data)
+data_enviro_skim <- skimr::skim(dataset_enviroscreen)
+
+
+#point uncertainty analysis ----
+intersected <- fread("StudyAreas/User_Cleaned_Data/uncertainty/points_inside_areas.csv") %>%
+  dplyr::select(id) %>%
+  mutate(inside_area = TRUE, id = as.character(id)) %>%
+  distinct()
+
+all_distances <- fread("StudyAreas/User_Cleaned_Data/uncertainty/all_points_distance_to_densified_vertices_of_area_meters.csv") %>%
+  left_join(intersected) %>%
+  mutate(inside_area = ifelse(is.na(inside_area), FALSE, inside_area)) %>%
+  mutate(distance_m = ifelse(inside_area, 0, HubDist))
+
+hist(all_distances$distance_m)
+BootMean(all_distances$distance_m)
+BootMean(all_distances$distance_m[!all_distances$inside_area])
+mean(all_distances$distance_m[!all_distances$inside_area], na.rm = T)
+summary(all_distances$distance_m)
 
 #Dataset source
 #https://data.bts.gov/Research-and-Statistics/Trips-by-Distance/w96p-f2qv
@@ -338,15 +448,27 @@ input_rate <- site_data_cleaned %>%
   group_by(Name) %>%
   mutate(DateDiff = as.numeric(Date) - dplyr::lag(as.numeric(Date), order_by = Name)) %>%
   mutate(generationrate = Intensity/DateDiff/Site_Length_m) %>%
-  filter(Date != as.Date("3/23/2020", format = "%m/%d/%Y")) %>% #Bring back in for 2020 analysis.
+  #filter(Date != as.Date("3/23/2020", format = "%m/%d/%Y")) %>% #Bring back in for 2020 analysis.
   ungroup() 
+
+weekend_sweeping <- input_rate %>%
+  mutate(type = ifelse(Weekend == "Y", "Weekend", "Non-Weekend")) %>%
+  bind_rows(input_rate %>%
+              filter(Name != "Site 6") %>%
+              mutate(type = ifelse(Sweeping == "Y", "Sweeping", "Non-Sweeping"))
+  ) 
+
+ggplot(weekend_sweeping) + 
+  geom_boxplot(aes(x = Name, y = generationrate, color = type), notch = T) + 
+  scale_y_log10() + 
+  scale_color_viridis_d()
 
 ggplot(input_rate) + geom_boxplot(aes(x = Name, y = generationrate, color = Weekend), notch = T) + scale_y_log10()
 ggplot(input_rate) + geom_boxplot(aes(x = Name, y = generationrate, color = Sweeping), notch = T) + scale_y_log10()
 
 
-ggplot(input_rate) + geom_boxplot(aes(y = generationrate, color = Weekend), notch = T) + scale_y_log10()
-ggplot(input_rate) + geom_boxplot(aes(y = generationrate, color = Sweeping), notch = T) + scale_y_log10()
+ggplot(input_rate) + geom_boxplot(aes(y = generationrate, x = Weekend), notch = T) + scale_y_log10()
+ggplot(input_rate) + geom_boxplot(aes(y = generationrate, x = Sweeping), notch = T) + scale_y_log10()
 
 #ggplot(input_rate) + geom_point(aes(x = Date, y = generationrate), notch = T) + scale_y_log10()
 # get all the start and end points
@@ -361,13 +483,15 @@ ggplot(input_rate, aes(x = Name, y = generationrate)) +
   scale_y_log10() 
 
 ggplot(input_rate, aes(x = Date, y = generationrate)) + 
-  geom_point() + 
+  geom_point(alpha = 0.5) + 
+#  geom_boxplot(aes(y = generationrate)) +
   #geom_smooth(method = "lm") +
   #geom_tile(aes(y=weekends$weekend*max(generationrate)), fill="yellow") +
-  facet_wrap(Name ~., scales = "free_x") + 
+  facet_wrap(Name ~.,strip.position =  "right", scales = "free_x", ncol = 1) + 
+  geom_text(aes(x = Date, y = 0.75, label = Intensity), size = 3) +
   theme_bw() + 
   labs(y = "Generation Rate #/Day/m") + 
-  scale_y_log10() + 
+  scale_y_log10(limits = c(0.001, 1)) + 
   scale_x_date(date_minor_breaks = "1 week")
 
 ggplot(input_rate, aes(x = Date, y = Name)) + 
@@ -387,7 +511,7 @@ mean_input_rate <- site_data_cleaned %>%
   #filter(user_id == 92684) %>%
   #mutate(Date = substr(photo_timestamp,1,nchar(photo_timestamp)-3)) %>%
   mutate(Date = as.Date(Day, format = "%m/%d/%Y")) %>%
-  group_by(Date, Name, Site_Length_m, `Mean Income_households_2019_5year_census`, `Median Income_households`, Cal_Enviro_Screen, Road_Width_m, Landuse_Type) %>%
+  group_by(Date, Name, Site_Length_m, Cal_Enviro_Screen, Road_Width_m, Landuse_Type, TractID) %>%
   summarise(Intensity = n()) %>%
   arrange(Date) %>%
   group_by(Name) %>%
@@ -395,7 +519,7 @@ mean_input_rate <- site_data_cleaned %>%
   mutate(generationrate = Intensity/DateDiff/Site_Length_m) %>%
   filter(Date != as.Date("3/23/2020", format = "%m/%d/%Y")) %>% #Bring back in for 2020 analysis.
   ungroup() %>%
-  group_by(Name, `Mean Income_households_2019_5year_census`, `Median Income_households`, Cal_Enviro_Screen, Road_Width_m, Landuse_Type) %>%
+  group_by(Name, TractID, Cal_Enviro_Screen, Road_Width_m, Landuse_Type) %>%
   summarise(mean = mean(generationrate, na.rm = T), cv = sd(generationrate, na.rm = T)/mean(generationrate, na.rm = T)) %>%
   ungroup() %>%
   dplyr::select(-Name) %>%
@@ -411,8 +535,19 @@ mean_input_rate <- site_data_cleaned %>%
     Landuse_Type == "Residential" ~ 1,
     Landuse_Type == "Mixed" ~0
   )) %>%
-  gather(key, value, -mean) %>%
-  mutate(value = as.numeric(value))
+  mutate(TractID = as.numeric(TractID)) %>%
+  left_join(enviroscreen, by = c("TractID" = "tract")) #%>%
+  left_join(census_data %>%
+              mutate(GIDTR = as.numeric(GIDTR)) %>%
+              select(LAND_AREA, Tot_Population_CEN_2010, GIDTR), by = c("TractID" = "GIDTR")) %>%
+  mutate(Pop_Density= Tot_Population_CEN_2010/LAND_AREA) %>%
+  select_if(is.numeric)
+  #gather(key, value, -mean) %>%
+  #mutate(value = as.numeric(value))
+generationcor <- stats::cor(mean_input_rate, method = "spearman")
+
+ggplot(mean_input_rate) +
+  geom_point(aes(x = mean, y = Pop_Density))
 
 ggplot(mean_input_rate) + 
   geom_point(aes(x = value, y = mean)) + 
@@ -467,12 +602,20 @@ material_composition <- site_data_cleaned %>%
   #mutate(Date = as.Date(timestamp)) %>%
   group_by(Date, Name, Material_TT) %>%
   summarise(Intensity = n()) %>%
+  arrange(Name, Intensity) %>%
   ungroup()
 
+library(Polychrome)
+
+#safe_pal <- glasbey.colors(14)
+
 ggplot(arrange(material_composition, Date, Name, Intensity), aes(fill=Material_TT, y=Intensity, x=Date)) + 
-  geom_bar(position="fill", stat="identity")+
-  #scale_fill_viridis_d() +
-  facet_wrap(Name ~. , scales = "free") + 
+  geom_bar(position="fill", stat="identity") +
+  #scale_fill_manual(values = safe_pal) +
+  #scale_fill_brewer(palette = "Dark2") +
+  #facet_wrap(Name ~. , scales = "free") + 
+  facet_wrap(Name ~.,strip.position =  "right", scales = "free_x", ncol = 1) + 
+  #geom_text(aes(x = Date, y = 0.75, label = Intensity), size = 3) +
   theme_bw()
 #Recognize critically that every day of the week at every site, plastic is the prevailing material type. 
 
@@ -503,7 +646,8 @@ material_diversity_boot <- site_data_cleaned %>%
   ungroup() %>%
   group_by(Name) %>%
   summarise(mean_even = mean(evenness, na.rm = T), min_even = BootMean(evenness)[1], max_even = BootMean(evenness)[3], mean_numgroups = mean(numgroups, na.rm = T), min_numgroups = BootMean(numgroups)[1], max_numgroups = BootMean(numgroups)[3]) %>%
-  ungroup()
+  ungroup()%>%
+  mutate(type = "Material")
 
 ggplot(material_diversity_boot, aes(x = mean_even, y = mean_numgroups, color = Name, label = Name)) +
   geom_point() +
@@ -527,7 +671,8 @@ item_diversity_boot <- site_data_cleaned %>%
   ungroup() %>%
   group_by(Name) %>%
   summarise(mean_even = mean(evenness, na.rm = T), min_even = BootMean(evenness)[1], max_even = BootMean(evenness)[3], mean_numgroups = mean(numgroups, na.rm = T), min_numgroups = BootMean(numgroups)[1], max_numgroups = BootMean(numgroups)[3]) %>%
-  ungroup()
+  ungroup() %>%
+  mutate(type = "Item")
 
 ggplot(item_diversity_boot, aes(x = mean_even, y = mean_numgroups, color = Name, label = Name)) +
   geom_point() +
@@ -551,7 +696,8 @@ brand_diversity_boot <- site_data_cleaned %>%
   ungroup() %>%
   group_by(Name) %>%
   summarise(mean_even = mean(evenness, na.rm = T), min_even = BootMean(evenness)[1], max_even = BootMean(evenness)[3], mean_numgroups = mean(numgroups, na.rm = T), min_numgroups = BootMean(numgroups)[1], max_numgroups = BootMean(numgroups)[3]) %>%
-  ungroup()
+  ungroup()%>%
+  mutate(type = "Brand")
 
 ggplot(brand_diversity_boot, aes(x = mean_even, y = mean_numgroups, color = Name, label = Name)) +
   geom_point() +
@@ -561,6 +707,22 @@ ggplot(brand_diversity_boot, aes(x = mean_even, y = mean_numgroups, color = Name
   scale_color_viridis_d(option = "C") + 
   theme_classic()
 #Evenness goes down compared to the other analyses, also less diverse than items. 
+
+
+joined_diversity <- bind_rows(material_diversity_boot, item_diversity_boot, brand_diversity_boot) %>%
+  mutate(type = factor(type, levels = c("Material", "Item", "Brand")))
+
+
+ggplot(joined_diversity, aes(x = mean_even, y = mean_numgroups, color = Name, label = Name)) +
+  geom_point() +
+  geom_errorbar(width=.05, aes(ymin=min_numgroups, ymax=max_numgroups)) +
+  geom_errorbar(width=.05, aes(xmin=min_even, xmax=max_even)) +
+  #geom_label(size = 0.5) +
+  scale_color_viridis_d(option = "C") + 
+  theme_classic() + 
+  facet_wrap(type~.)
+
+
 
 ggplot(material_diversity) + 
   geom_point(aes(x = Date, y = shannon)) + 
@@ -600,18 +762,36 @@ Material_DF <- site_data_cleaned %>%
   summarise(Count = n()) %>%
   ungroup()
 
+Material_DF_group <- site_data_cleaned %>%
+  mutate_all(removeslash) %>%
+  group_by(Material_TT, Name, Day) %>%
+  summarise(Count = n()) %>%
+  ungroup() %>%
+  rename(Class = Material_TT)
+
+
 Item_DF <- site_data_cleaned %>%
   mutate_all(removeslash) %>%
   group_by(Item_TT) %>%
   summarise(Count = n()) %>%
   ungroup() 
 
+
+Item_DF_group <- site_data_cleaned %>%
+  mutate_all(removeslash) %>%
+  group_by(Item_TT, Name, Day) %>%
+  summarise(Count = n()) %>%
+  ungroup() %>%
+  rename(Class = Item_TT)
+
+
 unmatched <- Item_DF %>%
   mutate_all(cleantext) %>%
   anti_join(ItemsAlias %>%
               mutate_all(cleantext), by = c("Item_TT" = "Alias"))
 
-MaterialTreeDF <- AggregateTrees(DF = Material_DF, Alias = MaterialsAlias, Hierarchy = MaterialsHierarchy)
+MaterialTreeDF <- AggregateTrees(DF = Material_DF, Alias = MaterialsAlias, Hierarchy = MaterialsHierarchy) %>%
+  mutate(from = ifelse(from == "trash", "Materials", from))
 
 
 plot_ly() %>%
@@ -620,12 +800,18 @@ plot_ly() %>%
     labels = MaterialTreeDF$to,
     parents = MaterialTreeDF$from,
     type = 'sunburst',
-    maxdepth = 4,
+    maxdepth = 6,
     domain = list(column = 1), 
     branchvalues = 'total',
+    textinfo = "label+percent entry",
     values = MaterialTreeDF$totalsum)
 
-ItemTreeDF <- AggregateTrees(DF = Item_DF, Alias = ItemsAlias, Hierarchy = ItemsHierarchy)
+
+
+grouped_uncertainty(DF_group = Material_DF_group, Group_Alias = MaterialsAlias, Group_Hierarchy = MaterialsHierarchy, type = "Materials")
+
+ItemTreeDF <- AggregateTrees(DF = Item_DF, Alias = ItemsAlias, Hierarchy = ItemsHierarchy) %>%
+  mutate(from = ifelse(from == "trash", "Items", from))
 
 #Add uncertainties to this by bootstrapping each days observations for the percent.
 plot_ly() %>%
@@ -634,37 +820,87 @@ plot_ly() %>%
     labels = ItemTreeDF$to,
     parents = ItemTreeDF$from,
     type = 'sunburst',
-    maxdepth = 4,
+    maxdepth = 6,
     domain = list(column = 1), 
     branchvalues = 'total',
     values = ItemTreeDF$totalsum)
 #Now some negative value appeared here. 
 
+#Item prop uncertainty
+grouped_uncertainty(DF_group = Item_DF_group, Group_Alias = ItemsAlias, Group_Hierarchy = ItemsHierarchy, type = "Items")
+
 
 #Brand tree df 
 BrandTreeDF <- site_data_cleaned %>%
+  mutate(Manufacturer = ifelse(Manufacturer == "other", Brand_TT, Manufacturer)) %>%
+  mutate(Manufacturer = ifelse(Manufacturer == "", "Unbranded", Manufacturer)) %>%
+  mutate(Manufacturer = ifelse(Brand_TT == Manufacturer, "Unmerged", Manufacturer)) %>%
+  #mutate(from = ifelse(to == "Unmerged", "Brands", from)) %>%
   group_by(Manufacturer, Brand_TT) %>%
   summarize(totalsum = n()) %>%
   ungroup() %>%
   rename(to = Brand_TT, from = Manufacturer) %>%
   bind_rows(site_data_cleaned %>%
+              mutate(Manufacturer = ifelse(Manufacturer == "other", Brand_TT, Manufacturer)) %>%
+              mutate(Manufacturer = ifelse(Manufacturer == "", "Unbranded", Manufacturer)) %>%
+              mutate(Manufacturer = ifelse(Brand_TT == Manufacturer, "Unmerged", Manufacturer)) %>%
               group_by(Manufacturer) %>%
               summarize(totalsum = n()) %>%
-              rename(from = Manufacturer) %>% 
-              ungroup()) %>%
+              rename(to = Manufacturer) %>% 
+              ungroup() %>%
+              mutate(from = "Brands")) %>%
   dplyr::filter(!is.na(from)) %>%
-  mutate(to = ifelse(is.na(to), "", to))
+  filter(to != "") %>%
+  #mutate(to = ifelse(is.na(to), "", to)) %>%
+  add_row(from = "Brands", to = "", totalsum = sum(filter(., from == "Brands") %>%
+                                                     pull(totalsum))) %>%
+  mutate(from = iconv(from, from = 'UTF-8', to = 'ASCII//TRANSLIT')) %>%
+  mutate(to = iconv(to, from = 'UTF-8', to = 'ASCII//TRANSLIT')) %>%
+  filter(from == "Brands") #This works
+  
+
 
 plot_ly() %>%
+   add_trace(
+    #ids = d2$ids,
+    labels = MaterialTreeDF$to,
+    parents = MaterialTreeDF$from,
+    type = 'sunburst',
+    maxdepth = 6,
+    domain = list(column = 0), 
+    branchvalues = 'total',
+    values = MaterialTreeDF$totalsum) %>%
+  add_trace(
+    #ids = d2$ids,
+    labels = ItemTreeDF$to,
+    parents = ItemTreeDF$from,
+    type = 'sunburst',
+    maxdepth = 6,
+    domain = list(column = 1), 
+    branchvalues = 'total',
+    values = ItemTreeDF$totalsum) %>%
   add_trace(
     #ids = d2$ids,
     labels = BrandTreeDF$to,
     parents = BrandTreeDF$from,
     type = 'sunburst',
-    #maxdepth = 2,
-    domain = list(column = 1), 
-  #  branchvalues = 'total',
-    values = BrandTreeDF$totalsum)
+    maxdepth = 2,
+    domain = list(column = 2), 
+    branchvalues = 'total',
+    values = BrandTreeDF$totalsum) %>%
+  layout(
+    grid = list(columns =3, rows = 1),
+    margin = list(l = 0.1, r = 0.1, b = 0.1, t = 0.1),
+    sunburstcolorway = c(
+      "#636efa","#EF553B","#00cc96","#ab63fa","#19d3f3",
+      "#e763fa", "#FECB52","#FFA15A","#FF6692","#B6E880"
+    ),
+    extendsunburstcolors = TRUE)
+ 
+#try this https://stackoverflow.com/questions/58173316/plotly-sunburst-plot-not-showing-in-jupyter-notebook
+
+#Unbranded things show us the importance of creating forensic labels, Unmerged things show us the importance of data science research in this field to build relational databases. Brands show us the minimum level of responsibility that these companies have for their environmental impact. Propose a fine on companies which is concomittant with their observed environmental impact and subsequent cleanup. Right now we are giving these companies subsidies on their pollution by paying for cleanup. 3% for philip moris and so on. We are incentivising their pollution by reinforcing the idea that cigarettes will just disappear when they enter the environment. This is the largest pollution we have ever seen since the BP oil spill and their should be a similar reponse from governments to end the pollution of our envioronment and hold the companies responsible.  
+
 
 #Trip Distances ----
 #Was thinking that we should limit this to work trips but I don't think so any more. 
@@ -732,11 +968,15 @@ for(row in 1:nrow(pdf_ie_dist)){
 
 #Result doesn't seem to depend much on which of the above we choose. Could also try log uniform, might be a nice way to get to the middle ground.
 
+library(grid)
 #In meters
-ggplot() + 
+p1 <- ggplot() + 
   stat_ecdf(data = CompleteDataWithGoogle, aes(x = DistanceFromLocation), color = "red") + 
   stat_ecdf(aes(x = montecarlo_vector * 1.60934 * 1000), color = "blue") + 
-  scale_x_log10()
+  scale_x_log10() #+ 
+  #annotation_custom(ggplotGrob(p2), xmin = 500, xmax = 2000, ymin = 0.5, ymax = 1)
+  
+  
 
 montecarlo_meters = montecarlo_vector * 1.60934 * 1000
 
@@ -744,7 +984,7 @@ receipt_distance_quantiles = quantile(CompleteDataWithGoogle$DistanceFromLocatio
 montecarlo_distance_quantiles = quantile(montecarlo_meters, probs = seq(0.01, 0.99, by = 0.01), na.rm = T)
 
 # Plot Quantiles against one another. 
-ggplot() + 
+p2 <- ggplot() + 
 geom_point(aes(y = receipt_distance_quantiles, x = montecarlo_distance_quantiles)) + 
   geom_smooth(aes(y = receipt_distance_quantiles, x = montecarlo_distance_quantiles),
               method = "lm") + 
@@ -758,31 +998,20 @@ linear_quantile_regression = lm(log10(receipt_distance_quantiles) ~ log10(montec
 
 #Wind and Rain ----
 
-#CompleteDataWithGoogle_Weather <- 
-#Receipt Distances ----
+#Rain ----
+for(row in 1:nrow(CompleteDataWithGoogle)){
+  CompleteDataWithGoogle[row, "precip"] <-rainpresabs(startdate = CompleteDataWithGoogle[row,"dateprintedcleaned"], enddate = CompleteDataWithGoogle[row,"TimestampDatecleaned"])
+}
 
+#Receipt Directions ----
 for(row in 1:nrow(CompleteDataWithGoogle)){ #This is the inverse of what we would think because wind direction is the inverse. This will tell us what direction the trash came from.
-  CompleteDataWithGoogle[row, "bearing"] <-bearing(lat2 = CompleteDataWithGoogle[row,"LocLat"]*pi/180, 
+  CompleteDataWithGoogle[row, "bearing"] <- swfscMisc::bearing(lat2 = CompleteDataWithGoogle[row,"LocLat"]*pi/180, 
                                                    lon2 = CompleteDataWithGoogle[row,"LocLon"]*pi/180,
                                                    lat1 = CompleteDataWithGoogle[row,"lat"]*pi/180, 
                                                    lon1 = CompleteDataWithGoogle[row,"lon"]*pi/180)[1]
 }
 
-
-x.circ <- circular(CompleteDataWithGoogle$bearing, type="directions", units="degrees", template="geographics", rotation="clock")
-rose.diag(x.circ, bins=10, col="gray", border=NA)
-
-CompleteDataWithGoogle %>%
-  filter(!is.na(Timedifference) & !is.na(bearing)) %>%
-  as_tibble()
-
-startdate <- CompleteDataWithGoogle[1, "dateprintedcleaned"]
-enddate <- CompleteDataWithGoogle[1, "TimestampDatecleaned"]
-bearing <- CompleteDataWithGoogle[1, "bearing"] 
-
-#Need to convert bearing to azimuth
-startdate = CompleteDataWithGoogle[1,"startdate"] 
-enddate = CompleteDataWithGoogle[1,"enddate"]
+#convert bearing the azimuth? 
 
 #difference between bearings.
 for(row in 1:nrow(CompleteDataWithGoogle)){
@@ -791,18 +1020,7 @@ for(row in 1:nrow(CompleteDataWithGoogle)){
 
 CompleteDataWithGoogle$differencebearings <- angle_diff(CompleteDataWithGoogle$bearing, CompleteDataWithGoogle$meanbearing)
 
-cor.circular(CompleteDataWithGoogle$bearing, CompleteDataWithGoogle$meanbearing, test = T)
-
-
-for(row in 1:nrow(CompleteDataWithGoogle)){
-  CompleteDataWithGoogle[row, "precip"] <-rainpresabs(startdate = CompleteDataWithGoogle[row,"dateprintedcleaned"], enddate = CompleteDataWithGoogle[row,"TimestampDatecleaned"])
-}
-
 #Wind velocity transport velocity correlation ----
-
-for(row in 1:nrow(CompleteDataWithGoogle)){
-  CompleteDataWithGoogle[row, "precip"] <-rainpresabs(startdate = CompleteDataWithGoogle[row,"dateprintedcleaned"], enddate = CompleteDataWithGoogle[row,"TimestampDatecleaned"])
-}
 
 x.circ <- circular(CompleteDataWithGoogle$bearing, type="directions", units="degrees", template="geographics", rotation="clock")
 rose.diag(x.circ, bins=10, col="gray", border=NA)
@@ -811,10 +1029,6 @@ y.circ <- circular(CompleteDataWithGoogle$meanbearing, type="directions", units=
 rose.diag(y.circ, bins=10, col="gray", border=NA)
 
 cor.circular(x.circ, y.circ, test = T)
-0
-
-0.5*cos(rad(90))
-0.5*sin(rad(90))
 
 CompleteDataWithGoogle$ycoordbearing <- 0.5*sin(rad(CompleteDataWithGoogle$bearing))
 CompleteDataWithGoogle$xcoordbearing <- 0.5*cos(rad(CompleteDataWithGoogle$bearing))
@@ -833,36 +1047,28 @@ CompleteDataCoordPlot <- CompleteDataWithGoogle %>%
   
 
 #360 (North) is on the right side.
-ggplot() + 
-  geom_circle(aes(x0 = c(0,0), y0 = c(0,0), r = c(0.5,1), color = c("Receipt Transport Direction", "Average Wind Direction"))) + 
+p3 <- ggplot() + 
+  geom_circle(aes(x0 = c(0,0), y0 = c(0,0), r = c(0.5,1))) + 
   geom_point(data = CompleteDataCoordPlot, aes(x = x, y = y), alpha = 0.5, size = 2) + 
   geom_line(data = CompleteDataCoordPlot, aes(x = x, y = y, group = row)) +
   theme_void() + 
-  theme(aspect.ratio = 1) + 
+  theme(aspect.ratio = 1, legend.position = NULL) + 
   geom_text(aes(x = c(0,1.1,0,-1.1), y = c(1.1, 0, -1.1, 0) , label = c("W", "N", "E", "S")))
-#What is row 144?
 
 plot(x.circ, stack = T)
 #plotCircular(area1 = CompleteDataWithGoogle$bearing, area2 = CompleteDataWithGoogle$meanbearing, spokes = )
-
-ggplot(data = CompleteDataWithGoogle) +
-  #geom_circle(aes(x))
-  geom_point(aes(x = bearing)) +
-  coord_polar()# +
-  #scale_x_continuous(limits = c(0,360))
-
-
-plot(x = y.circ)
-lines.circular(x = x.circ, y = y.circ, nosort = T)
+plot(x = y.circ, stack = T)
 
 ggplot(CompleteDataWithGoogle, aes(x = "differnce", y = differencebearings)) + geom_boxplot(notch = T)
 
 #how many of the receipts could have experienced precipitation?
-CompleteDataWithGoogle %>%
+p4 <- CompleteDataWithGoogle %>%
   filter(!is.na(dateprintedcleaned) & !is.na(TimestampDatecleaned)) %>%
   group_by(precip) %>%
   summarise(count = n()) %>%
   ggplot() + geom_col(aes(x = precip, y = count))
+
+grid.arrange(p4,p3,p1,p2, ncol = 4)
 
 ggplot(CompleteDataWithGoogle, aes(x = differencebearings)) + geom_histogram(bins = 10) + scale_x_continuous(breaks = c(seq(0,180, by = 20)))+ dark_theme_classic(base_size = 20, base_line_size = 2) + labs(x = "Direction Angle Difference")
 ggplot(CompleteDataWithGoogle, aes(x = DistanceFromLocation/Timedifference)) + geom_histogram(bins = 10) + scale_x_continuous()+ dark_theme_classic(base_size = 20, base_line_size = 2) + scale_x_log10() + labs(x = "Meters Traveled per Day")
