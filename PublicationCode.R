@@ -485,10 +485,12 @@ ggplot(weekend_sweeping) +
   scale_color_viridis_d()
 
 ggplot() + 
-  geom_boxplot(data = input_rate, aes(x = Name, y = generationrate)) + 
-  geom_errorbar(data = mean_input_rate, aes(x = Name, y = mean, ymin = minmean, ymax = maxmean), color = "red")+
+  geom_boxplot(data = input_rate %>%
+                 bind_rows(input_rate %>%
+                             mutate(Name = "All")), aes(x = Name, y = generationrate)) + 
+  geom_errorbar(data = mean_input_rate, aes(x = Name, y = mean, ymin = minmean, ymax = maxmean),color = "red", width = 0.25)+
   geom_point(data = mean_input_rate, aes(x = Name, y = mean), color = "red")+
-  geom_text(data = mean_input_rate, aes(x = Name, y = 0.75, label = paste(round(cv, 2), " (", count, ")", sep = "")), size = 5) +
+  geom_text(data = mean_input_rate, aes(x = Name, y = 0.75, label = paste("n=", count, "", sep = "")), size = 5) +
   theme_bw(base_size = 20) + 
   labs(y = "Generation Rate #/Day/m") + 
   scale_y_log10(limits = c(0.001, 1)) 
