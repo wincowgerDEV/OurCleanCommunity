@@ -272,6 +272,15 @@ grouped_uncertainty <- function(DF_group, Group_Alias, Group_Hierarchy, type){
                     '</br> Min: ', round(df_join_boot$min_prop, 2),
                     '</br> Max: ', round(df_join_boot$max_prop, 2)),
       textinfo = "label+percent entry",
+      texttemplate = paste(df_join_boot$to, 
+                           "<br>", 
+                           round(df_join_boot$mean_prop, 2) * 100, 
+                           " (", 
+                           round(df_join_boot$min_prop, 2) * 100, 
+                           "-", 
+                           round(df_join_boot$max_prop, 2) * 100, 
+                           ")%", 
+                           sep = ""),
       values = df_join_boot$mean_prop)
 }
 
@@ -458,7 +467,9 @@ weekend_sweeping <- input_rate %>%
   bind_rows(input_rate %>%
               filter(Name != "Site 6") %>%
               mutate(type = ifelse(Sweeping == "Y", "Sweeping", "Non-Sweeping"))
-  ) 
+  ) %>%
+  group_by(Name, type) %>%
+  summarise(count = n(), mean = mean(generationrate, na.rm = T), cv = sd(generationrate, na.rm = T)/mean(generationrate, na.rm = T), minmean = BootMean(generationrate)[1], maxmean = BootMean(generationrate)[3])
 
 #Input Rate Correlation
 mean_input_rate <- site_data_cleaned %>%
@@ -479,10 +490,15 @@ mean_input_rate <- site_data_cleaned %>%
   ungroup()  
 
 ##plots ----
-ggplot(weekend_sweeping) + 
-  geom_boxplot(aes(x = Name, y = generationrate, color = type), notch = T) + 
-  scale_y_log10() + 
-  scale_color_viridis_d()
+ggplot(weekend_sweeping, aes(group = type, color = type)) + 
+  geom_errorbar(aes(x = Name, y = mean, ymin = minmean, ymax = maxmean), position = position_dodge(width = 0.8))+
+  geom_point(aes(x = Name, y = mean),position = position_dodge(width = 0.8))+
+  geom_text(aes(x = Name, y = 0.75, label = paste("n=", count, "", sep = "")), position = position_dodge(width = 0.8), size = 4) +  
+  scale_y_log10(limits = c(0.001, 1)) + 
+  scale_color_viridis_d() + 
+  theme_bw(base_size = 20) + 
+  theme(legend.title = element_blank()) + 
+  labs(x = "", y = "Generation Rate (#/Day/m)")
 
 ggplot() + 
   geom_boxplot(data = input_rate %>%
@@ -492,15 +508,15 @@ ggplot() +
   geom_point(data = mean_input_rate, aes(x = Name, y = mean), color = "red")+
   geom_text(data = mean_input_rate, aes(x = Name, y = 0.75, label = paste("n=", count, "", sep = "")), size = 5) +
   theme_bw(base_size = 20) + 
-  labs(y = "Generation Rate #/Day/m") + 
+  labs(y = "Generation Rate (#/Day/m)") + 
   scale_y_log10(limits = c(0.001, 1)) 
 
 ggplot(input_rate, aes(x = Date, y = generationrate)) + 
   geom_point(alpha = 0.5) + 
   facet_wrap(Name ~.,strip.position =  "right", scales = "free_x", ncol = 1) + 
   geom_text(aes(x = Date, y = 0.75, label = Intensity), size = 3) +
-  theme_bw() + 
-  labs(y = "Generation Rate #/Day/m") + 
+  theme_bw(base_size = 18) + 
+  labs(y = "Generation Rate (#/Day/m)") + 
   scale_y_log10(limits = c(0.001, 1)) + 
   scale_x_date(date_minor_breaks = "1 week")
 
@@ -508,11 +524,9 @@ ggplot(input_rate, aes(x = Date, y = Name)) +
   geom_point(alpha = 0.5, size = 4) + 
   #geom_smooth(method = "lm") +
   #facet_wrap(Name ~., scales = "free") + 
-  theme_bw() + 
+  theme_bw(base_size = 20) + 
   labs(y = "Site") + 
   scale_x_date(date_minor_breaks = "1 month")
-
-
 
 
 mean_for_corrleation <- site_data_cleaned %>%
@@ -539,29 +553,34 @@ mean_for_corrleation <- site_data_cleaned %>%
     Landuse_Type == "Residential" ~ 1,
     Landuse_Type == "Mixed" ~0
   )) %>%
-  mutate(TractID = as.numeric(TractID)) 
+  mutate(TractID = as.numeric(TractID)) %>%
   left_join(enviroscreen, by = c("TractID" = "tract")) %>%
   left_join(census_data %>%
               mutate(GIDTR = as.numeric(GIDTR)) %>%
               select(LAND_AREA, Tot_Population_CEN_2010, GIDTR), by = c("TractID" = "GIDTR")) %>%
-  mutate(Pop_Density= Tot_Population_CEN_2010/LAND_AREA) %>%
-  select_if(is.numeric)
+  mutate(Pop_Density= Tot_Population_CEN_2010/LAND_AREA)
   #gather(key, value, -mean) %>%
   #mutate(value = as.numeric(value))
   
-generationcor <- stats::cor(mean_for_corrleation, method = "spearman")
+mean_for_corrleation_numeric <- mean_for_corrleation %>%
+  select_if(is.numeric)
 
-ggplot(mean_input_rate) +
-  geom_point(aes(x = mean, y = Pop_Density))
+generationcor <- stats::cor(mean_for_corrleation_numeric, method = "spearman")
 
-ggplot(mean_input_rate) + 
-  geom_point(aes(x = value, y = mean)) + 
-  facet_wrap(key~., scales = "free") + 
-  labs(y = "Mean Trash Generation (#/m/day") + 
-  theme_bw()
+mean_for_corrleation_numeric %>%
+  gather(key = "variable", value = "value", -mean, -minmean, -maxmean) %>%
+ggplot(aes(y = mean, x = value)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = minmean, ymax = maxmean)) + 
+  scale_y_log10() + 
+  facet_wrap(~variable, scales = "free")+
+  theme_bw(base_size = 10)
 
-
-
+# ggplot(mean_input_rate) + 
+#  geom_point(aes(x = value, y = mean)) + 
+#  facet_wrap(key~., scales = "free") + 
+#  labs(y = "Mean Trash Generation (#/m/day") + 
+#  theme_bw()
 
 #Material Types By Site and Date
 material_composition <- site_data_cleaned %>%
@@ -574,7 +593,7 @@ material_composition <- site_data_cleaned %>%
   arrange(Name, Intensity) %>%
   ungroup()
 
-library(Polychrome)
+#library(Polychrome)
 
 #safe_pal <- glasbey.colors(14)
 
@@ -753,12 +772,20 @@ Item_DF_group <- site_data_cleaned %>%
   ungroup() %>%
   rename(Class = Item_TT)
 
+Brand_DF_group <- site_data_cleaned %>%
+  mutate_all(removeslash) %>%
+  group_by(Brand_TT, Name, Day) %>%
+  summarise(Count = n()) %>%
+  ungroup() %>%
+  rename(Class = Item_TT)
+
 
 unmatched <- Item_DF %>%
   mutate_all(cleantext) %>%
   anti_join(ItemsAlias %>%
               mutate_all(cleantext), by = c("Item_TT" = "Alias"))
 
+##Material taxonomy ----
 MaterialTreeDF <- AggregateTrees(DF = Material_DF, Alias = MaterialsAlias, Hierarchy = MaterialsHierarchy) %>%
   mutate(from = ifelse(from == "trash", "Materials", from))
 
@@ -766,19 +793,20 @@ MaterialTreeDF <- AggregateTrees(DF = Material_DF, Alias = MaterialsAlias, Hiera
 plot_ly() %>%
   add_trace(
     #ids = d2$ids,
-    labels = MaterialTreeDF$to,
+    labels = MaterialTreeDF$to, #needs parents and labels to correspond
     parents = MaterialTreeDF$from,
     type = 'sunburst',
     maxdepth = 6,
     domain = list(column = 1), 
     branchvalues = 'total',
     textinfo = "label+percent entry",
+    texttemplate = paste("A", MaterialTreeDF$to),
     values = MaterialTreeDF$totalsum)
-
 
 
 grouped_uncertainty(DF_group = Material_DF_group, Group_Alias = MaterialsAlias, Group_Hierarchy = MaterialsHierarchy, type = "Materials")
 
+##Item taxonoy ----
 ItemTreeDF <- AggregateTrees(DF = Item_DF, Alias = ItemsAlias, Hierarchy = ItemsHierarchy) %>%
   mutate(from = ifelse(from == "trash", "Items", from))
 
@@ -798,17 +826,25 @@ plot_ly() %>%
 #Item prop uncertainty
 grouped_uncertainty(DF_group = Item_DF_group, Group_Alias = ItemsAlias, Group_Hierarchy = ItemsHierarchy, type = "Items")
 
-
-#Brand tree df 
+##Brand tree df ----
 BrandTreeDF <- site_data_cleaned %>%
   mutate(Manufacturer = ifelse(Manufacturer == "other", Brand_TT, Manufacturer)) %>%
   mutate(Manufacturer = ifelse(Manufacturer == "", "Unbranded", Manufacturer)) %>%
   mutate(Manufacturer = ifelse(Brand_TT == Manufacturer, "Unmerged", Manufacturer)) %>%
   #mutate(from = ifelse(to == "Unmerged", "Brands", from)) %>%
-  group_by(Manufacturer, Brand_TT) %>%
+  group_by(Manufacturer, Brand_TT, Name, Day) %>%
   summarize(totalsum = n()) %>%
   ungroup() %>%
+  group_by(Name, Day) %>%
+  mutate(totalsum_value = sum(totalsum)) %>%
+  ungroup() %>%
+  mutate(totalsum = totalsum/totalsum_value) %>%
   rename(to = Brand_TT, from = Manufacturer) %>%
+  group_by(from, to) %>%
+  summarise(mean_prop = mean(totalsum, na.rm = T), 
+            min_prop = BootMean(totalsum)[1], 
+            max_prop = BootMean(totalsum)[3]) %>%
+  ungroup()
   bind_rows(site_data_cleaned %>%
               mutate(Manufacturer = ifelse(Manufacturer == "other", Brand_TT, Manufacturer)) %>%
               mutate(Manufacturer = ifelse(Manufacturer == "", "Unbranded", Manufacturer)) %>%
@@ -827,6 +863,39 @@ BrandTreeDF <- site_data_cleaned %>%
   mutate(to = iconv(to, from = 'UTF-8', to = 'ASCII//TRANSLIT')) %>%
   filter(from == "Brands") #This works
   
+
+df_join_boot <- BrandTreeDF %>%
+  #mutate(node_num = rep(1:27, times = nrow(groups))) %>%
+  group_by(from, to) %>%
+  summarise(mean_prop = mean(totalsum, na.rm = T), 
+            min_prop = BootMean(totalsum)[1], 
+            max_prop = BootMean(totalsum)[3])
+
+plot_ly() %>%
+  add_trace(
+    #ids = d2$ids,
+    labels = df_join_boot$to,
+    parents = df_join_boot$from,
+    type = 'sunburst',
+    maxdepth = 6,
+    domain = list(column = 1), 
+    branchvalues = 'total',
+    text = ~paste('</br> Mean: ', round(df_join_boot$mean_prop, 2),
+                  '</br> Min: ', round(df_join_boot$min_prop, 2),
+                  '</br> Max: ', round(df_join_boot$max_prop, 2)),
+    textinfo = "label+percent entry",
+    texttemplate = paste(df_join_boot$to, 
+                         "<br>", 
+                         round(df_join_boot$mean_prop, 2) * 100, 
+                         " (", 
+                         round(df_join_boot$min_prop, 2) * 100, 
+                         "-", 
+                         round(df_join_boot$max_prop, 2) * 100, 
+                         ")%", 
+                         sep = ""),
+    values = df_join_boot$mean_prop)
+
+
 
 
 plot_ly() %>%
