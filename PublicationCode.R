@@ -438,7 +438,9 @@ summary(all_distances$distance_m)
 
 #Basic Stats 2018 ----
 
-#Input Rate Changes
+#Generation Rate Changes ----
+
+##Data cleaning ----
 input_rate <- site_data_cleaned %>%
   #filter(user_id == 92684) %>%
   #mutate(Date = substr(photo_timestamp,1,nchar(photo_timestamp)-3)) %>%
@@ -458,35 +460,41 @@ weekend_sweeping <- input_rate %>%
               mutate(type = ifelse(Sweeping == "Y", "Sweeping", "Non-Sweeping"))
   ) 
 
+#Input Rate Correlation
+mean_input_rate <- site_data_cleaned %>%
+  #filter(user_id == 92684) %>%
+  #mutate(Date = substr(photo_timestamp,1,nchar(photo_timestamp)-3)) %>%
+  mutate(Date = as.Date(Day, format = "%m/%d/%Y")) %>%
+  group_by(Date, Name, Site_Length_m, Cal_Enviro_Screen, Road_Width_m, Landuse_Type, TractID) %>%
+  summarise(Intensity = n()) %>%
+  arrange(Date) %>%
+  group_by(Name) %>%
+  mutate(DateDiff = as.numeric(Date) - dplyr::lag(as.numeric(Date), order_by = Name)) %>%
+  mutate(generationrate = Intensity/DateDiff/Site_Length_m) %>%
+  #filter(Date != as.Date("3/23/2020", format = "%m/%d/%Y")) %>% #Bring back in for 2020 analysis.
+  ungroup() %>%
+  bind_rows(mutate(., Name = "All")) %>%
+  group_by(Name) %>%
+  summarise(count = n(), mean = mean(generationrate, na.rm = T), cv = sd(generationrate, na.rm = T)/mean(generationrate, na.rm = T), minmean = BootMean(generationrate)[1], maxmean = BootMean(generationrate)[3]) %>%
+  ungroup()  
+
+##plots ----
 ggplot(weekend_sweeping) + 
   geom_boxplot(aes(x = Name, y = generationrate, color = type), notch = T) + 
   scale_y_log10() + 
   scale_color_viridis_d()
 
-ggplot(input_rate) + geom_boxplot(aes(x = Name, y = generationrate, color = Weekend), notch = T) + scale_y_log10()
-ggplot(input_rate) + geom_boxplot(aes(x = Name, y = generationrate, color = Sweeping), notch = T) + scale_y_log10()
-
-
-ggplot(input_rate) + geom_boxplot(aes(y = generationrate, x = Weekend), notch = T) + scale_y_log10()
-ggplot(input_rate) + geom_boxplot(aes(y = generationrate, x = Sweeping), notch = T) + scale_y_log10()
-
-#ggplot(input_rate) + geom_point(aes(x = Date, y = generationrate), notch = T) + scale_y_log10()
-# get all the start and end points
-
-ggplot(input_rate, aes(x = Name, y = generationrate)) + 
-  geom_boxplot(notch = T) + 
-  #geom_smooth(method = "lm") +
-  #geom_tile(aes(y=weekends$weekend*max(generationrate)), fill="yellow") +
-  #facet_wrap(Name ~., scales = "free_x") + 
-  theme_bw() + 
+ggplot() + 
+  geom_boxplot(data = input_rate, aes(x = Name, y = generationrate)) + 
+  geom_errorbar(data = mean_input_rate, aes(x = Name, y = mean, ymin = minmean, ymax = maxmean), color = "red")+
+  geom_point(data = mean_input_rate, aes(x = Name, y = mean), color = "red")+
+  geom_text(data = mean_input_rate, aes(x = Name, y = 0.75, label = paste(round(cv, 2), " (", count, ")", sep = "")), size = 5) +
+  theme_bw(base_size = 20) + 
   labs(y = "Generation Rate #/Day/m") + 
-  scale_y_log10() 
+  scale_y_log10(limits = c(0.001, 1)) 
 
 ggplot(input_rate, aes(x = Date, y = generationrate)) + 
   geom_point(alpha = 0.5) + 
-#  geom_boxplot(aes(y = generationrate)) +
-  #geom_smooth(method = "lm") +
-  #geom_tile(aes(y=weekends$weekend*max(generationrate)), fill="yellow") +
   facet_wrap(Name ~.,strip.position =  "right", scales = "free_x", ncol = 1) + 
   geom_text(aes(x = Date, y = 0.75, label = Intensity), size = 3) +
   theme_bw() + 
@@ -502,14 +510,10 @@ ggplot(input_rate, aes(x = Date, y = Name)) +
   labs(y = "Site") + 
   scale_x_date(date_minor_breaks = "1 month")
 
-##
-two <- site_data_cleaned %>%
-  filter(Name == "Site 2")
 
-#Input Rate Correlation
-mean_input_rate <- site_data_cleaned %>%
-  #filter(user_id == 92684) %>%
-  #mutate(Date = substr(photo_timestamp,1,nchar(photo_timestamp)-3)) %>%
+
+
+mean_for_corrleation <- site_data_cleaned %>%
   mutate(Date = as.Date(Day, format = "%m/%d/%Y")) %>%
   group_by(Date, Name, Site_Length_m, Cal_Enviro_Screen, Road_Width_m, Landuse_Type, TractID) %>%
   summarise(Intensity = n()) %>%
@@ -517,12 +521,10 @@ mean_input_rate <- site_data_cleaned %>%
   group_by(Name) %>%
   mutate(DateDiff = as.numeric(Date) - dplyr::lag(as.numeric(Date), order_by = Name)) %>%
   mutate(generationrate = Intensity/DateDiff/Site_Length_m) %>%
-  filter(Date != as.Date("3/23/2020", format = "%m/%d/%Y")) %>% #Bring back in for 2020 analysis.
   ungroup() %>%
   group_by(Name, TractID, Cal_Enviro_Screen, Road_Width_m, Landuse_Type) %>%
-  summarise(mean = mean(generationrate, na.rm = T), cv = sd(generationrate, na.rm = T)/mean(generationrate, na.rm = T)) %>%
+  summarise(mean = mean(generationrate, na.rm = T), cv = sd(generationrate, na.rm = T)/mean(generationrate, na.rm = T), minmean = BootMean(generationrate)[1], maxmean = BootMean(generationrate)[3]) %>%
   ungroup() %>%
-  dplyr::select(-Name) %>%
   mutate(Cal_Enviro_Screen = case_when(
     Cal_Enviro_Screen == "40-45" ~ 42.5,
     Cal_Enviro_Screen == "65-70" ~ 67.5,
@@ -535,8 +537,8 @@ mean_input_rate <- site_data_cleaned %>%
     Landuse_Type == "Residential" ~ 1,
     Landuse_Type == "Mixed" ~0
   )) %>%
-  mutate(TractID = as.numeric(TractID)) %>%
-  left_join(enviroscreen, by = c("TractID" = "tract")) #%>%
+  mutate(TractID = as.numeric(TractID)) 
+  left_join(enviroscreen, by = c("TractID" = "tract")) %>%
   left_join(census_data %>%
               mutate(GIDTR = as.numeric(GIDTR)) %>%
               select(LAND_AREA, Tot_Population_CEN_2010, GIDTR), by = c("TractID" = "GIDTR")) %>%
@@ -544,7 +546,8 @@ mean_input_rate <- site_data_cleaned %>%
   select_if(is.numeric)
   #gather(key, value, -mean) %>%
   #mutate(value = as.numeric(value))
-generationcor <- stats::cor(mean_input_rate, method = "spearman")
+  
+generationcor <- stats::cor(mean_for_corrleation, method = "spearman")
 
 ggplot(mean_input_rate) +
   geom_point(aes(x = mean, y = Pop_Density))
@@ -555,43 +558,7 @@ ggplot(mean_input_rate) +
   labs(y = "Mean Trash Generation (#/m/day") + 
   theme_bw()
 
-#Input Rate Correlation
-cv_input_rate <- site_data_cleaned %>%
-  #filter(user_id == 92684) %>%
-  #mutate(Date = substr(photo_timestamp,1,nchar(photo_timestamp)-3)) %>%
-  mutate(Date = as.Date(Day, format = "%m/%d/%Y")) %>%
-  group_by(Date, Name, Site_Length_m, `Mean Income_households_2019_5year_census`, `Median Income_households`, Cal_Enviro_Screen, Road_Width_m, Landuse_Type) %>%
-  summarise(Intensity = n()) %>%
-  arrange(Date) %>%
-  group_by(Name) %>%
-  mutate(DateDiff = as.numeric(Date) - dplyr::lag(as.numeric(Date), order_by = Name)) %>%
-  mutate(generationrate = Intensity/DateDiff/Site_Length_m) %>%
-  filter(Date != as.Date("3/23/2020", format = "%m/%d/%Y")) %>% #Bring back in for 2020 analysis.
-  ungroup() %>%
-  group_by(Name, `Mean Income_households_2019_5year_census`, `Median Income_households`, Cal_Enviro_Screen, Road_Width_m, Landuse_Type) %>%
-  summarise(mean = mean(generationrate, na.rm = T), cv = sd(generationrate, na.rm = T)/mean(generationrate, na.rm = T)) %>%
-  ungroup() %>%
-  dplyr::select(-Name) %>%
-  mutate(Cal_Enviro_Screen = case_when(
-    Cal_Enviro_Screen == "40-45" ~ 42.5,
-    Cal_Enviro_Screen == "65-70" ~ 67.5,
-    Cal_Enviro_Screen == "80-85" ~ 82.5,
-    Cal_Enviro_Screen == "85-90" ~ 87.5,
-    Cal_Enviro_Screen == "90-95" ~ 92.5,
-    Cal_Enviro_Screen == "95-100" ~ 97.5,
-  )) %>%
-  mutate(Landuse_Type = case_when(
-    Landuse_Type == "Residential" ~ 1,
-    Landuse_Type == "Mixed" ~0
-  )) %>%
-  gather(key, value, -cv) %>%
-  mutate(value = as.numeric(value))
 
-ggplot(cv_input_rate) + 
-  geom_point(aes(x = value, y = cv)) + 
-  facet_wrap(key~., scales = "free") + 
-  labs(y = "Coeficient of Variation Trash Generation (#/m/day") + 
-  theme_bw()
 
 
 #Material Types By Site and Date
