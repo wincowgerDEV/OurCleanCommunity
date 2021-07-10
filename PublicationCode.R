@@ -837,7 +837,13 @@ Brands_not_merged <- site_data_cleaned %>%
   filter(is.na(ID) & Manufacturer != "other") #All branded and joined data has an id
   #distinct(Brand_TT) %>%
   #anti_join(BrandHierarchy, by = c( "Brand_TT" = "to"))
-  
+days_sites_exist <- site_data_cleaned %>%
+  distinct(Name, Day)
+#This is generating days which did not exist at a site. 
+
+zero_values_brands <- expand.grid(to = unique(site_data_cleaned$Brand_TT), from = unique(site_data_cleaned$Manufacturer), Name = unique(site_data_cleaned$Name), Day = unique(site_data_cleaned$Day)) %>%
+  inner_join(days_sites_exist)
+
 Brand_DF_group <- site_data_cleaned %>%
   mutate(Manufacturer = ifelse(Manufacturer == "other" & Brand_TT != "", "Unmerged", ifelse(Manufacturer == "other" & Brand_TT == "", "Unbranded", Manufacturer))) %>%
   group_by(Manufacturer, Brand_TT, Name, Day) %>%
@@ -853,7 +859,6 @@ Brand_DF_group <- site_data_cleaned %>%
   full_join(zero_values_brands) %>%
   mutate(totalsum = ifelse(is.na(totalsum), 0, totalsum))
 
-zero_values_brands <- expand.grid(to = unique(Brand_DF_group$to), from = unique(Brand_DF_group$from), Name = unique(Brand_DF_group$Name), Day = unique(Brand_DF_group$Day))
 
 BrandTreeDF <- Brand_DF_group %>%
   #%>% #Need to add in zero values here for combos that do not exist. 
@@ -861,8 +866,10 @@ BrandTreeDF <- Brand_DF_group %>%
   summarise(mean_prop = mean(totalsum, na.rm = T), 
             min_prop = BootMean(totalsum)[1], 
             max_prop = BootMean(totalsum)[3]) %>%
-  ungroup() #Add pipe here
+  ungroup() #Add pipe here, could also skip the from-too combo and go straight to from. Might want to do a totalsum sum on the next line before adding in the bootstrap. 
   bind_rows(Brand_DF_group %>%
+              group_by(from , Name, Day) %>%
+              summarise(totalsum = sum(totalsum)) %>%
               group_by(from) %>%
               summarise(mean_prop = mean(totalsum, na.rm = T), 
                         min_prop = BootMean(totalsum)[1], 
@@ -875,9 +882,19 @@ BrandTreeDF <- Brand_DF_group %>%
   filter(to != "") %>% #Is this still relevant?
   add_row(from = "Brands", to = "", totalsum = sum(filter(., from == "Brands") %>%
                                                      pull(totalsum))) %>%
-  
   filter(from == "Brands") #This works but removes the brand info
   
+#From this it looks like zeros are being propogated to days where they don't belong since there is really high uncertainty even for unbranded 
+#something like this probably works to summarize the from column only. 
+test <- Brand_DF_group %>%
+    group_by(from, Name, Day) %>%
+    summarise(totalsum = sum(totalsum)) %>%
+    ungroup() %>%
+    group_by(from) %>%
+    summarise(mean_prop = mean(totalsum, na.rm = T), 
+            min_prop = BootMean(totalsum)[1], 
+            max_prop = BootMean(totalsum)[3]) %>%
+    ungroup()
 
 df_join_boot <- BrandTreeDF %>%
   #mutate(node_num = rep(1:27, times = nrow(groups))) %>%
