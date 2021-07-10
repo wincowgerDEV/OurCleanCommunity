@@ -732,6 +732,11 @@ ItemsHierarchy <- read.csv("Taxonomy/Website/Items_Hierarchy_V2.csv")
 
 #Test items not matched 
 
+BrandHierarchy <- read.csv("Taxonomy/Website/BrandManufacturer.csv") %>%
+  rename(to = Brand, from = Manufacturer) %>%
+  
+
+
 MaterialsHierarchy <- read.csv("Taxonomy/Website/Materials_Hierarchy_V2.csv") 
 
 ItemsAlias <- read.csv("Taxonomy/Website/Items_Alias_V2.csv")%>%
@@ -777,7 +782,7 @@ Brand_DF_group <- site_data_cleaned %>%
   group_by(Brand_TT, Name, Day) %>%
   summarise(Count = n()) %>%
   ungroup() %>%
-  rename(Class = Item_TT)
+  rename(Class = Brand_TT)
 
 
 unmatched <- Item_DF %>%
@@ -827,11 +832,14 @@ plot_ly() %>%
 grouped_uncertainty(DF_group = Item_DF_group, Group_Alias = ItemsAlias, Group_Hierarchy = ItemsHierarchy, type = "Items")
 
 ##Brand tree df ----
-BrandTreeDF <- site_data_cleaned %>%
-  mutate(Manufacturer = ifelse(Manufacturer == "other", Brand_TT, Manufacturer)) %>%
-  mutate(Manufacturer = ifelse(Manufacturer == "", "Unbranded", Manufacturer)) %>%
-  mutate(Manufacturer = ifelse(Brand_TT == Manufacturer, "Unmerged", Manufacturer)) %>%
-  #mutate(from = ifelse(to == "Unmerged", "Brands", from)) %>%
+
+Brands_not_merged <- site_data_cleaned %>%
+  filter(is.na(ID) & Manufacturer != "other") #All branded and joined data has an id
+  #distinct(Brand_TT) %>%
+  #anti_join(BrandHierarchy, by = c( "Brand_TT" = "to"))
+  
+Brand_DF_group <- site_data_cleaned %>%
+  mutate(Manufacturer = ifelse(Manufacturer == "other" & Brand_TT != "", "Unmerged", ifelse(Manufacturer == "other" & Brand_TT == "", "Unbranded", Manufacturer))) %>%
   group_by(Manufacturer, Brand_TT, Name, Day) %>%
   summarize(totalsum = n()) %>%
   ungroup() %>%
@@ -840,28 +848,35 @@ BrandTreeDF <- site_data_cleaned %>%
   ungroup() %>%
   mutate(totalsum = totalsum/totalsum_value) %>%
   rename(to = Brand_TT, from = Manufacturer) %>%
+  mutate(from = iconv(from, from = 'UTF-8', to = 'ASCII//TRANSLIT')) %>%
+  mutate(to = iconv(to, from = 'UTF-8', to = 'ASCII//TRANSLIT'))%>%
+  full_join(zero_values_brands) %>%
+  mutate(totalsum = ifelse(is.na(totalsum), 0, totalsum))
+
+zero_values_brands <- expand.grid(to = unique(Brand_DF_group$to), from = unique(Brand_DF_group$from), Name = unique(Brand_DF_group$Name), Day = unique(Brand_DF_group$Day))
+
+BrandTreeDF <- Brand_DF_group %>%
+  #%>% #Need to add in zero values here for combos that do not exist. 
   group_by(from, to) %>%
   summarise(mean_prop = mean(totalsum, na.rm = T), 
             min_prop = BootMean(totalsum)[1], 
             max_prop = BootMean(totalsum)[3]) %>%
-  ungroup()
-  bind_rows(site_data_cleaned %>%
-              mutate(Manufacturer = ifelse(Manufacturer == "other", Brand_TT, Manufacturer)) %>%
-              mutate(Manufacturer = ifelse(Manufacturer == "", "Unbranded", Manufacturer)) %>%
-              mutate(Manufacturer = ifelse(Brand_TT == Manufacturer, "Unmerged", Manufacturer)) %>%
-              group_by(Manufacturer) %>%
-              summarize(totalsum = n()) %>%
-              rename(to = Manufacturer) %>% 
+  ungroup() #Add pipe here
+  bind_rows(Brand_DF_group %>%
+              group_by(from) %>%
+              summarise(mean_prop = mean(totalsum, na.rm = T), 
+                        min_prop = BootMean(totalsum)[1], 
+                        max_prop = BootMean(totalsum)[3]) %>%
+              ungroup() %>%
+              rename(to = from) %>% 
               ungroup() %>%
               mutate(from = "Brands")) %>%
-  dplyr::filter(!is.na(from)) %>%
-  filter(to != "") %>%
-  #mutate(to = ifelse(is.na(to), "", to)) %>%
+  dplyr::filter(!is.na(from)) %>% #This still relevant with new code?
+  filter(to != "") %>% #Is this still relevant?
   add_row(from = "Brands", to = "", totalsum = sum(filter(., from == "Brands") %>%
                                                      pull(totalsum))) %>%
-  mutate(from = iconv(from, from = 'UTF-8', to = 'ASCII//TRANSLIT')) %>%
-  mutate(to = iconv(to, from = 'UTF-8', to = 'ASCII//TRANSLIT')) %>%
-  filter(from == "Brands") #This works
+  
+  filter(from == "Brands") #This works but removes the brand info
   
 
 df_join_boot <- BrandTreeDF %>%
