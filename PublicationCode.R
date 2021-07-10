@@ -841,7 +841,7 @@ days_sites_exist <- site_data_cleaned %>%
   distinct(Name, Day)
 #This is generating days which did not exist at a site. 
 
-zero_values_brands <- expand.grid(to = unique(site_data_cleaned$Brand_TT), from = unique(site_data_cleaned$Manufacturer), Name = unique(site_data_cleaned$Name), Day = unique(site_data_cleaned$Day)) %>%
+zero_values_brands <- expand.grid(to = iconv(unique(site_data_cleaned$Brand_TT),  from = 'UTF-8', to = 'ASCII//TRANSLIT'), from = iconv(unique(site_data_cleaned$Manufacturer), from = 'UTF-8', to = 'ASCII//TRANSLIT'), Name = unique(site_data_cleaned$Name), Day = unique(site_data_cleaned$Day)) %>%
   inner_join(days_sites_exist)
 
 Brand_DF_group <- site_data_cleaned %>%
