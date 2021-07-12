@@ -259,9 +259,12 @@ grouped_uncertainty <- function(DF_group, Group_Alias, Group_Hierarchy, type){
               min_prop = BootMean(totalsum)[1], 
               max_prop = BootMean(totalsum)[3])
   
+
+}
+
+sunburstplot <- function(df_join_boot){
   plot_ly() %>%
     add_trace(
-      #ids = d2$ids,
       labels = df_join_boot$to,
       parents = df_join_boot$from,
       type = 'sunburst',
@@ -283,78 +286,7 @@ grouped_uncertainty <- function(DF_group, Group_Alias, Group_Hierarchy, type){
                            sep = ""),
       values = df_join_boot$mean_prop)
 }
-
-
-
-
-theme_rainplot<- function (base_size = 11, base_family = "Arial") 
-{
-  half_line <- base_size/2
-  theme(
-    line = element_line(colour = "black", size = rel(1.5), 
-                        linetype = 1, lineend = "butt"), 
-    rect = element_rect(fill = NA, colour = "black",
-                        size = 0.5, linetype = 1),
-    text = element_text(family = base_family, face = "plain",
-                        colour = "black", size = base_size,
-                        lineheight = 0.9,  hjust = 0.5,
-                        vjust = 0.5, angle = 0, 
-                        margin = margin(), debug = FALSE), 
-    
-    axis.line = element_line(size = 2, color = "black"), 
-    axis.text = element_text(family= "Arial", size = rel(1.5), colour = "grey10"),
-    axis.text.x = element_text(margin = margin(t = half_line/2), 
-                               vjust = 1), 
-    axis.text.y = element_blank(),
-    axis.ticks = element_line(colour = "black", size=1), 
-    axis.ticks.length = unit(half_line*0.75, "pt"), 
-    axis.title = element_text(family="Arial",size = rel(1.5), colour = "black"),
-    axis.title.x = element_text(margin = margin(t = half_line*5,
-                                                b = half_line)),
-    axis.title.y = element_text(angle = 90, 
-                                margin = margin(r = half_line*5,
-                                                l = half_line)),
-    
-    legend.background = element_rect(colour = NA), 
-    legend.key = element_rect(colour = NA),
-    legend.key.size = unit(2, "lines"), 
-    legend.key.height = NULL,
-    legend.key.width = NULL, 
-    legend.text = element_text(family = "Arial", size = rel(1)),
-    legend.text.align = NULL,
-    legend.title = element_text(family = "Arial", size = rel(1)), 
-    legend.title.align = NULL, 
-    legend.position = "right", 
-    legend.direction = NULL,
-    legend.justification = "center", 
-    legend.box = NULL, 
-    
-    panel.background = element_blank(),
-    panel.border = element_blank(),
-    panel.grid.major = element_blank(), 
-    panel.grid.minor = element_blank(), 
-    panel.spacing = unit(half_line, "pt"), panel.margin.x = NULL, 
-    panel.spacing.y = NULL, panel.ontop = FALSE, 
-    
-    #Facet Labels
-    strip.background = element_blank(),
-    strip.text = element_text(family = "Arial",face="bold",colour = "black", size = rel(1.5)),
-    strip.text.x = element_text(margin = margin(t = half_line,
-                                                b = half_line)), 
-    strip.text.y = element_text(angle = 0, 
-                                margin = margin(l = half_line, 
-                                                r = half_line)),
-    strip.switch.pad.grid = unit(5, "lines"),
-    strip.switch.pad.wrap = unit(5, "lines"), 
-    
-    
-    plot.background = element_blank(), 
-    plot.title = element_text(size = rel(1.5), 
-                              margin = margin(b = half_line * 1.2)),
-    plot.margin = margin(4*half_line, 4*half_line, 4*half_line, 4*half_line),
-    complete = TRUE)
-}
-
+  
 
 #Datasets ----
 
@@ -489,6 +421,23 @@ mean_input_rate <- site_data_cleaned %>%
   summarise(count = n(), mean = mean(generationrate, na.rm = T), cv = sd(generationrate, na.rm = T)/mean(generationrate, na.rm = T), minmean = BootMean(generationrate)[1], maxmean = BootMean(generationrate)[3]) %>%
   ungroup()  
 
+#Quanitles for all generation rate 
+site_data_cleaned %>%
+  #filter(user_id == 92684) %>%
+  #mutate(Date = substr(photo_timestamp,1,nchar(photo_timestamp)-3)) %>%
+  mutate(Date = as.Date(Day, format = "%m/%d/%Y")) %>%
+  group_by(Date, Name, Site_Length_m, Cal_Enviro_Screen, Road_Width_m, Landuse_Type, TractID) %>%
+  summarise(Intensity = n()) %>%
+  arrange(Date) %>%
+  group_by(Name) %>%
+  mutate(DateDiff = as.numeric(Date) - dplyr::lag(as.numeric(Date), order_by = Name)) %>%
+  mutate(generationrate = Intensity/DateDiff/Site_Length_m) %>%
+  #filter(Date != as.Date("3/23/2020", format = "%m/%d/%Y")) %>% #Bring back in for 2020 analysis.
+  ungroup() %>%
+  pull(generationrate) %>%
+  quantile(na.rm = T)
+
+
 ##plots ----
 ggplot(weekend_sweeping, aes(group = type, color = type)) + 
   geom_errorbar(aes(x = Name, y = mean, ymin = minmean, ymax = maxmean), position = position_dodge(width = 0.8))+
@@ -576,34 +525,16 @@ ggplot(aes(y = mean, x = value)) +
   facet_wrap(~variable, scales = "free")+
   theme_bw(base_size = 10)
 
-# ggplot(mean_input_rate) + 
-#  geom_point(aes(x = value, y = mean)) + 
-#  facet_wrap(key~., scales = "free") + 
-#  labs(y = "Mean Trash Generation (#/m/day") + 
-#  theme_bw()
-
 #Material Types By Site and Date
 material_composition <- site_data_cleaned %>%
-  #filter(user_id == 92684) %>%
-  #mutate(Date = substr(photo_timestamp,1,nchar(photo_timestamp)-3)) %>%
-  #mutate(Date = as.Date(Day, format = "%m/%d/%Y")) %>%
-  #mutate(Date = as.Date(timestamp)) %>%
   group_by(Date, Name, Material_TT) %>%
   summarise(Intensity = n()) %>%
   arrange(Name, Intensity) %>%
   ungroup()
 
-#library(Polychrome)
-
-#safe_pal <- glasbey.colors(14)
-
 ggplot(arrange(material_composition, Date, Name, Intensity), aes(fill=Material_TT, y=Intensity, x=Date)) + 
   geom_bar(position="fill", stat="identity") +
-  #scale_fill_manual(values = safe_pal) +
-  #scale_fill_brewer(palette = "Dark2") +
-  #facet_wrap(Name ~. , scales = "free") + 
   facet_wrap(Name ~.,strip.position =  "right", scales = "free_x", ncol = 1) + 
-  #geom_text(aes(x = Date, y = 0.75, label = Intensity), size = 3) +
   theme_bw()
 #Recognize critically that every day of the week at every site, plastic is the prevailing material type. 
 
@@ -647,8 +578,6 @@ ggplot(material_diversity_boot, aes(x = mean_even, y = mean_numgroups, color = N
 
 #ItemDiversity Boot
 item_diversity_boot <- site_data_cleaned %>%
-  #filter(user_id == 92684) %>%
-  #mutate(Date = substr(photo_timestamp,1,nchar(photo_timestamp)-3)) %>%
   mutate(Date = as.Date(Day, format = "%m/%d/%Y")) %>%
   group_by(Date, Name) %>%
   dplyr::summarise(shannon = calc_shannon(Item_TT),
@@ -717,13 +646,9 @@ ggplot(material_diversity) +
   geom_point(aes(x = Date, y = simpson), color = "red") + 
   geom_point(aes(x = Date, y = menhincks), color = "blue") + 
   geom_point(aes(x = Date, y = numgroups), color = "green") +
-  
-  #geom_smooth(method = "lm") +
-  #geom_tile(aes(y=weekends$weekend*max(generationrate)), fill="yellow") +
   facet_wrap(Name ~., scales = "free") + 
   theme_bw() + 
   labs(y = "Diversity") + 
-  #scale_y_log10() + 
   scale_x_date(date_minor_breaks = "1 week")
 
 
@@ -733,10 +658,8 @@ ItemsHierarchy <- read.csv("Taxonomy/Website/Items_Hierarchy_V2.csv")
 #Test items not matched 
 
 BrandHierarchy <- read.csv("Taxonomy/Website/BrandManufacturer.csv") %>%
-  rename(to = Brand, from = Manufacturer) %>%
+  rename(to = Brand, from = Manufacturer) 
   
-
-
 MaterialsHierarchy <- read.csv("Taxonomy/Website/Materials_Hierarchy_V2.csv") 
 
 ItemsAlias <- read.csv("Taxonomy/Website/Items_Alias_V2.csv")%>%
@@ -795,51 +718,23 @@ MaterialTreeDF <- AggregateTrees(DF = Material_DF, Alias = MaterialsAlias, Hiera
   mutate(from = ifelse(from == "trash", "Materials", from))
 
 
-plot_ly() %>%
-  add_trace(
-    #ids = d2$ids,
-    labels = MaterialTreeDF$to, #needs parents and labels to correspond
-    parents = MaterialTreeDF$from,
-    type = 'sunburst',
-    maxdepth = 6,
-    domain = list(column = 1), 
-    branchvalues = 'total',
-    textinfo = "label+percent entry",
-    texttemplate = paste("A", MaterialTreeDF$to),
-    values = MaterialTreeDF$totalsum)
+material_grouped <- grouped_uncertainty(DF_group = Material_DF_group, Group_Alias = MaterialsAlias, Group_Hierarchy = MaterialsHierarchy, type = "Materials")
 
-
-grouped_uncertainty(DF_group = Material_DF_group, Group_Alias = MaterialsAlias, Group_Hierarchy = MaterialsHierarchy, type = "Materials")
+sunburstplot(df_join_boot = material_grouped)
 
 ##Item taxonoy ----
 ItemTreeDF <- AggregateTrees(DF = Item_DF, Alias = ItemsAlias, Hierarchy = ItemsHierarchy) %>%
   mutate(from = ifelse(from == "trash", "Items", from))
 
-#Add uncertainties to this by bootstrapping each days observations for the percent.
-plot_ly() %>%
-  add_trace(
-    #ids = d2$ids,
-    labels = ItemTreeDF$to,
-    parents = ItemTreeDF$from,
-    type = 'sunburst',
-    maxdepth = 6,
-    domain = list(column = 1), 
-    branchvalues = 'total',
-    values = ItemTreeDF$totalsum)
-#Now some negative value appeared here. 
-
 #Item prop uncertainty
-grouped_uncertainty(DF_group = Item_DF_group, Group_Alias = ItemsAlias, Group_Hierarchy = ItemsHierarchy, type = "Items")
+item_grouped <- grouped_uncertainty(DF_group = Item_DF_group, Group_Alias = ItemsAlias, Group_Hierarchy = ItemsHierarchy, type = "Items")
+
+sunburstplot(df_join_boot = item_grouped)
 
 ##Brand tree df ----
 
-Brands_not_merged <- site_data_cleaned %>%
-  filter(is.na(ID) & Manufacturer != "other") #All branded and joined data has an id
-  #distinct(Brand_TT) %>%
-  #anti_join(BrandHierarchy, by = c( "Brand_TT" = "to"))
 days_sites_exist <- site_data_cleaned %>%
   distinct(Name, Day)
-#This is generating days which did not exist at a site. 
 
 zero_values_brands <- expand.grid(to = iconv(unique(site_data_cleaned$Brand_TT),  from = 'UTF-8', to = 'ASCII//TRANSLIT'), from = iconv(unique(site_data_cleaned$Manufacturer), from = 'UTF-8', to = 'ASCII//TRANSLIT'), Name = unique(site_data_cleaned$Name), Day = unique(site_data_cleaned$Day)) %>%
   inner_join(days_sites_exist)
@@ -859,34 +754,9 @@ Brand_DF_group <- site_data_cleaned %>%
   full_join(zero_values_brands) %>%
   mutate(totalsum = ifelse(is.na(totalsum), 0, totalsum))
 
-
-BrandTreeDF <- Brand_DF_group %>%
-  #%>% #Need to add in zero values here for combos that do not exist. 
-  group_by(from, to) %>%
-  summarise(mean_prop = mean(totalsum, na.rm = T), 
-            min_prop = BootMean(totalsum)[1], 
-            max_prop = BootMean(totalsum)[3]) %>%
-  ungroup() #Add pipe here, could also skip the from-too combo and go straight to from. Might want to do a totalsum sum on the next line before adding in the bootstrap. 
-  bind_rows(Brand_DF_group %>%
-              group_by(from , Name, Day) %>%
-              summarise(totalsum = sum(totalsum)) %>%
-              group_by(from) %>%
-              summarise(mean_prop = mean(totalsum, na.rm = T), 
-                        min_prop = BootMean(totalsum)[1], 
-                        max_prop = BootMean(totalsum)[3]) %>%
-              ungroup() %>%
-              rename(to = from) %>% 
-              ungroup() %>%
-              mutate(from = "Brands")) %>%
-  dplyr::filter(!is.na(from)) %>% #This still relevant with new code?
-  filter(to != "") %>% #Is this still relevant?
-  add_row(from = "Brands", to = "", totalsum = sum(filter(., from == "Brands") %>%
-                                                     pull(totalsum))) %>%
-  filter(from == "Brands") #This works but removes the brand info
-  
 #From this it looks like zeros are being propogated to days where they don't belong since there is really high uncertainty even for unbranded 
 #something like this probably works to summarize the from column only. 
-test <- Brand_DF_group %>%
+brand_grouped <- Brand_DF_group %>%
     group_by(from, Name, Day) %>%
     summarise(totalsum = sum(totalsum)) %>%
     ungroup() %>%
@@ -894,70 +764,68 @@ test <- Brand_DF_group %>%
     summarise(mean_prop = mean(totalsum, na.rm = T), 
             min_prop = BootMean(totalsum)[1], 
             max_prop = BootMean(totalsum)[3]) %>%
-    ungroup()
+    ungroup() %>%
+    rename(to = from) %>% 
+    mutate(from = "Brands") %>%
+    add_row(from = "Brands", 
+            to = "", 
+            mean_prop = sum(filter(., from == "Brands") %>% pull(mean_prop)))
+  
+sunburstplot(brand_grouped)
 
-df_join_boot <- BrandTreeDF %>%
-  #mutate(node_num = rep(1:27, times = nrow(groups))) %>%
-  group_by(from, to) %>%
-  summarise(mean_prop = mean(totalsum, na.rm = T), 
-            min_prop = BootMean(totalsum)[1], 
-            max_prop = BootMean(totalsum)[3])
 
 plot_ly() %>%
   add_trace(
-    #ids = d2$ids,
-    labels = df_join_boot$to,
-    parents = df_join_boot$from,
-    type = 'sunburst',
-    maxdepth = 6,
-    domain = list(column = 1), 
-    branchvalues = 'total',
-    text = ~paste('</br> Mean: ', round(df_join_boot$mean_prop, 2),
-                  '</br> Min: ', round(df_join_boot$min_prop, 2),
-                  '</br> Max: ', round(df_join_boot$max_prop, 2)),
-    textinfo = "label+percent entry",
-    texttemplate = paste(df_join_boot$to, 
-                         "<br>", 
-                         round(df_join_boot$mean_prop, 2) * 100, 
-                         " (", 
-                         round(df_join_boot$min_prop, 2) * 100, 
-                         "-", 
-                         round(df_join_boot$max_prop, 2) * 100, 
-                         ")%", 
-                         sep = ""),
-    values = df_join_boot$mean_prop)
-
-
-
-
-plot_ly() %>%
-   add_trace(
-    #ids = d2$ids,
-    labels = MaterialTreeDF$to,
-    parents = MaterialTreeDF$from,
+    labels = material_grouped$to,
+    parents = material_grouped$from,
     type = 'sunburst',
     maxdepth = 6,
     domain = list(column = 0), 
     branchvalues = 'total',
-    values = MaterialTreeDF$totalsum) %>%
+    texttemplate = paste(material_grouped$to, 
+                         "<br>", 
+                         round(material_grouped$mean_prop, 2) * 100, 
+                         " (", 
+                         round(material_grouped$min_prop, 2) * 100, 
+                         "-", 
+                         round(material_grouped$max_prop, 2) * 100, 
+                         ")%", 
+                         sep = ""),
+    values = material_grouped$mean_prop) %>%
   add_trace(
-    #ids = d2$ids,
-    labels = ItemTreeDF$to,
-    parents = ItemTreeDF$from,
+    labels = item_grouped$to,
+    parents = item_grouped$from,
     type = 'sunburst',
     maxdepth = 6,
     domain = list(column = 1), 
     branchvalues = 'total',
-    values = ItemTreeDF$totalsum) %>%
+    texttemplate = paste(item_grouped$to, 
+                         "<br>", 
+                         round(item_grouped$mean_prop, 2) * 100, 
+                         " (", 
+                         round(item_grouped$min_prop, 2) * 100, 
+                         "-", 
+                         round(item_grouped$max_prop, 2) * 100, 
+                         ")%", 
+                         sep = ""),
+    values = item_grouped$mean_prop) %>%
   add_trace(
-    #ids = d2$ids,
-    labels = BrandTreeDF$to,
-    parents = BrandTreeDF$from,
+    labels = brand_grouped$to,
+    parents = brand_grouped$from,
     type = 'sunburst',
-    maxdepth = 2,
+    maxdepth = 6,
     domain = list(column = 2), 
     branchvalues = 'total',
-    values = BrandTreeDF$totalsum) %>%
+    texttemplate = paste(brand_grouped$to, 
+                         "<br>", 
+                         round(brand_grouped$mean_prop, 2) * 100, 
+                         " (", 
+                         round(brand_grouped$min_prop, 2) * 100, 
+                         "-", 
+                         round(brand_grouped$max_prop, 2) * 100, 
+                         ")%", 
+                         sep = ""),
+    values = brand_grouped$mean_prop) %>%
   layout(
     grid = list(columns =3, rows = 1),
     margin = list(l = 0.1, r = 0.1, b = 0.1, t = 0.1),
@@ -1043,7 +911,11 @@ library(grid)
 p1 <- ggplot() + 
   stat_ecdf(data = CompleteDataWithGoogle, aes(x = DistanceFromLocation), color = "red") + 
   stat_ecdf(aes(x = montecarlo_vector * 1.60934 * 1000), color = "blue") + 
-  scale_x_log10() #+ 
+  scale_x_log10(limits = c(1, 10000000), breaks = 10^c(0:7), labels = 10^c(0:7)) +
+  geom_text(aes(x = 100, y = 0.50, label = "Receipt Distances"), color = "red", size = 3) +
+  geom_text(aes(x = 100000, y = 0.50, label = "Human Trip Distances"), color = "blue", size = 3) +
+  theme_bw(base_size = 20) + 
+  labs(x = "Distance From Location (m)", y = "Proportion Shorter")
   #annotation_custom(ggplotGrob(p2), xmin = 500, xmax = 2000, ymin = 0.5, ymax = 1)
   
   
@@ -1058,8 +930,11 @@ p2 <- ggplot() +
 geom_point(aes(y = receipt_distance_quantiles, x = montecarlo_distance_quantiles)) + 
   geom_smooth(aes(y = receipt_distance_quantiles, x = montecarlo_distance_quantiles),
               method = "lm") + 
-  scale_x_log10() + 
-  scale_y_log10()
+  scale_x_log10(breaks= 10^c(1:5)) + 
+  scale_y_log10() + 
+  theme_bw(base_size = 20) + 
+  labs(x = "Human Trip Quantile Distance (m)", y = "Receipt Quantile Distance (m)") + 
+  coord_equal()
 
 linear_quantile_regression = lm(log10(receipt_distance_quantiles) ~ log10(montecarlo_distance_quantiles))
 
@@ -1123,7 +998,7 @@ p3 <- ggplot() +
   geom_line(data = CompleteDataCoordPlot, aes(x = x, y = y, group = row)) +
   theme_void() + 
   theme(aspect.ratio = 1, legend.position = NULL) + 
-  geom_text(aes(x = c(0,1.1,0,-1.1), y = c(1.1, 0, -1.1, 0) , label = c("W", "N", "E", "S")))
+  geom_text(aes(x = c(0,1.1,0,-1.1), y = c(1.1, 0, -1.1, 0) , label = c("W", "N", "E", "S")), size = 10) 
 
 plot(x.circ, stack = T)
 #plotCircular(area1 = CompleteDataWithGoogle$bearing, area2 = CompleteDataWithGoogle$meanbearing, spokes = )
@@ -1136,213 +1011,29 @@ p4 <- CompleteDataWithGoogle %>%
   filter(!is.na(dateprintedcleaned) & !is.na(TimestampDatecleaned)) %>%
   group_by(precip) %>%
   summarise(count = n()) %>%
-  ggplot() + geom_col(aes(x = precip, y = count))
+  ggplot() + 
+  geom_col(aes(x = precip, y = count)) +
+  theme_bw(base_size = 20) +
+  labs(x = "Precipitation Occured?", y = "Count")
 
 grid.arrange(p4,p3,p1,p2, ncol = 4)
 
 ggplot(CompleteDataWithGoogle, aes(x = differencebearings)) + geom_histogram(bins = 10) + scale_x_continuous(breaks = c(seq(0,180, by = 20)))+ dark_theme_classic(base_size = 20, base_line_size = 2) + labs(x = "Direction Angle Difference")
 ggplot(CompleteDataWithGoogle, aes(x = DistanceFromLocation/Timedifference)) + geom_histogram(bins = 10) + scale_x_continuous()+ dark_theme_classic(base_size = 20, base_line_size = 2) + scale_x_log10() + labs(x = "Meters Traveled per Day")
 
-#hist(CompleteDataWithGoogle$differencebearings)
+#Summary stats----
+max(CompleteDataWithGoogle$DistanceFromLocation, na.rm = T)
+min(CompleteDataWithGoogle$DistanceFromLocation, na.rm = T)
 
-write.csv(CompleteDataWithGoogle, "CompleteDataWithGoogle.csv")
+mean(CompleteDataWithGoogle$DistanceFromLocation/CompleteDataWithGoogle$Timedifference, na.rm =T)
+min(CompleteDataWithGoogle$DistanceFromLocation/CompleteDataWithGoogle$Timedifference, na.rm =T)
+max(CompleteDataWithGoogle$DistanceFromLocation/CompleteDataWithGoogle$Timedifference, na.rm =T)
 
-ggplot(data = CompleteData, 
-       aes(x = 0, y = Timedifference)) +
-  geom_flat_violin(aes(fill = ""), position = position_nudge(x = .3, y = 0),adjust =2) +
-  geom_point(aes(y = Timedifference, fill = "", color = ""),position = position_jitter(width = .15), size = .75, alpha = 0.5)+
-  geom_boxplot(aes(x = 0.22,fill = ""), notch= T, outlier.shape = NA,  width = .1, colour = "BLACK") +
-  scale_x_continuous(breaks=NULL) +
-  scale_y_log10(breaks = c(1, 10, 100, 1000), limits = c(1,1000)) +
-  guides(fill = FALSE) +
-  guides(color = FALSE) +
-  coord_flip() +
-  scale_color_brewer(palette = "Spectral") +
-  scale_fill_brewer(palette = "Spectral") +
-  theme_bw() +
-  labs(x = "", y = "Time Difference (Days)")+
-  theme_rainplot()
+quantile(CompleteDataWithGoogle$DistanceFromLocation/CompleteDataWithGoogle$Timedifference, na.rm =T)
 
-ggplot(data = CompleteData, 
-       aes(x = 0, y = Value)) +
-  geom_flat_violin(aes(fill = ""), position = position_nudge(x = .3, y = 0),adjust =2) +
-  geom_point(aes(y = Value, fill = "", color = ""),position = position_jitter(width = .15), size = .75, alpha = 0.5)+
-  geom_boxplot(aes(x = 0.22, fill = ""), notch= T, outlier.shape = NA,  width = .1, colour = "BLACK") +
-  scale_x_continuous(breaks=NULL) +
-  #ylim(0,1000) +
-  scale_y_log10(breaks = c(0, 1, 10, 100, 1000), limits = c(0.5,1000)) +
-  guides(fill = FALSE) +
-  guides(color = FALSE) +
-  coord_flip() +
-  scale_color_brewer(palette = "Spectral") +
-  scale_fill_brewer(palette = "Spectral") +
-  theme_bw() +
-  labs(x = "", y = "Value (USD)")+
-  theme_rainplot()
+transport_speed <- CompleteDataWithGoogle$DistanceFromLocation/CompleteDataWithGoogle$Timedifference
 
-
-ggplot(CompleteData, aes(x=Value)) +
-  geom_histogram(colour="black", fill="white") +
-  geom_vline(aes(xintercept=median(Value, na.rm=T)),   # Ignore NA values for mean
-             color="red", linetype="dashed", size=1) + scale_x_log10(limits = c(0.5,1000)) + theme_gray() + theme(aspect.ratio = 1)
-
-ggplot(data = CompleteData, 
-       aes(x = 0, y = Value)) +
-  geom_flat_violin(aes(fill = ""), position = position_nudge(x = .3, y = 0),adjust =2) +
-  geom_point(aes(y = Value, fill = "", color = ""),position = position_jitter(width = .15), size = .75, alpha = 0.5)+
-  geom_boxplot(aes(x = 0.22, fill = ""), notch= T, outlier.shape = NA,  width = .1, colour = "BLACK") +
-  scale_x_continuous(breaks=NULL) +
-  scale_y_log10(breaks = c(0, 1, 10, 100, 1000), limits = c(0.5,1000)) +
-  guides(fill = FALSE) +
-  guides(color = FALSE) +
-  coord_flip() +
-  scale_color_brewer(palette = "Spectral") +
-  scale_fill_brewer(palette = "Spectral") +
-  theme_bw() +
-  labs(x = "", y = "Value (USD)")+
-  theme_rainplot()
-
-#Rain plot: Distance between where receipt was picked up and where it came from
-ggplot(data = CompleteData, aes(x = "Distance", y = DistanceFromLocation)) + scale_y_log10()+  geom_flat_violin(position = position_nudge(x = .2, y = 0),adjust =2, colour = "blue", fill = "blue") +
-  geom_boxplot(aes(y = DistanceFromLocation),outlier.shape = NA, alpha = 0.1, width = .1, colour = "gray", notch = TRUE)+geom_point(position = position_jitter(width = .15), size = .25) + 
-  ylab('Meters')+xlab('')+coord_flip()+theme_cowplot()+guides(fill = FALSE, colour = FALSE) + ggtitle("Distance From Location") + theme_gray()
-
-#Bar plot: Frequency of type of location receipt is from 
-LocationCounts <- read.csv("LocationTypeCounts.csv")
-ggplot(data = LocationCounts, aes(x = reorder(?..Type.of.Location, Count), y = Count)) + geom_bar(stat = "identity") + xlab("Location Type") + geom_text(aes(label = Count), nudge_y = 2) + theme_gray() + coord_flip()
-
-#paymentmethod <- data.frame(paymentmethod = unique(CompleteData$paymentmethodcleaned))
-#write.csv(paymentmethod, "paymentmethod.csv")
-
-#Bar plot: Frequency of type of payment used
-PaymentCounts <- read.csv("paymentmethod.csv")
-ggplot(data = PaymentCounts, aes(x = reorder(Payment.Method, Count), y = Count)) + geom_bar(stat = "identity") + xlab("Payment Method") +  geom_text(aes(label = Count), nudge_y = 3) + theme_gray() + coord_flip()
-
-
-#LocationNames <- data.frame(Locationnamecleaned = unique(ReceiptsDataandDistance$Locationnamecleaned))
-#write.csv(LocationNames, "LocationNames.csv") #Location type categorization of places
-
-
-#Cleanup Receipt Data ----
-Data2018 <- read.csv("Data_Receipts2018.csv")
-summary(Data2018)
-str(Data2018)
-
-AllReceiptsData <- read.csv('All_Receipts_Draft.csv')
-
-Data2018Complete <- left_join(Data2018, AllReceiptsData, by = c("ï..LitterID" = "LitterID")) #Data from only 2018
-
-Data2018Cleaned <- Data2018Complete %>% #New table to generate coordinates of receipt place locations
-  mutate(dateprintedcleaned = as.character(Date.Printed)) %>%
-  mutate(timeprintedcleaned = as.character(Time.Printed)) %>%
-  mutate(dateprintedcleaned = ifelse(dateprintedcleaned == "Unknown", NA, dateprintedcleaned)) %>%
-  mutate(dateprintedcleaned = as.Date(dateprintedcleaned, format = c("%m/%d/%Y"))) %>%
-  mutate(TimestampDatecleaned = as.character(Timestamp.Date)) %>%
-  mutate(TimestampDatecleaned = as.Date(TimestampDatecleaned, format = c("%m/%d/%Y"))) %>%
-  mutate(Timedifference = as.numeric(TimestampDatecleaned - dateprintedcleaned)) %>%
-  mutate(Locationaddresscleaned = as.character(Location.address)) %>%
-  mutate(Locationnamecleaned = as.character(Location.name))%>%
-  mutate(Locationnamecleaned = ifelse(Locationnamecleaned == "Unknown", NA, Locationnamecleaned)) %>%
-  mutate(paymentmethodcleaned = as.character(Payment.Method)) %>%
-  mutate(Value = as.numeric(as.character(Total.Value..US.dollars.))) %>%
-  mutate(litterID = as.character(ï..LitterID)) %>%
-  dplyr::select(litterID, username, user_id, dateprintedcleaned, TimestampDatecleaned, Timedifference, Locationaddresscleaned, Non.Specific.Location.Address, Manual.Lat, Manual.Lon, Locationnamecleaned, Itemized, paymentmethodcleaned, Value, lat, lon)
-
-
-Data20182019 <- read.csv("All_Receipts.csv")
-summary(Data20182019)
-str(Data20182019)
-
-Data20182019cleaned <- Data20182019 %>% #Data from both 2018 & 2019
-  mutate(dateprintedcleaned = as.character(Date.Printed)) %>%
-  mutate(timeprintedcleaned1 = as.character(Time.Printed)) %>%
-  mutate(dateprintedcleaned = ifelse(dateprintedcleaned == "Unknown", NA, dateprintedcleaned)) %>%
-  mutate(dateprintedcleaned = as.Date(dateprintedcleaned, format = c("%m/%d/%Y"))) %>%
-  mutate(TimestampDatecleaned = as.character(Timestamp.Date)) %>%
-  mutate(TimestampDatecleaned = as.Date(TimestampDatecleaned, format = c("%m/%d/%Y"))) %>%
-  mutate(Timedifference = as.numeric(TimestampDatecleaned - dateprintedcleaned)) %>%
-  mutate(Locationaddresscleaned = as.character((Location.address))) %>%
-  mutate(Locationnamecleaned = as.character(Location.name)) %>%
-  mutate(Locationnamecleaned = ifelse(Locationnamecleaned == "Unknown", NA, Locationnamecleaned)) %>%
-  mutate(paymentmethodcleaned = as.character(Payment.Method)) %>%
-  mutate(Value = as.numeric(as.character(Total.Value..US.dollars.))) %>%
-  mutate(litterID = as.character(LitterID)) %>%
-  dplyr::select(litterID, username, user_id, dateprintedcleaned, TimestampDatecleaned, Timedifference, Locationaddresscleaned, Non.Specific.Location.Address, Manual.Lat, Manual.Lon, Locationnamecleaned, Itemized, paymentmethodcleaned, Value, lat, lon)
-
-JacquelinesSiteData <- read.csv("JacquelinesSiteReceiptData.csv")
-
-JacquelinesSiteDataCleaned <- JacquelinesSiteData %>% #2019 data not included in 2019 dataset
-  mutate(dateprintedcleaned = as.character(Date.Printed)) %>%
-  mutate(dateprintedcleaned = ifelse(dateprintedcleaned == "Unknown", NA, dateprintedcleaned)) %>%
-  mutate(dateprintedcleaned = as.Date(dateprintedcleaned, format = c("%m/%d/%Y"))) %>%
-  mutate(TimestampDatecleaned = as.character(Timestamp.Date)) %>%
-  mutate(TimestampDatecleaned = as.Date(TimestampDatecleaned, format = c("%m/%d/%Y"))) %>%
-  mutate(Timedifference = as.numeric(TimestampDatecleaned - dateprintedcleaned)) %>%
-  mutate(Locationaddresscleaned = as.character(Location.address)) %>%
-  mutate(Locationnamecleaned = as.character(Location.name)) %>%
-  mutate(Locationnamecleaned = ifelse(Locationnamecleaned == "Unknown", NA, Locationnamecleaned)) %>%
-  mutate(paymentmethodcleaned = as.character(Payment.Method)) %>%
-  mutate(Value = as.numeric(as.character(Total.Value..US.dollars.))) %>%
-  mutate(litterID = as.character(litterId)) %>%
-  dplyr::select(litterID, username, user_id, dateprintedcleaned, TimestampDatecleaned, Timedifference, Locationaddresscleaned, Non.Specific.Location.Address, Manual.Lat, Manual.Lon, Locationnamecleaned, Itemized, paymentmethodcleaned, Value, lat, lon)
-
-CombinedData <- rbind(Data2018Cleaned, Data20182019cleaned, JacquelinesSiteDataCleaned) #all 3 data sets combined into 1
-
-#Files of generated coordinates
-Data2018LocLatLon <- read.csv("Data2018LocLatLon.csv")
-Data20182019LocLatLon <- read.csv("Data20182019LocLatLon.csv")
-JacquelinesSiteDataLocLatLon <- read.csv("JacquelinesSiteDataLocLatLon.csv")
-
-CombinedLocLatLon <- rbind(Data2018LocLatLon, Data20182019LocLatLon, JacquelinesSiteDataLocLatLon)
-
-CombinedDataLatLon<-cbind(CombinedData, CombinedLocLatLon) #Generated coordinates combined with the other attributes
-
-#To find the distance between the location where the receipt was found and the location of the place it came from
-ReceiptsData <- CombinedDataLatLon %>%
-  mutate(latrad = (lat*pi)/180) %>%
-  mutate(lonrad = (lon*pi)/180) %>%
-  mutate(LocationLatrad = (LocLat*pi)/180) %>%
-  mutate(LocationLonrad = (LocLon*pi)/180)
-
-R <- 6371000 #meters
-timestamplat <- ReceiptsData$latrad
-locaddresslat <- ReceiptsData$LocationLatrad
-timestamplon <- ReceiptsData$lonrad
-locaddresslon <- ReceiptsData$LocationLonrad
-changeinlat <- timestamplat - locaddresslat
-changeinlon <- timestamplon - locaddresslon
-a <- (sin(changeinlat/2) * sin(changeinlat/2)) + (cos(locaddresslat) * cos(timestamplat) * sin(changeinlon/2) * sin(changeinlon/2))
-c <- 2 * atan2(sqrt(a), sqrt(1-a))
-DistanceFromLocation <- R * c
-
-ReceiptsDataandDistance <- cbind(ReceiptsData, DistanceFromLocation) #Calculated distance combined with rest of attributes
-
-LocationNames <- read.csv("LocationNames.csv") #Location type categorization of places
-CompleteData<-left_join(ReceiptsDataandDistance, LocationNames) #Final version: receipt dataset with all attributes
-
-for (row in 1:nrow(CompleteData)) { #for loop output was made into a csv file
-  combo1vec<-cbind(as.vector(as.numeric(CompleteData$lat[row])), as.vector(as.numeric(CompleteData$lon[row])))
-  LocNames1<-CompleteData$Locationnamecleaned[row]
-  if(is.na(LocNames1)) next
-  Search1<-google_find_place(input = LocNames1, fields = c("name", "formatted_address", "geometry/location"), point = combo1vec)
-  Search1df<-data.frame(Search1)
-  Refined1<-slice(.data = Search1df, ... = 1, .preserve = FALSE)
-  CompleteData[row, "googleformattedaddress"] <- Refined1$candidates.formatted_address
-  CompleteData[row, "googleformattedlat"] <- Refined1$candidates.geometry$location$lat
-  CompleteData[row, "googleformattedlon"] <- Refined1$candidates.geometry$location$lng
-  CompleteData[row, "googleformattedname"] <- Refined1$candidates.name
-  print(row)
-}
-
-
-CompleteDataWithGoogle <- CompleteData %>%
-  mutate(googleLatrad = (googleformattedlat*pi)/180) %>%
-  mutate(googleLonrad = (googleformattedlon*pi)/180) %>%
-  mutate(changelat = latrad - googleLatrad) %>%
-  mutate(changelon = lonrad - googleLonrad) %>%
-  mutate(a = (sin(changelat/2) * sin(changelat/2)) + (cos(googleLatrad) * cos(latrad) * sin(changelon/2) * sin(changelon/2))) %>%
-  mutate(c = 2 * atan2(sqrt(a), sqrt(1-a))) %>%
-  mutate(googledistancemeters = R * c)
-
-
+length(transport_speed[!is.na(transport_speed)])
+length(CompleteDataWithGoogle$DistanceFromLocation[!is.na(CompleteDataWithGoogle$DistanceFromLocation)])
+length(CompleteDataWithGoogle$Timedifference[!is.na(CompleteDataWithGoogle$Timedifference)])
 
