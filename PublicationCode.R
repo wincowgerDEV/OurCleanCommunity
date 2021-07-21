@@ -6,35 +6,23 @@ library(readxl)
 library(gridExtra)
 #library(dplyr)
 library(ggplot2)
-library(ggmap)
-library(cowplot)
 library(readr)
 library(lavaan)
 library(smooth)
 library(Hmisc)
-library(googleway)
-library(ggforce)
+library(ggrepel)
 #library(stormwindmodel)
-library(RCurl)
-library(httr)
-library(hexView)
-library(jsonlite)
 library(data.table)
 library(dplyr)
 library(tidyr)
-library(fitdistrplus) #https://cran.r-project.org/web/packages/fitdistrplus/vignettes/paper2JSS.pdf
+#library(fitdistrplus) #https://cran.r-project.org/web/packages/fitdistrplus/vignettes/paper2JSS.pdf
 library(swfscMisc)
 library(circular)
 library(geosphere)
 #devtools::install_github(repo = "michaelmalick/r-malick")
-library(malick)
-library(collapsibleTree)
-#library(dplyr)
-#library(tidyr)
+#library(malick)
 library(data.tree)
 library(plotly)
-library(ggdark)
-library(rWind)
 
 
 #Functions ----
@@ -262,29 +250,35 @@ grouped_uncertainty <- function(DF_group, Group_Alias, Group_Hierarchy, type){
 
 }
 
-sunburstplot <- function(df_join_boot){
+sunburstplot <-function(df_join_boot){
+  
+  values <- paste(df_join_boot$to, 
+                  "<br>", 
+                  round(df_join_boot$mean_prop, 2) * 100, 
+                  " (", 
+                  round(df_join_boot$min_prop, 2) * 100, 
+                  "-", 
+                  round(df_join_boot$max_prop, 2) * 100, 
+                  ")%", 
+                  sep = "")
+  
+  values[df_join_boot$mean_prop < 0.1] <- NA
+  
   plot_ly() %>%
     add_trace(
       labels = df_join_boot$to,
       parents = df_join_boot$from,
-      type = 'sunburst',
+      type = "sunburst",
       maxdepth = 6,
       domain = list(column = 1), 
       branchvalues = 'total',
-      text = ~paste('</br> Mean: ', round(df_join_boot$mean_prop, 2),
-                    '</br> Min: ', round(df_join_boot$min_prop, 2),
-                    '</br> Max: ', round(df_join_boot$max_prop, 2)),
-      textinfo = "label+percent entry",
-      texttemplate = paste(df_join_boot$to, 
-                           "<br>", 
-                           round(df_join_boot$mean_prop, 2) * 100, 
-                           " (", 
-                           round(df_join_boot$min_prop, 2) * 100, 
-                           "-", 
-                           round(df_join_boot$max_prop, 2) * 100, 
-                           ")%", 
-                           sep = ""),
-      values = df_join_boot$mean_prop)
+      #text = ~paste('</br> Mean: ', round(df_join_boot$mean_prop, 2),
+      #              '</br> Min: ', round(df_join_boot$min_prop, 2),
+      #              '</br> Max: ', round(df_join_boot$max_prop, 2)),
+      #textinfo = "label+percent entry",
+      texttemplate = values,
+      values = df_join_boot$mean_prop) #%>%
+   # layout(uniformtext=list(minsize=18, mode = "show"))
 }
   
 
@@ -323,9 +317,12 @@ full_data <- fread("Litterati-Partners.csv") %>%
 #  mutate(horizdist = vechaversine(lon1 = minlon, lat1 = maxlat, lon2 = maxlon, lat2 = maxlat), vertdist = vechaversine(lon1 = minlon, lat1 = minlat, lon2 = minlon, lat2 = maxlat)) %>%
 #  mutate(area_m2 = horizdist * vertdist)
 
+mass_of_items <- fread("material_item_site_join_mass.csv")
+
 site_data_cleaned <- fread("StudyAreas/User_Cleaned_Data/reconciled_cleaned.csv") %>%
   left_join(fread("StudyAreas/User_Cleaned_Data/weekend_sweep_manual.csv")) %>%
-  mutate(Date = as.Date(Day, format = "%m/%d/%Y"))
+  mutate(Date = as.Date(Day, format = "%m/%d/%Y")) %>%
+  left_join(mass_of_items)
   
 census_data <- fread("StudyAreas/Demographic_Site_Data/PDB_2015_Tract.csv")
 
@@ -376,8 +373,11 @@ summary(all_distances$distance_m)
 
 #Dataset source
 #https://data.bts.gov/Research-and-Statistics/Trips-by-Distance/w96p-f2qv
+#Trash mass conversion matching. 
+material_item_list <- site_data_cleaned %>%
+  distinct(Material_TT, Item_TT)
 
-#Basic Stats 2018 ----
+write.csv(material_item_list, "material_item_site.csv")
 
 #Generation Rate Changes ----
 
@@ -393,6 +393,18 @@ input_rate <- site_data_cleaned %>%
   mutate(generationrate = Intensity/DateDiff/Site_Length_m) %>%
   #filter(Date != as.Date("3/23/2020", format = "%m/%d/%Y")) %>% #Bring back in for 2020 analysis.
   ungroup() 
+
+input_rate_mass <- site_data_cleaned %>%
+  #filter(user_id == 92684) %>%
+  #mutate(Date = substr(photo_timestamp,1,nchar(photo_timestamp)-3)) %>%
+  group_by(Date, Name, Site_Length_m, Weekend, Sweeping) %>%
+  summarise(Intensity = sum(weigth_estimate_g, na.rm = T)) %>%
+  arrange(Date) %>%
+  group_by(Name) %>%
+  mutate(DateDiff = as.numeric(Date) - dplyr::lag(as.numeric(Date), order_by = Name)) %>%
+  mutate(generationrate = Intensity/DateDiff/Site_Length_m) %>%
+  #filter(Date != as.Date("3/23/2020", format = "%m/%d/%Y")) %>% #Bring back in for 2020 analysis.
+  ungroup()
 
 weekend_sweeping <- input_rate %>%
   mutate(type = ifelse(Weekend == "Y", "Weekend", "Non-Weekend")) %>%
@@ -420,6 +432,24 @@ mean_input_rate <- site_data_cleaned %>%
   group_by(Name) %>%
   summarise(count = n(), mean = mean(generationrate, na.rm = T), cv = sd(generationrate, na.rm = T)/mean(generationrate, na.rm = T), minmean = BootMean(generationrate)[1], maxmean = BootMean(generationrate)[3]) %>%
   ungroup()  
+
+#Input Rate Correlation Mass
+mean_input_rate_mass <- site_data_cleaned %>%
+  #filter(user_id == 92684) %>%
+  #mutate(Date = substr(photo_timestamp,1,nchar(photo_timestamp)-3)) %>%
+  mutate(Date = as.Date(Day, format = "%m/%d/%Y")) %>%
+  group_by(Date, Name, Site_Length_m, Cal_Enviro_Screen, Road_Width_m, Landuse_Type, TractID) %>%
+  summarise(Intensity = sum(weigth_estimate_g, na.rm = T)) %>%
+  arrange(Date) %>%
+  group_by(Name) %>%
+  mutate(DateDiff = as.numeric(Date) - dplyr::lag(as.numeric(Date), order_by = Name)) %>%
+  mutate(generationrate = Intensity/DateDiff/Site_Length_m) %>%
+  #filter(Date != as.Date("3/23/2020", format = "%m/%d/%Y")) %>% #Bring back in for 2020 analysis.
+  ungroup() %>%
+  bind_rows(mutate(., Name = "All")) %>%
+  group_by(Name) %>%
+  summarise(count = n(), mean = mean(generationrate, na.rm = T), cv = sd(generationrate, na.rm = T)/mean(generationrate, na.rm = T), minmean = BootMean(generationrate)[1], maxmean = BootMean(generationrate)[3]) %>%
+  ungroup() 
 
 #Quanitles for all generation rate 
 site_data_cleaned %>%
@@ -456,26 +486,59 @@ ggplot() +
   geom_errorbar(data = mean_input_rate, aes(x = Name, y = mean, ymin = minmean, ymax = maxmean),color = "red", width = 0.25)+
   geom_point(data = mean_input_rate, aes(x = Name, y = mean), color = "red")+
   geom_text(data = mean_input_rate, aes(x = Name, y = 0.75, label = paste("n=", count, "", sep = "")), size = 5) +
-  theme_bw(base_size = 20) + 
+  theme_classic(base_size = 20) + 
   labs(y = "Generation Rate (#/Day/m)") + 
   scale_y_log10(limits = c(0.001, 1)) 
 
+
+ggplot() + 
+  geom_boxplot(data = input_rate_mass %>%
+                 bind_rows(input_rate_mass %>%
+                             mutate(Name = "All")), aes(x = Name, y = generationrate)) + 
+  geom_errorbar(data = mean_input_rate_mass, aes(x = Name, y = mean, ymin = minmean, ymax = maxmean),color = "red", width = 0.25)+
+  geom_point(data = mean_input_rate_mass, aes(x = Name, y = mean), color = "red")+
+  geom_text(data = mean_input_rate_mass, aes(x = Name, y = 0.75, label = paste("n=", count, "", sep = "")), size = 5) +
+  theme_bw(base_size = 20) + 
+  labs(y = "Generation Rate (g/Day/m)") + 
+  scale_y_log10() 
+
 ggplot(input_rate, aes(x = Date, y = generationrate)) + 
   geom_point(alpha = 0.5) + 
-  facet_wrap(Name ~.,strip.position =  "right", scales = "free_x", ncol = 1) + 
-  geom_text(aes(x = Date, y = 0.75, label = Intensity), size = 3) +
-  theme_bw(base_size = 18) + 
-  labs(y = "Generation Rate (#/Day/m)") + 
+  geom_line(alpha = 0.5) + 
+  facet_grid(cols = vars(Name), scales = "free_x", space = "free_x") + 
+  #geom_text(aes(x = Date, y = 0.75, label = Intensity), size = 3) +
+  theme_classic(base_size = 18) + 
+  labs(y = "Generation Rate (#/Day/m)", x = "Week of Year") + 
   scale_y_log10(limits = c(0.001, 1)) + 
-  scale_x_date(date_minor_breaks = "1 week")
+  scale_x_date(date_breaks = "1 week", date_labels = "%W") 
+  
+  
+ggplot(input_rate_mass, aes(x = Date, y = generationrate)) + 
+  geom_point(alpha = 0.5, width = 1) + 
+  geom_line(alpha = 0.5, width = 1) + 
+  facet_grid(Name ~., scales = "free", ncol = 1) + 
+  geom_text(aes(x = Date, y = 10, label = round(Intensity, 0)), size = 3) +
+  theme_bw(base_size = 18) + 
+  labs(y = "Generation Rate (g/Day/m)", x = "Week of Year") + 
+  scale_y_log10() + 
+  scale_x_date(date_breaks = "1 week", labels = NULL)
 
 ggplot(input_rate, aes(x = Date, y = Name)) + 
   geom_point(alpha = 0.5, size = 4) + 
+  geom_text_repel(aes(label = Intensity),
+                  size = 6,
+                  force_pull   = 0, # do not pull toward data points
+                  nudge_y      = 0.5,
+                  direction    = "x",
+                  angle        = 90,
+                  hjust        = 0,
+                  segment.size = 0.2,
+                  max.iter = 1e4, max.time = 1) +
   #geom_smooth(method = "lm") +
   #facet_wrap(Name ~., scales = "free") + 
-  theme_bw(base_size = 20) + 
-  labs(y = "Site") + 
-  scale_x_date(date_minor_breaks = "1 month")
+  theme_classic(base_size = 20) + 
+  labs(y = "") + 
+  scale_x_date(date_breaks = "2 month")
 
 
 mean_for_corrleation <- site_data_cleaned %>%
@@ -717,10 +780,15 @@ unmatched <- Item_DF %>%
 MaterialTreeDF <- AggregateTrees(DF = Material_DF, Alias = MaterialsAlias, Hierarchy = MaterialsHierarchy) %>%
   mutate(from = ifelse(from == "trash", "Materials", from))
 
-
 material_grouped <- grouped_uncertainty(DF_group = Material_DF_group, Group_Alias = MaterialsAlias, Group_Hierarchy = MaterialsHierarchy, type = "Materials")
 
-sunburstplot(df_join_boot = material_grouped)
+
+material_grouped_test <- material_grouped %>%
+  filter(mean_prop > 0.1)
+
+MaterialsPlot <- sunburstplot(df_join_boot = material_grouped)
+
+orca(MaterialsPlot, "material-plot.svg")
 
 ##Item taxonoy ----
 ItemTreeDF <- AggregateTrees(DF = Item_DF, Alias = ItemsAlias, Hierarchy = ItemsHierarchy) %>%
@@ -729,7 +797,8 @@ ItemTreeDF <- AggregateTrees(DF = Item_DF, Alias = ItemsAlias, Hierarchy = Items
 #Item prop uncertainty
 item_grouped <- grouped_uncertainty(DF_group = Item_DF_group, Group_Alias = ItemsAlias, Group_Hierarchy = ItemsHierarchy, type = "Items")
 
-sunburstplot(df_join_boot = item_grouped)
+item_plot <- sunburstplot(df_join_boot = item_grouped)
+orca(item_plot, "item-plot.svg")
 
 ##Brand tree df ----
 
@@ -771,7 +840,8 @@ brand_grouped <- Brand_DF_group %>%
             to = "", 
             mean_prop = sum(filter(., from == "Brands") %>% pull(mean_prop)))
   
-sunburstplot(brand_grouped)
+brand_plot <- sunburstplot(brand_grouped)
+orca(brand_plot, "brand-plot.svg")
 
 
 plot_ly() %>%
