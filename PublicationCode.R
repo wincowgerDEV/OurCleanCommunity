@@ -911,6 +911,13 @@ plot_ly() %>%
 
 
 #Trip Distances ----
+
+#Check summary stats of distances
+CompleteDataWithGoogle %>%
+  filter(!is.na(DistanceFromLocation)) %>%
+  pull(enddate) %>%
+  summary()
+
 #Was thinking that we should limit this to work trips but I don't think so any more. 
 IETrips <- Trips %>%
   filter(`State Postal Code` == "CA") %>%
