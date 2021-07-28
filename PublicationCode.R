@@ -23,7 +23,7 @@ library(geosphere)
 #library(malick)
 library(data.tree)
 library(plotly)
-
+library(ggforce)
 
 #Functions ----
 #Function returns the difference between two bearings
@@ -324,6 +324,14 @@ site_data_cleaned <- fread("StudyAreas/User_Cleaned_Data/reconciled_cleaned.csv"
   mutate(Date = as.Date(Day, format = "%m/%d/%Y")) %>%
   left_join(mass_of_items)
   
+#Check number of lost data points
+vals <- site_data_cleaned %>%
+  filter(is.na(Lon)) %>%
+  mutate(id = as.numeric(id)) %>%
+  left_join(full_data, by = c("id" = "Litter"))
+
+inn
+
 census_data <- fread("StudyAreas/Demographic_Site_Data/PDB_2015_Tract.csv")
 
 unique(site_data_cleaned$TractID) %in% unique(census_data$GIDTR)
@@ -430,8 +438,20 @@ mean_input_rate <- site_data_cleaned %>%
   ungroup() %>%
   bind_rows(mutate(., Name = "All")) %>%
   group_by(Name) %>%
-  summarise(count = n(), mean = mean(generationrate, na.rm = T), cv = sd(generationrate, na.rm = T)/mean(generationrate, na.rm = T), minmean = BootMean(generationrate)[1], maxmean = BootMean(generationrate)[3]) %>%
-  ungroup()  
+  summarise(count = n(), sd = sd(generationrate, na.rm = T), mean = mean(generationrate, na.rm = T), cv = sd(generationrate, na.rm = T)/mean(generationrate, na.rm = T), minmean = BootMean(generationrate)[1], maxmean = BootMean(generationrate)[3]) %>%
+  ungroup() %>%
+  mutate(count = ifelse(Name == "All", count-8, count-1))
+
+residual_analysis <- input_rate %>%
+  left_join(mean_input_rate) %>%
+  mutate(residual = generationrate - mean) %>%
+  group_by(Name) %>%
+  arrange(Date) %>%
+  mutate(residual = ifelse(is.na(residual), 0, residual)) %>%
+  mutate(running_residual = cumsum(residual)) %>%
+  mutate(running_residual = ifelse(is.na(generationrate), NA, running_residual)) %>%
+  ungroup()
+  
 
 #Input Rate Correlation Mass
 mean_input_rate_mass <- site_data_cleaned %>%
@@ -477,7 +497,7 @@ ggplot(weekend_sweeping, aes(group = type, color = type)) +
   scale_color_viridis_d() + 
   theme_bw(base_size = 20) + 
   theme(legend.title = element_blank()) + 
-  labs(x = "", y = "Generation Rate (#/Day/m)")
+  labs(x = "", y = "Accumulation Rate (#/Day/m)")
 
 ggplot() + 
   geom_boxplot(data = input_rate %>%
@@ -487,7 +507,7 @@ ggplot() +
   geom_point(data = mean_input_rate, aes(x = Name, y = mean), color = "red")+
   geom_text(data = mean_input_rate, aes(x = Name, y = 0.75, label = paste("n=", count, "", sep = "")), size = 5) +
   theme_classic(base_size = 20) + 
-  labs(y = "Generation Rate (#/Day/m)") + 
+  labs(y = "Accumulation Rate (#/Day/m)") + 
   scale_y_log10(limits = c(0.001, 1)) 
 
 
@@ -499,29 +519,45 @@ ggplot() +
   geom_point(data = mean_input_rate_mass, aes(x = Name, y = mean), color = "red")+
   geom_text(data = mean_input_rate_mass, aes(x = Name, y = 0.75, label = paste("n=", count, "", sep = "")), size = 5) +
   theme_bw(base_size = 20) + 
-  labs(y = "Generation Rate (g/Day/m)") + 
+  labs(y = "Accumulation Rate (g/Day/m)") + 
   scale_y_log10() 
 
 ggplot(input_rate, aes(x = Date, y = generationrate)) + 
+  geom_smooth(method = "lm", color = "transparent") +
   geom_point(alpha = 0.5) + 
   geom_line(alpha = 0.5) + 
   facet_grid(cols = vars(Name), scales = "free_x", space = "free_x") + 
   #geom_text(aes(x = Date, y = 0.75, label = Intensity), size = 3) +
   theme_classic(base_size = 18) + 
-  labs(y = "Generation Rate (#/Day/m)", x = "Week of Year") + 
+  labs(y = "Accumulation Rate (#/Day/m)", x = "Week of Year") + 
   scale_y_log10(limits = c(0.001, 1)) + 
+  scale_x_date(date_breaks = "1 week", date_labels = "%W") 
+
+#also shows that there is not a clear decreasing trend at sites. 
+ggplot(residual_analysis, aes(x = Date, y = running_residual)) + 
+  #geom_smooth(method = "lm", color = "transparent") +
+  geom_point(alpha = 0.5) + 
+  geom_line(alpha = 0.5) + 
+  facet_grid(cols = vars(Name), scales = "free_x", space = "free_x") + 
+  #geom_text(aes(x = Date, y = 0.75, label = Intensity), size = 3) +
+  theme_classic(base_size = 18) + 
+  labs(y = "Residual Accumulation Rate (#/Day/m)", x = "Week of Year") + 
+  #scale_y_log10(limits = c(0.001, 1)) + 
   scale_x_date(date_breaks = "1 week", date_labels = "%W") 
   
   
 ggplot(input_rate_mass, aes(x = Date, y = generationrate)) + 
-  geom_point(alpha = 0.5, width = 1) + 
-  geom_line(alpha = 0.5, width = 1) + 
-  facet_grid(Name ~., scales = "free", ncol = 1) + 
-  geom_text(aes(x = Date, y = 10, label = round(Intensity, 0)), size = 3) +
-  theme_bw(base_size = 18) + 
-  labs(y = "Generation Rate (g/Day/m)", x = "Week of Year") + 
+  geom_point(alpha = 0.5) + 
+  geom_line(alpha = 0.5) + 
+  geom_smooth(method = "lm") +
+  facet_grid(cols = vars(Name), scales = "free_x", space = "free_x") + 
+  #geom_text(aes(x = Date, y = 0.75, label = Intensity), size = 3) +
+  theme_classic(base_size = 18) + 
+  labs(y = "Accumulation Rate (#/Day/m)", x = "Week of Year") + 
   scale_y_log10() + 
-  scale_x_date(date_breaks = "1 week", labels = NULL)
+  scale_x_date(date_breaks = "1 week", date_labels = "%W") 
+
+
 
 ggplot(input_rate, aes(x = Date, y = Name)) + 
   geom_point(alpha = 0.5, size = 4) + 
@@ -918,6 +954,16 @@ CompleteDataWithGoogle %>%
   pull(enddate) %>%
   summary()
 
+CompleteDataWithGoogle %>%
+  filter(!is.na(DistanceFromLocation))
+
+CompleteDataWithGoogle %>%
+  filter(!is.na(startdate))
+
+CompleteDataWithGoogle %>%
+  filter(!is.na(DistanceFromLocation) & !is.na(startdate)) %>%
+  pull(startdate) 
+
 #Was thinking that we should limit this to work trips but I don't think so any more. 
 IETrips <- Trips %>%
   filter(`State Postal Code` == "CA") %>%
@@ -995,8 +1041,6 @@ p1 <- ggplot() +
   labs(x = "Distance From Location (m)", y = "Proportion Shorter")
   #annotation_custom(ggplotGrob(p2), xmin = 500, xmax = 2000, ymin = 0.5, ymax = 1)
   
-  
-
 montecarlo_meters = montecarlo_vector * 1.60934 * 1000
 
 receipt_distance_quantiles = quantile(CompleteDataWithGoogle$DistanceFromLocation, probs = seq(0.01, 0.99, by = 0.01), na.rm = T)
@@ -1006,12 +1050,14 @@ montecarlo_distance_quantiles = quantile(montecarlo_meters, probs = seq(0.01, 0.
 p2 <- ggplot() + 
 geom_point(aes(y = receipt_distance_quantiles, x = montecarlo_distance_quantiles)) + 
   geom_smooth(aes(y = receipt_distance_quantiles, x = montecarlo_distance_quantiles),
-              method = "lm") + 
+              method = "lm",
+              se = F) + 
   scale_x_log10(breaks= 10^c(1:5)) + 
   scale_y_log10() + 
-  theme_bw(base_size = 20) + 
+  theme_classic(base_size = 20) + 
   labs(x = "Human Trip Quantile Distance (m)", y = "Receipt Quantile Distance (m)") + 
-  coord_equal()
+  coord_equal() +
+  geom_abline(intercept = 0, slope = 1)
 
 linear_quantile_regression = lm(log10(receipt_distance_quantiles) ~ log10(montecarlo_distance_quantiles))
 
@@ -1040,7 +1086,7 @@ for(row in 1:nrow(CompleteDataWithGoogle)){
   CompleteDataWithGoogle[row, "meanbearing"] <- differenceofmean(startdate = CompleteDataWithGoogle[row,"startdate"], enddate = CompleteDataWithGoogle[row,"enddate"])
 }
 
-CompleteDataWithGoogle$differencebearings <- angle_diff(CompleteDataWithGoogle$bearing, CompleteDataWithGoogle$meanbearing)
+#CompleteDataWithGoogle$differencebearings <- angle_diff(CompleteDataWithGoogle$bearing, CompleteDataWithGoogle$meanbearing)
 
 #Wind velocity transport velocity correlation ----
 
@@ -1113,4 +1159,36 @@ transport_speed <- CompleteDataWithGoogle$DistanceFromLocation/CompleteDataWithG
 length(transport_speed[!is.na(transport_speed)])
 length(CompleteDataWithGoogle$DistanceFromLocation[!is.na(CompleteDataWithGoogle$DistanceFromLocation)])
 length(CompleteDataWithGoogle$Timedifference[!is.na(CompleteDataWithGoogle$Timedifference)])
+
+#Power analysis ----
+#Power Analysis for detecting % shift in future studies
+library(pwr)
+
+#How many samples do we need to detect a X% shift?
+for(n in 1:length(mean_input_rate$mean)){
+  power_count_10 <- power.t.test(delta = mean_input_rate$mean[n] - 0.1*mean_input_rate$mean[n], sd = mean_input_rate$sd[n], sig.level = 0.05, power = 0.8)
+  print(mean_input_rate$Name[n])
+  print(power_count_10$n)
+}
+
+#How much power did we have to detect a X% reduction
+for(n in 1:length(mean_input_rate$mean)){
+  power_count_10 <- power.t.test(n = mean_input_rate$count[n], delta = mean_input_rate$mean[n] - 0.1*mean_input_rate$mean[n], sd = mean_input_rate$sd[n], sig.level = 0.05)
+  print(mean_input_rate$Name[n])
+  print(power_count_10$power)
+}
+
+#What size of effect (% change in mean) could we have detected with the power we have?
+for(n in 1:length(mean_input_rate$mean)){
+  power_count_10 <- power.t.test(n = mean_input_rate$count[n], sd = mean_input_rate$sd[n], sig.level = 0.05, power = 0.8)
+  print(mean_input_rate$Name[n])
+  print(power_count_10$delta / mean_input_rate$mean[n])
+}
+
+#What size of effect cohens D could we have detected with the power we have? 0.5 is medium, 0.2 is small, 0.8 is large
+for(n in 1:length(mean_input_rate$mean)){
+  power_count_10 <- power.t.test(n = mean_input_rate$count[n], sd = mean_input_rate$sd[n], sig.level = 0.05, power = 0.8)
+  print(mean_input_rate$Name[n])
+  print(power_count_10$delta / mean_input_rate$sd[n])
+}
 
