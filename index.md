@@ -22,9 +22,9 @@ Example:
 ![image](https://user-images.githubusercontent.com/26821843/136639726-50feba9e-5096-41b2-8a5d-a9b510b868d5.png)
 
 
-Download the app to phone. 
-Android: https://play.google.com/store/apps/details?id=org.litterati.android&hl=en
-Apple: https://itunes.apple.com/us/app/litterati/id982782776?mt=8
+### Download the app to phone. 
+- Android: https://play.google.com/store/apps/details?id=org.litterati.android&hl=en
+- Apple: https://itunes.apple.com/us/app/litterati/id982782776?mt=8
 
 
 ### How to use the app:
