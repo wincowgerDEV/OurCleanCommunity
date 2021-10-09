@@ -1,2 +1,2 @@
-# OurCleanCommunity
-Our Clean Community research on trash data.
+# Our Clean Community
+Researching trash generation rates around the world.
