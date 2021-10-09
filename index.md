@@ -1,6 +1,24 @@
-## Welcome to GitHub Pages
+# Welcome to Our Clean Community
 
-You can use the [editor on GitHub](https://github.com/wincowgerDEV/OurCleanCommunity/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+## Goals
+1. Measure litter generation rates around the world. 
+2. Assess why we see higher and lower litter generation rates in different places. 
+3. Determine how litter arrives at the location we find it. 
+4. Quantify the efficacy of litter prevention efforts. 
+
+## Methodology
+
+
+## Results
+
+## Highlighted Achievements
+
+## Partners
+
+
+
+
+[editor on GitHub](https://github.com/wincowgerDEV/OurCleanCommunity/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
 
 Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
 
