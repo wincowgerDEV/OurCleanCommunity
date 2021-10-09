@@ -1,7 +1,11 @@
 # Welcome to Our Clean Community
 
 ## Background
-There are major litter problems in all of our backyards. We don't need to go to far away places to study the problem of mismanaged waste. We developed a methodology which can be deployed on any 
+Global scales of plastic pollution research have helped to aid in policy recommendations to state and global governments. With the aid of new microscale phone enabled technologies from Litterati and Marine Debris Tracker, we may begin to resolve our questions about anthropogenic litter and plastic pollution to local communities. 
+
+This project will advance the objectives of up and coming applied scientists. Participants will lead their own local research project on anthropogenic litter guided by resources and expertise from Dr. Win Cowger. Participants will learn about field data collection, data management, GIS, and modeling and will have the opportunity to have their name on an academic paper. Participants will clean up a street block in their local community three times a week for a month, while collecting detailed information on the materials, items, and brands that make up the constituents of the trash. No previous experience in research is needed and there will be a lot of opportunity for learning. 
+
+The primary objective of this research is to use science to make a difference in our local community. We will explore dynamics like overfilled trash cans, littering, infrequent street sweeping, illegal dumping, wind transport, and other questions that cannot be revealed at any other scales besides the micro. All data will be time stamped, photographed, and georeferenced creating a trustworthy dataset rich in evidence. Participants visibility in their community during this project may encourage other community members to join the project and make participants the de facto litter ambassador of their community. The conclusion of this research will be an academic paper or many with all dedicated and committed contributors listed as coauthors. This paper will be presented to the local government who we will also consult along the way. 
 
 ## Goals
 1. Measure litter generation rates around the world. 
@@ -10,12 +14,12 @@ There are major litter problems in all of our backyards. We don't need to go to 
 4. Quantify the efficacy of litter prevention efforts. 
 
 ## Methodology
-Site Selection:
+### Site Selection:
 
-Determine a manageable location on your street to clean up and record data three times a week for a month. Draw it on a map, and send it to wcowg001@ucr.edu It is important that you think you can feasibly clean up the entire area three times a week and that you can accurately find the boundaries in the real world that you drew on the map. Zoom in on the map to outline it very clearly and precisely. The site should be very close to your home or somewhere else that you go regularly. The site should encompass both sides of the road and not extend into private property. See the more specific instructions for greater details on how to create your site.
+Determine a manageable location on your street to clean up and record data three times a week for a month. The site should be large enough to that you would find at least 100 piece of trash on your first survey but not so large that you would need to record more than 1000 piece on your first survey. An innitial visit to assess the amount of litter will be helpful for determining  Draw it on a map, and send it to Win via email at wincowger@gmail.com. It is important that you think you can feasibly clean up the entire area three times a week and that you can accurately find the boundaries in the real world that you drew on the map. Zoom in on the map to outline it very clearly and precisely. The site should encompass both sides of the road and not extend into private property. See the more specific instructions for greater details on how to create your site.
 
 Example:
-
+![image](https://user-images.githubusercontent.com/26821843/136639726-50feba9e-5096-41b2-8a5d-a9b510b868d5.png)
 
 
 Download the app to phone. 
@@ -23,11 +27,11 @@ https://play.google.com/store/apps/details?id=org.litterati.android&hl=en
 https://itunes.apple.com/us/app/litterati/id982782776?mt=8
 
 
-How to use the app:
+### How to use the app:
 Join the “Our Clean Community” group in the app. Take photos of every piece of trash you find, tag them with item, material, and brand identification, and press submit. Use the category cheat sheet to use as the item and material names. Add the brand if there is one or leave it blank. Open up receipts so that the entire receipt can be read from the image.
 
 
-Data Quality and Methodological Rules: 
+### Data Quality and Methodological  Checklist: 
 1. Safety first, be aware of cars on the road and don’t go into the road if there are moving cars.
 2. Any rule can be broken for the sake of safety or respect for your community just record rules that have to be broken on a particular day.
 3. Take photos of every piece of trash within the area of interest on each sampling day.
@@ -53,14 +57,14 @@ Data Quality and Methodological Rules:
 23. The better your photos, the less time it will take to verify them later.
 24. Take notes using the note sheet.
 
-Analyze your data:
+### Analyze your data:
 
 You will need to go through and manually verify all of the data to remove any photos that don’t belong or reclassify images with any corrections and to tally all the items in multi item images. If the photos are tagged correctly the first time it will tremendously speed up this process. This will happen once at the middle and once at the end of your study. 
 
-Social Presence:
+### Social Presence:
 
-Hashtag #OurCleanCommunity when posting to social media. 
-
+- Hashtag #OurCleanCommunity when posting to social media. 
+- Invite others to join the group.
 
 ## Major Learnings
 Publication pending, results of the first study will be released soon. 
@@ -69,7 +73,10 @@ Publication pending, results of the first study will be released soon.
 - Over 20 researchers have contributed to the project so far. 
 
 ## Partners
+![image](https://user-images.githubusercontent.com/26821843/136639629-98e3374a-5101-43a1-91d4-a95e46d125fe.png)
 ![image](https://user-images.githubusercontent.com/26821843/136639000-191ff00d-603f-4363-87d8-bfd2180558ea.png)
+![image](https://user-images.githubusercontent.com/26821843/136639598-15db300d-51fc-4a5c-832d-9ea47b18639f.png)
+
 
 ## Contact
 Contact Win Cowger <wincowger@gmail.com>
