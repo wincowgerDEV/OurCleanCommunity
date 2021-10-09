@@ -12,11 +12,12 @@ The primary objective of this research is to use science to make a difference in
 2. Assess why we see higher and lower litter generation rates in different places. 
 3. Determine how litter arrives at the location we find it. 
 4. Quantify the efficacy of litter prevention efforts. 
+5. Share data open access and foster open science. (Data in this repository is explained in the ReadMe.md file)
 
 ## Methodology
 ### Site Selection:
 
-Determine a manageable location on your street to clean up and record data three times a week for a month. The site should be large enough to that you would find at least 100 piece of trash on your first survey but not so large that you would need to record more than 1000 piece on your first survey. An innitial visit to assess the amount of litter will be helpful for determining  Draw it on a map, and send it to Win via email at wincowger@gmail.com. It is important that you think you can feasibly clean up the entire area three times a week and that you can accurately find the boundaries in the real world that you drew on the map. Zoom in on the map to outline it very clearly and precisely. The site should encompass both sides of the road and not extend into private property. See the more specific instructions for greater details on how to create your site.
+Determine a manageable location on your street to clean up and record data three times a week for a month. The site should be large enough to that you would find at least 100 piece of trash on your first survey but not so large that you would need to record more than 1000 piece on your first survey. An initial visit to assess the amount of litter will be helpful for determining how large the location should be. The site should either be a park or public space or a stretch of road where both sides of the road are surveyed. Draw it on a map, and send it to Win via email at wincowger@gmail.com. It is important that you think you can feasibly clean up the entire area three times a week and that you can accurately find the boundaries in the real world that you drew on the map. Zoom in on the map to outline it very clearly and precisely. The site should encompass both sides of the road and not extend into private property. See the more specific instructions for greater details on how to create your site.
 
 Example:
 ![image](https://user-images.githubusercontent.com/26821843/136639726-50feba9e-5096-41b2-8a5d-a9b510b868d5.png)
