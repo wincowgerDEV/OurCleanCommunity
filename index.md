@@ -23,8 +23,8 @@ Example:
 
 
 Download the app to phone. 
-https://play.google.com/store/apps/details?id=org.litterati.android&hl=en
-https://itunes.apple.com/us/app/litterati/id982782776?mt=8
+Android: https://play.google.com/store/apps/details?id=org.litterati.android&hl=en
+Apple: https://itunes.apple.com/us/app/litterati/id982782776?mt=8
 
 
 ### How to use the app:
@@ -59,7 +59,11 @@ Join the “Our Clean Community” group in the app. Take photos of every piece 
 
 ### Analyze your data:
 
-You will need to go through and manually verify all of the data to remove any photos that don’t belong or reclassify images with any corrections and to tally all the items in multi item images. If the photos are tagged correctly the first time it will tremendously speed up this process. This will happen once at the middle and once at the end of your study. 
+Once you are done with your survey, notify Win via email wincowger@gmail.com to get your full dataset compiled from the database. Win will provide it to you and you will go through and manually verify all of the data. During verification you will add a note column to the data file and make down any observations of these occurances:
+1. Duplicate images
+2. Image not of trash
+3. Tag incorrect: correct tag is...
+4. The piece is not for this study area
 
 ### Social Presence:
 
@@ -79,4 +83,4 @@ Publication pending, results of the first study will be released soon.
 
 
 ## Contact
-Contact Win Cowger <wincowger@gmail.com>
+Contact Project Coordinator Win Cowger <wincowger@gmail.com>
