@@ -1,4 +1,6 @@
 # Welcome to Our Clean Community
+![IMG_20181018_120303663](https://user-images.githubusercontent.com/26821843/137013034-2882e718-42a3-465f-b93a-d2bece33b643.jpg)
+2018 Our Clean Community Group during training
 
 ## Background
 Global scales of plastic pollution research have helped to aid in policy recommendations to state and global governments. With the aid of new microscale phone enabled technologies from Litterati and Marine Debris Tracker, we may begin to resolve our questions about anthropogenic litter and plastic pollution to local communities. 
