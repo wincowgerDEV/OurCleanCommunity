@@ -1,6 +1,6 @@
 # Welcome to Our Clean Community
-![IMG_20181018_120303663](https://user-images.githubusercontent.com/26821843/137013034-2882e718-42a3-465f-b93a-d2bece33b643.jpg)
 2018 Our Clean Community Group during training
+![IMG_20181018_120303663](https://user-images.githubusercontent.com/26821843/137013034-2882e718-42a3-465f-b93a-d2bece33b643.jpg)
 
 ## Background
 Global scales of plastic pollution research have helped to aid in policy recommendations to state and global governments. With the aid of new microscale phone enabled technologies from Litterati and Marine Debris Tracker, we may begin to resolve our questions about anthropogenic litter and plastic pollution to local communities. 
@@ -41,8 +41,8 @@ Example:
 8. Continue these surveys 3 times a week for a month.
 
 ### Image Criteria
+Example of a good quality image:
 ![4813603](https://user-images.githubusercontent.com/26821843/137013610-e2a0eb12-f8a5-4706-a26b-9ef593ab50f1.jpg)
-Example of a good quality image.
 
 1. Take the photo as soon as you find the trash.
 2. Take only one photo of each object.
@@ -59,8 +59,8 @@ Example of a good quality image.
 13. Retake any photos that do not meet the quality expectations of this study including blurry photos or photos that do not have the entire object in view. 
 
 ### Category Tags Criteria
+Example of quality categorization:
 ![BrandedExample](https://user-images.githubusercontent.com/26821843/137014187-04247fa7-eacc-48f9-9189-0cf4adc62a98.png)
-Example of quality categorization.
 
 1. Label the material, item, and brand of each object in the app. 
 2. Use the words from the trash terms sheet for materials and item identification and copy the name exactly, spaces and all. 
