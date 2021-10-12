@@ -41,11 +41,14 @@ Example:
 8. Continue these surveys 3 times a week for a month.
 
 ### Image Criteria
+![4813603](https://user-images.githubusercontent.com/26821843/137013610-e2a0eb12-f8a5-4706-a26b-9ef593ab50f1.jpg)
+Example of a good quality image.
+
 1. Take the photo as soon as you find the trash.
 2. Take only one photo of each object.
 3. Take the photo within 1 m of where the trash lays.
 4. Have a ruler in the photo to scale the size of the items. 
-5. It is best to take one photo of each object but it is sometimes necessary to take a photo of multiple objects at the same time in the case of one item being broken into many. If photographing multiple objects, place only similar things in an image together.
+5. It is best to take photos of a single object at a time but it is sometimes necessary to take a photo of multiple objects at the same time in the case of one item being broken into many. If photographing multiple objects, place only similar things in an image together.
 6. Photos should be close up but you should be able to see the entire item with enough background behind it to tell if it is against a fence, on the curb, in the street ect.
 7. Any brands on the objects should be visible in the image.
 8. If there is a pile of trash, deconstruct the pile and take photos of like objects together in one image or photograph each piece individually.
@@ -56,6 +59,9 @@ Example:
 13. Retake any photos that do not meet the quality expectations of this study including blurry photos or photos that do not have the entire object in view. 
 
 ### Category Tags Criteria
+![BrandedExample](https://user-images.githubusercontent.com/26821843/137014187-04247fa7-eacc-48f9-9189-0cf4adc62a98.png)
+Example of quality categorization.
+
 1. Label the material, item, and brand of each object in the app. 
 2. Use the words from the trash terms sheet for materials and item identification and copy the name exactly, spaces and all. 
 3. If there is a material or item not on the list you can create a new one and use that term each time you encounter that object.
