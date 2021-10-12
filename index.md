@@ -28,51 +28,59 @@ Example:
 - Apple: https://itunes.apple.com/us/app/litterati/id982782776?mt=8
 
 
-### How to use the app:
-Join the “Our Clean Community” group in the app. Take photos of every piece of trash you find, tag them with item, material, and brand identification, and press submit. Use the category cheat sheet to use as the item and material names. Add the brand if there is one or leave it blank. Open up receipts so that the entire receipt can be read from the image.
-
-
-### Data Quality and Methodological  Checklist: 
-1. Safety first, be aware of cars on the road and don’t go into the road if there are moving cars.
-2. Any rule can be broken for the sake of safety or respect for your community just record rules that have to be broken on a particular day.
-3. Take photos of every piece of trash within the area of interest on each sampling day.
+### How to conduct the survey
+1. Join the “Our Clean Community” group in the app. 
+2. Safety first, be aware of cars on the road and don’t go into the road if there are moving vehicles.
+3. Any method step can be broken for the sake of safety or respect for your community, just record any alterations to the methodology.
 4. Cover the area systematically, eg. by walking it abreast, in bands or otherwise subdividing it for complete coverage. Do not walk in the center of the road but if you see trash from the sidewalk and it is safe to grab the trash you may retrieve it.
-5. Stay inside of the area of interest.
-6. Take the photo as soon as you find the trash.
-7. Take only one photo of each object.
-8. Take the photo within 1 m of where the trash lays.
-9. Have a ruler in the photo to scale the size of the items. 
-10. It is best to take one photo of each object but it is sometimes necessary to take a photo of multiple objects at the same time in the case of one item being broken into many. If photographing multiple objects, place only similar things in an image together.
-11. Photos should be close up but you should be able to see the entire item with enough background behind it to tell if it is against a fence, on the curb, in the street ect.
-12. Any brands on the objects should be visible in the image.
-13. If there is a pile of trash, deconstruct the pile and take photos of like objects together in one image or photograph each piece individually.
-14. If there is a bag full of more than 10 items of trash just photograph the bagful. 
-15. If there are items that cannot be removed because they are hazardous or too large, photograph them once on the day they are spotted and take note of them if they disappear or move. 
-16. Photograph anything the size of a cigarette butt (approximately 1 cm) and larger.
-17. Retake any photos that do not meet the quality expectations of this study including blurry photos or photos that do not have the entire object in view. 
-18. Label the material, item, and brand of each object in the app. 
-19. Use the trash terms sheet for materials and item identification and copy the name exactly, spaces and all. 
-20. If there is a material or item not on the list you can create a new one and use that term each time.
-21. If the object is many materials use the most abundant material in the mixture.
-22. If there are many objects write them all.
-23. The better your photos, the less time it will take to verify them later.
-24. Take notes using the note sheet.
+5. Whenever you encounter a piece of trash,  photo graph it (see below), label it with the item, material, and brand tags (see below), and clean it up. 
+6. Continue this for the entire survey site for each survey day to cleanup and photograph every piece of litter there on each day. 
+7. Do not record litter outside of the survey area.
+8. Continue these surveys 3 times a week for a month.
 
-### Analyze your data:
+### Image Criteria
+1. Take the photo as soon as you find the trash.
+2. Take only one photo of each object.
+3. Take the photo within 1 m of where the trash lays.
+4. Have a ruler in the photo to scale the size of the items. 
+5. It is best to take one photo of each object but it is sometimes necessary to take a photo of multiple objects at the same time in the case of one item being broken into many. If photographing multiple objects, place only similar things in an image together.
+6. Photos should be close up but you should be able to see the entire item with enough background behind it to tell if it is against a fence, on the curb, in the street ect.
+7. Any brands on the objects should be visible in the image.
+8. If there is a pile of trash, deconstruct the pile and take photos of like objects together in one image or photograph each piece individually.
+9. If there is a bag full of more than 10 items of trash just photograph the bagful. 
+10. If there are items that cannot be removed because they are hazardous or too large, photograph them once on the day they are spotted and take note of them if they disappear or move. 
+11. Open up receipts so that the entire receipt can be read from the image.
+12. Photograph anything the size of a cigarette butt (approximately 1 cm) and larger.
+13. Retake any photos that do not meet the quality expectations of this study including blurry photos or photos that do not have the entire object in view. 
 
+### Category Tags Criteria
+1. Label the material, item, and brand of each object in the app. 
+2. Use the words from the trash terms sheet for materials and item identification and copy the name exactly, spaces and all. 
+3. If there is a material or item not on the list you can create a new one and use that term each time you encounter that object.
+4. If the object is a mix of many materials use the most abundant (by volume) material in the mixture.
+5. If there are many objects write them all.
+7. Add the brand name as a tag if there is one or leave it blank. 
+
+### Data Review Criteria
 Once you are done with your survey, notify Win via email wincowger@gmail.com to get your full dataset compiled from the database. Win will provide it to you and you will go through and manually verify all of the data. During verification you will add a note column to the data file and make down any observations of these occurances:
 1. Duplicate images
 2. Image not of trash
 3. Tag incorrect: correct tag is...
 4. The piece is not for this study area
 
-### Social Presence:
+### Litter Disposal Guidance
+You may end up with a lot of trash collected, this trash is now your property so you can do whatever you would like with it. Here are some things we like to do with trash:
+1. Reuse it: if you find a 5$ bill, that is yours, buy yourself something nice. 
+2. Upcycle it: make an art piece. 
+3. Recycle it: check your local guidance on what can be recycled and how. 
+4. Waste it: if none of the above are possible, throw it in your trash bin or take to the local landfil.
 
+### Social Presence:
 - Hashtag #OurCleanCommunity when posting to social media. 
 - Invite others to join the group.
 
 ## Major Learnings
-Publication pending, results of the first study will be released soon. 
+Publication in review now, results of the first study will be released soon. 
 
 ## Highlighted Achievements
 - Over 20 researchers have contributed to the project so far. 
@@ -81,7 +89,6 @@ Publication pending, results of the first study will be released soon.
 ![image](https://user-images.githubusercontent.com/26821843/136639629-98e3374a-5101-43a1-91d4-a95e46d125fe.png)
 ![image](https://user-images.githubusercontent.com/26821843/136639000-191ff00d-603f-4363-87d8-bfd2180558ea.png)
 ![image](https://user-images.githubusercontent.com/26821843/136639598-15db300d-51fc-4a5c-832d-9ea47b18639f.png)
-
 
 ## Contact
 Contact Project Coordinator Win Cowger <wincowger@gmail.com>
