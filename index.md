@@ -1,5 +1,6 @@
 # Welcome to Our Clean Community
 2018 Our Clean Community Group during training
+
 <image src= "https://user-images.githubusercontent.com/26821843/137013034-2882e718-42a3-465f-b93a-d2bece33b643.jpg" width = "25%"> 
 
 ## Background
@@ -22,6 +23,7 @@ The primary objective of this research is to use science to make a difference in
 Determine a manageable location on your street to clean up and record data three times a week for a month. The site should be large enough to that you would find at least 100 piece of trash on your first survey but not so large that you would need to record more than 1000 piece on your first survey. An initial visit to assess the amount of litter will be helpful for determining how large the location should be. The site should either be a park or public space or a stretch of road where both sides of the road are surveyed. Draw it on a map, and send it to Win via email at wincowger@gmail.com. It is important that you think you can feasibly clean up the entire area three times a week and that you can accurately find the boundaries in the real world that you drew on the map. Zoom in on the map to outline it very clearly and precisely. The site should encompass both sides of the road and not extend into private property. See the more specific instructions for greater details on how to create your site.
 
 Example:
+  
 <image src= "https://user-images.githubusercontent.com/26821843/136639726-50feba9e-5096-41b2-8a5d-a9b510b868d5.png" width = "25%"> 
 
 ### Download the app to phone. 
@@ -41,6 +43,7 @@ Example:
 
 ### Image Criteria
 Example of a good quality image:
+  
 <image src= "https://user-images.githubusercontent.com/26821843/137013610-e2a0eb12-f8a5-4706-a26b-9ef593ab50f1.jpg" width = "25%"> 
 
 1. Take the photo as soon as you find the trash.
@@ -59,6 +62,7 @@ Example of a good quality image:
 
 ### Category Tags Criteria
 Example of quality categorization:
+  
 <image src= "https://user-images.githubusercontent.com/26821843/137014187-04247fa7-eacc-48f9-9189-0cf4adc62a98.png" width = "25%"> 
 
 1. Label the material, item, and brand of each object in the app. 
