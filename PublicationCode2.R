@@ -2,12 +2,9 @@
 #Check out this wind data https://mrcc.illinois.edu/CLIMATE/Hourly/WindRose.jsp
 
 #Libraries ----
-library(readxl)
 library(gridExtra)
 library(ggplot2)
 library(readr)
-library(lavaan)
-library(smooth)
 library(Hmisc)
 library(ggrepel)
 library(data.table)
@@ -15,13 +12,11 @@ library(dplyr)
 library(tidyr)
 library(swfscMisc)
 library(circular)
-library(geosphere)
 library(data.tree)
 library(plotly)
 library(ggforce)
 
 #Functions ----
-#Function returns the difference between two bearings
 vector_wind_average <- function(speed, direction){
   complete_values = !is.na(direction) & !is.na(speed)
   
@@ -34,9 +29,13 @@ vector_wind_average <- function(speed, direction){
   atan2(TotalEW, TotalNS)*180/pi
 }
 
-angle_diff <- function(theta1, theta2){
-  theta <- abs(theta1 - theta2) %% 360 
-  return(ifelse(theta > 180, 360 - theta, theta))
+aggregate_vector_wind_average <- function(startdate, enddate){
+date_range <-  Weather %>%
+    dplyr::filter(Date >= as.Date(startdate, "%Y-%m-%d") & Date <= as.Date(enddate, "%Y-%m-%d")) %>%
+    dplyr::select(Mean.Wind.Dir..deg., Mean.Wind.Speed..mph.) #%>%
+    
+    vector_wind_average(date_range$Mean.Wind.Speed..mph., date_range$Mean.Wind.Dir..deg.) %>%
+    ifelse(.<0, .+360, .)
 }
 
 rainpresabs <- function(startdate, enddate){
@@ -46,36 +45,6 @@ rainpresabs <- function(startdate, enddate){
         pull() > 0, na.rm = T)
 }
 
-differenceofmean <- function(startdate, enddate){
-date_range <-  Weather %>%
-    dplyr::filter(Date >= as.Date(startdate, "%Y-%m-%d") & Date <= as.Date(enddate, "%Y-%m-%d")) %>%
-    dplyr::select(Mean.Wind.Dir..deg., Mean.Wind.Speed..mph.) #%>%
-    
-    vector_wind_average(date_range$Mean.Wind.Speed..mph., date_range$Mean.Wind.Dir..deg.) %>%
-    ifelse(.<0, .+360, .)
-}
-
-#https://www.flutterbys.com.au/stats/tut/tut13.2.html
-calc_shannon <- function(community) {
-  p <- table(community)/length(community) # Find proportions
-  p <- p[p > 0] # Get rid of zero proportions (log zero is undefined)
-  -sum(p * log(p)) # Calculate index
-}
-
-calc_simpson <- function(community) {
-  p <- table(community)/length(community) # Find proportions
-  1 / sum(p^2) # Calculate index
-}
-
-calc_menshinicks <- function(community) {
-  p <- length(unique(community))/sqrt(length(community)) # Find proportions
-  p # Calculate index
-}
-
-calc_numgroups <- function(community) {
-  p <- length(unique(community)) # Find proportions
-  p # Calculate index
-}
 
 cleantext <- function(x) {
   tolower(gsub("[[:space:]]", "", x))
@@ -97,84 +66,9 @@ BootMean <- function(data) {
 
 not_all_na <- function(x) any(!is.na(x))
 
-#requires alias to have Alias, RowID and Key columns, requires DF to have a count column and some column to match
-jointohierarchy <- function(DF, Hierarchy, Alias, ColNum) {
-  DF <- mutate_all(DF, cleantext) %>%
-    mutate(Count = as.numeric(Count))
-  Hierarchy <- mutate_all(Hierarchy, cleantext)
-  Alias <- mutate_all(Alias, cleantext) 
-  
-  DF$RowID <- unlist(apply(DF, 1, function(x) which(Alias == as.character(x[ColNum]), arr.ind = TRUE)[1]))
-  
-  DF <- DF %>%
-    left_join(dplyr::select(Alias, Key)) %>%
-    dplyr::select(Key, Count) %>%
-    mutate(Key = ifelse(is.na(Key), "other", Key))
-  
-  list <- apply(DF, 1, function(x) which(Hierarchy == as.character(x[1]), arr.ind = TRUE))
-  
-  for(n in 1:length(list)){
-    if(length(list[[n]]) == 0) next
-    DF[n, "Row"] <- unname(list[[n]][1,1])
-    DF[n, "Column"] <- unname(list[[n]][1,2])
-  }
-  
-  RowColSum <- DF %>%
-    group_by(Row, Column) %>%
-    summarise(sum = sum(Count)) %>%
-    filter(!is.na(Row)) #This one of the culprits, the rows aren't being matched so they are being dropped and we need some backup mechanism. 
-  
-  HierarcyFinalForm <- Hierarchy[0,]
-  HierarcyFinalForm$sum <- numeric()
-  
-  row = 25
-  for(row in 1:nrow(RowColSum)){
-    filter1 <- Hierarchy %>%
-      filter(.[[1]] == Hierarchy[unlist(RowColSum[row, "Row"]),1])
-    filter2 <- filter1 %>%
-      filter_all(any_vars(. == Hierarchy[unlist(RowColSum[row, "Row"]),unlist(RowColSum[row, "Column"])])) %>%
-      dplyr::select(where(not_all_na)) %>%
-      mutate(sum = unlist(RowColSum[row, "sum"]))
-    
-    if(unlist(RowColSum[row, "Column"]) < ncol(filter2)-1) {
-      filter2[,(unlist(RowColSum[row, "Column"])+1):(ncol(filter2)-1)] <- NA
-    }
-    filter2 <- filter2 %>%
-      distinct()
-    
-    #print(sum(filter2$sum) == sum(RowColSum[row, "sum"]))
-    
-    HierarcyFinalForm <- bind_rows(HierarcyFinalForm, filter2)
-  }
-  
-  test <-  HierarcyFinalForm %>%
-    mutate_if(is.character, as.factor) %>%
-    mutate(sum = as.numeric(unname(sum))) %>%
-    dplyr::group_by(across(c(-sum))) %>%
-    summarise(sum = sum(sum)) %>%
-    ungroup() %>%
-    mutate_if(is.factor, as.character) 
-  
-}
-
-
-
-#check out this: https://stackoverflow.com/questions/45225671/aggregating-values-on-a-data-tree-with-r
-myApply <- function(node) {
-  node$totalsum <- 
-    sum(c(node$Count, purrr::map_dbl(node$children, myApply)), na.rm = TRUE)
-}
-
-
-
 removeslash <- function(x){
   gsub("/", " OR ", x)
 }
-#DF2 <- SMC
-#Hierarchy <- ItemsHierarchy
-#Alias <- ItemsAlias
-#ColNum <- 2
-
 
 AggregateTrees <- function(DF, Alias, Hierarchy){
   
@@ -267,17 +161,11 @@ sunburstplot <-function(df_join_boot){
       maxdepth = 6,
       domain = list(column = 1), 
       branchvalues = 'total',
-      #text = ~paste('</br> Mean: ', round(df_join_boot$mean_prop, 2),
-      #              '</br> Min: ', round(df_join_boot$min_prop, 2),
-      #              '</br> Max: ', round(df_join_boot$max_prop, 2)),
-      #textinfo = "label+percent entry",
       texttemplate = values,
-      values = df_join_boot$mean_prop) #%>%
-   # layout(uniformtext=list(minsize=18, mode = "show"))
+      values = df_join_boot$mean_prop) 
 }
 
-#Datasets ----
-
+#Datasets and Cleanup ----
 
 CompleteDataWithGoogle <- read.csv("CompleteDataWithGoogle.csv") %>%
   mutate(startdate = as.Date(dateprintedcleaned, "%Y-%m-%d"), enddate =  as.Date(TimestampDatecleaned, "%Y-%m-%d"))
@@ -388,7 +276,6 @@ input_rate_mass <- site_data_cleaned %>%
   group_by(Name) %>%
   mutate(DateDiff = as.numeric(Date) - dplyr::lag(as.numeric(Date), order_by = Name)) %>%
   mutate(generationrate = Intensity/DateDiff/Site_Length_m) %>%
-  #filter(Date != as.Date("3/23/2020", format = "%m/%d/%Y")) %>% #Bring back in for 2020 analysis.
   ungroup()
 
 #Input Rate Correlation
@@ -525,7 +412,6 @@ write.csv(material_item_list, "material_item_site.csv")
 
 ItemsHierarchy <- read.csv("Taxonomy/Website/Items_Hierarchy_V2.csv")
 
-#Test items not matched 
 
 BrandHierarchy <- read.csv("Taxonomy/Website/BrandManufacturer.csv") %>%
   rename(to = Brand, from = Manufacturer) 
@@ -577,7 +463,7 @@ Brand_DF_group <- site_data_cleaned %>%
   ungroup() %>%
   rename(Class = Brand_TT)
 
-
+#want this to be zero unmatches. 
 unmatched <- Item_DF %>%
   mutate_all(cleantext) %>%
   anti_join(ItemsAlias %>%
@@ -588,7 +474,6 @@ MaterialTreeDF <- AggregateTrees(DF = Material_DF, Alias = MaterialsAlias, Hiera
   mutate(from = ifelse(from == "trash", "Materials", from))
 
 material_grouped <- grouped_uncertainty(DF_group = Material_DF_group, Group_Alias = MaterialsAlias, Group_Hierarchy = MaterialsHierarchy, type = "Materials")
-
 
 material_grouped_test <- material_grouped %>%
   filter(mean_prop > 0.1)
@@ -649,75 +534,10 @@ brand_grouped <- Brand_DF_group %>%
   
 brand_plot <- sunburstplot(brand_grouped)
 orca(brand_plot, "brand-plot.svg")
-
-
-plot_ly() %>%
-  add_trace(
-    labels = material_grouped$to,
-    parents = material_grouped$from,
-    type = 'sunburst',
-    maxdepth = 6,
-    domain = list(column = 0), 
-    branchvalues = 'total',
-    texttemplate = paste(material_grouped$to, 
-                         "<br>", 
-                         round(material_grouped$mean_prop, 2) * 100, 
-                         " (", 
-                         round(material_grouped$min_prop, 2) * 100, 
-                         "-", 
-                         round(material_grouped$max_prop, 2) * 100, 
-                         ")%", 
-                         sep = ""),
-    values = material_grouped$mean_prop) %>%
-  add_trace(
-    labels = item_grouped$to,
-    parents = item_grouped$from,
-    type = 'sunburst',
-    maxdepth = 6,
-    domain = list(column = 1), 
-    branchvalues = 'total',
-    texttemplate = paste(item_grouped$to, 
-                         "<br>", 
-                         round(item_grouped$mean_prop, 2) * 100, 
-                         " (", 
-                         round(item_grouped$min_prop, 2) * 100, 
-                         "-", 
-                         round(item_grouped$max_prop, 2) * 100, 
-                         ")%", 
-                         sep = ""),
-    values = item_grouped$mean_prop) %>%
-  add_trace(
-    labels = brand_grouped$to,
-    parents = brand_grouped$from,
-    type = 'sunburst',
-    maxdepth = 6,
-    domain = list(column = 2), 
-    branchvalues = 'total',
-    texttemplate = paste(brand_grouped$to, 
-                         "<br>", 
-                         round(brand_grouped$mean_prop, 2) * 100, 
-                         " (", 
-                         round(brand_grouped$min_prop, 2) * 100, 
-                         "-", 
-                         round(brand_grouped$max_prop, 2) * 100, 
-                         ")%", 
-                         sep = ""),
-    values = brand_grouped$mean_prop) %>%
-  layout(
-    grid = list(columns =3, rows = 1),
-    margin = list(l = 0.1, r = 0.1, b = 0.1, t = 0.1),
-    sunburstcolorway = c(
-      "#636efa","#EF553B","#00cc96","#ab63fa","#19d3f3",
-      "#e763fa", "#FECB52","#FFA15A","#FF6692","#B6E880"
-    ),
-    extendsunburstcolors = TRUE)
- 
-#try this https://stackoverflow.com/questions/58173316/plotly-sunburst-plot-not-showing-in-jupyter-notebook
-
 #Unbranded things show us the importance of creating forensic labels, Unmerged things show us the importance of data science research in this field to build relational databases. Brands show us the minimum level of responsibility that these companies have for their environmental impact. Propose a fine on companies which is concomittant with their observed environmental impact and subsequent cleanup. Right now we are giving these companies subsidies on their pollution by paying for cleanup. 3% for philip moris and so on. We are incentivising their pollution by reinforcing the idea that cigarettes will just disappear when they enter the environment. This is the largest pollution we have ever seen since the BP oil spill and their should be a similar reponse from governments to end the pollution of our envioronment and hold the companies responsible.  
 
-
-#Trip Distances ----
+#Human trip distances, Wind, and Rain ----
+##Trip Distances ----
 #Dataset source
 #https://data.bts.gov/Research-and-Statistics/Trips-by-Distance/w96p-f2qv
 
@@ -737,19 +557,18 @@ CompleteDataWithGoogle %>%
   filter(!is.na(DistanceFromLocation) & !is.na(startdate)) %>%
   pull(startdate) 
 
-#Was thinking that we should limit this to work trips but I don't think so any more. 
+#Just look at IE trips
 IETrips <- Trips %>%
   filter(`State Postal Code` == "CA") %>%
   mutate(DateFormatted = as.Date(Date)) %>%
   filter(DateFormatted < "2019-12-30") %>%
   filter(`County Name` == "Riverside County" | `County Name` == "San Bernardino County")
-#How do we treat the population staying at home? Are those zeros?
-#We got ourselves a double sided censorship here. End is greater than, and beginning is less than. 
 
 IEDistribution <- IETrips %>%
   dplyr::select(`Number of Trips`:`Number of Trips >=500`) %>%
   summarise(across(everything(), ~sum(.x, na.rm = T)))
 
+#Reformat names and set distribution estimation values.
 pdf_ie_dist <- IEDistribution %>%
   pivot_longer(everything()) %>%
   filter(name != "Number of Trips") %>%
@@ -792,18 +611,15 @@ pdf_ie_dist <- IEDistribution %>%
   mutate(percent = value/sum(value)) %>%
   mutate(count = round(percent * 10000))
 
-#Going with lognormal
+#Estimate with uniform distribution
 montecarlo_vector <- c()
-
-#Or Uniform
 for(row in 1:nrow(pdf_ie_dist)){
   montecarlo_vector <- c(montecarlo_vector, runif(n = unlist(pdf_ie_dist[row, "count"]), min = unlist(pdf_ie_dist[row, "min_dist"]), max = unlist(pdf_ie_dist[row, "max_dist"]))) 
 }
 
 #Result doesn't seem to depend much on which of the above we choose. Could also try log uniform, might be a nice way to get to the middle ground.
 
-library(grid)
-#In meters
+#compare receipt and human trip distances in meters
 p1 <- ggplot() + 
   stat_ecdf(data = CompleteDataWithGoogle, aes(x = DistanceFromLocation), color = "red") + 
   stat_ecdf(aes(x = montecarlo_vector * 1.60934 * 1000), color = "blue") + 
@@ -832,92 +648,14 @@ geom_point(aes(y = receipt_distance_quantiles, x = montecarlo_distance_quantiles
   coord_equal() +
   geom_abline(intercept = 0, slope = 1)
 
+#Get summary stats for goodness of fit between the two PDFs
 linear_quantile_regression = lm(log10(receipt_distance_quantiles) ~ log10(montecarlo_distance_quantiles))
+summary(linear_quantile_regression)
 
-#Might not be the best way to do this because the data set is synthesized.
-#ks.test(x = montecarlo_vector * 1.60934 * 1000, y =  CompleteDataWithGoogle$DistanceFromLocation)
+##Travel Velocity ----
+ggplot(CompleteDataWithGoogle, aes(x = DistanceFromLocation/Timedifference)) + geom_histogram(bins = 10) + scale_x_continuous()+ theme_classic(base_size = 20, base_line_size = 2) + scale_x_log10() + labs(x = "Meters Traveled per Day")
 
-#Wind and Rain ----
-
-#Rain ----
-for(row in 1:nrow(CompleteDataWithGoogle)){
-  CompleteDataWithGoogle[row, "precip"] <-rainpresabs(startdate = CompleteDataWithGoogle[row,"dateprintedcleaned"], enddate = CompleteDataWithGoogle[row,"TimestampDatecleaned"])
-}
-
-#Receipt Directions ----
-for(row in 1:nrow(CompleteDataWithGoogle)){ #This is the inverse of what we would think because wind direction is the inverse. This will tell us what direction the trash came from.
-  CompleteDataWithGoogle[row, "bearing"] <- swfscMisc::bearing(lat2 = CompleteDataWithGoogle[row,"LocLat"]*pi/180, 
-                                                   lon2 = CompleteDataWithGoogle[row,"LocLon"]*pi/180,
-                                                   lat1 = CompleteDataWithGoogle[row,"lat"]*pi/180, 
-                                                   lon1 = CompleteDataWithGoogle[row,"lon"]*pi/180)[1]
-}
-
-#convert bearing the azimuth? 
-
-#difference between bearings.
-for(row in 1:nrow(CompleteDataWithGoogle)){
-  CompleteDataWithGoogle[row, "meanbearing"] <- differenceofmean(startdate = CompleteDataWithGoogle[row,"startdate"], enddate = CompleteDataWithGoogle[row,"enddate"])
-}
-
-#CompleteDataWithGoogle$differencebearings <- angle_diff(CompleteDataWithGoogle$bearing, CompleteDataWithGoogle$meanbearing)
-
-#Wind velocity transport velocity correlation ----
-
-x.circ <- circular(CompleteDataWithGoogle$bearing, type="directions", units="degrees", template="geographics", rotation="clock")
-rose.diag(x.circ, bins=10, col="gray", border=NA)
-
-y.circ <- circular(CompleteDataWithGoogle$meanbearing, type="directions", units="degrees", template="geographics", rotation="clock")
-rose.diag(y.circ, bins=10, col="gray", border=NA)
-
-cor.circular(x.circ, y.circ, test = T)
-
-CompleteDataWithGoogle$ycoordbearing <- 0.5*sin(rad(CompleteDataWithGoogle$bearing))
-CompleteDataWithGoogle$xcoordbearing <- 0.5*cos(rad(CompleteDataWithGoogle$bearing))
-CompleteDataWithGoogle$ycoordmeanbearing <- 1*sin(rad(CompleteDataWithGoogle$meanbearing))
-CompleteDataWithGoogle$xcoordmeanbearing <- 1*cos(rad(CompleteDataWithGoogle$meanbearing))
-CompleteDataWithGoogle$row <- 1:nrow(CompleteDataWithGoogle)
-
-CompleteDataCoordPlot <- CompleteDataWithGoogle %>%
-  filter(!is.na(xcoordmeanbearing) & !is.na(xcoordbearing)) %>% #Removes data where we don't have wind or dont have receipt direction from the analysis.
-  dplyr::select(xcoordmeanbearing, ycoordmeanbearing, row) %>%
-  rename(x = xcoordmeanbearing, y = ycoordmeanbearing) %>%
-  bind_rows(CompleteDataWithGoogle %>%
-              filter(!is.na(xcoordmeanbearing) & !is.na(xcoordbearing)) %>% 
-              dplyr::select(ycoordbearing, xcoordbearing, row) %>%
-              rename(x = ycoordbearing, y = xcoordbearing)) 
-  
-
-#360 (North) is on the right side.
-p3 <- ggplot() + 
-  geom_circle(aes(x0 = c(0,0), y0 = c(0,0), r = c(0.5,1))) + 
-  geom_point(data = CompleteDataCoordPlot, aes(x = x, y = y), alpha = 0.5, size = 2) + 
-  geom_line(data = CompleteDataCoordPlot, aes(x = x, y = y, group = row)) +
-  theme_void() + 
-  theme(aspect.ratio = 1, legend.position = NULL) + 
-  geom_text(aes(x = c(0,1.1,0,-1.1), y = c(1.1, 0, -1.1, 0) , label = c("W", "N", "E", "S")), size = 10) 
-
-plot(x.circ, stack = T)
-#plotCircular(area1 = CompleteDataWithGoogle$bearing, area2 = CompleteDataWithGoogle$meanbearing, spokes = )
-plot(x = y.circ, stack = T)
-
-ggplot(CompleteDataWithGoogle, aes(x = "differnce", y = differencebearings)) + geom_boxplot(notch = T)
-
-#how many of the receipts could have experienced precipitation?
-p4 <- CompleteDataWithGoogle %>%
-  filter(!is.na(dateprintedcleaned) & !is.na(TimestampDatecleaned)) %>%
-  group_by(precip) %>%
-  summarise(count = n()) %>%
-  ggplot() + 
-  geom_col(aes(x = precip, y = count)) +
-  theme_bw(base_size = 20) +
-  labs(x = "Precipitation Occured?", y = "Count")
-
-grid.arrange(p4,p3,p1,p2, ncol = 4)
-
-ggplot(CompleteDataWithGoogle, aes(x = differencebearings)) + geom_histogram(bins = 10) + scale_x_continuous(breaks = c(seq(0,180, by = 20)))+ dark_theme_classic(base_size = 20, base_line_size = 2) + labs(x = "Direction Angle Difference")
-ggplot(CompleteDataWithGoogle, aes(x = DistanceFromLocation/Timedifference)) + geom_histogram(bins = 10) + scale_x_continuous()+ dark_theme_classic(base_size = 20, base_line_size = 2) + scale_x_log10() + labs(x = "Meters Traveled per Day")
-
-#Summary stats----
+###Summary stats----
 max(CompleteDataWithGoogle$DistanceFromLocation, na.rm = T)
 min(CompleteDataWithGoogle$DistanceFromLocation, na.rm = T)
 
@@ -933,9 +671,77 @@ length(transport_speed[!is.na(transport_speed)])
 length(CompleteDataWithGoogle$DistanceFromLocation[!is.na(CompleteDataWithGoogle$DistanceFromLocation)])
 length(CompleteDataWithGoogle$Timedifference[!is.na(CompleteDataWithGoogle$Timedifference)])
 
+##Rain ----
+for(row in 1:nrow(CompleteDataWithGoogle)){
+  CompleteDataWithGoogle[row, "precip"] <-rainpresabs(startdate = CompleteDataWithGoogle[row,"dateprintedcleaned"], enddate = CompleteDataWithGoogle[row,"TimestampDatecleaned"])
+}
+
+#rain plot how many of the receipts could have experienced precipitation?
+p4 <- CompleteDataWithGoogle %>%
+  filter(!is.na(dateprintedcleaned) & !is.na(TimestampDatecleaned)) %>%
+  group_by(precip) %>%
+  summarise(count = n()) %>%
+  ggplot() + 
+  geom_col(aes(x = precip, y = count)) +
+  theme_bw(base_size = 20) +
+  labs(x = "Precipitation Occured?", y = "Count")
+
+##Wind ----
+for(row in 1:nrow(CompleteDataWithGoogle)){ #This is the inverse of what we would think because wind direction is the inverse. This will tell us what direction the trash came from.
+  CompleteDataWithGoogle[row, "trashbearing"] <- swfscMisc::bearing(lat2 = CompleteDataWithGoogle[row,"LocLat"]*pi/180, 
+                                                   lon2 = CompleteDataWithGoogle[row,"LocLon"]*pi/180,
+                                                   lat1 = CompleteDataWithGoogle[row,"lat"]*pi/180, 
+                                                   lon1 = CompleteDataWithGoogle[row,"lon"]*pi/180)[1]
+}
+
+
+#difference between bearings.
+for(row in 1:nrow(CompleteDataWithGoogle)){
+  CompleteDataWithGoogle[row, "windmeanbearing"] <- aggregate_vector_wind_average(startdate = CompleteDataWithGoogle[row,"startdate"], enddate = CompleteDataWithGoogle[row,"enddate"])
+}
+
+###Wind velocity correlation ----
+
+x.circ <- circular(CompleteDataWithGoogle$trashbearing, type="directions", units="degrees", template="geographics", rotation="clock")
+rose.diag(x.circ, bins=10, col="gray", border=NA)
+
+y.circ <- circular(CompleteDataWithGoogle$windmeanbearing, type="directions", units="degrees", template="geographics", rotation="clock")
+rose.diag(y.circ, bins=10, col="gray", border=NA)
+
+cor.circular(x.circ, y.circ, test = T)
+
+#Calculate the trash and wind bearing x and y coordinates.
+CompleteDataWithGoogle$trashycoordbearing <- 0.5*sin(rad(CompleteDataWithGoogle$trashbearing))
+CompleteDataWithGoogle$trashxcoordbearing <- 0.5*cos(rad(CompleteDataWithGoogle$trashbearing))
+CompleteDataWithGoogle$windycoordmeanbearing <- 1*sin(rad(CompleteDataWithGoogle$windmeanbearing))
+CompleteDataWithGoogle$windxcoordmeanbearing <- 1*cos(rad(CompleteDataWithGoogle$windmeanbearing))
+CompleteDataWithGoogle$row <- 1:nrow(CompleteDataWithGoogle)
+
+#join the trash bearing data and wind data into single frame for plotting. 
+CompleteDataCoordPlot <- CompleteDataWithGoogle %>%
+  filter(!is.na(windxcoordmeanbearing) & !is.na(trashxcoordbearing)) %>% #Removes data where we don't have wind or dont have receipt direction from the analysis.
+  dplyr::select(windxcoordmeanbearing, windycoordmeanbearing, row) %>%
+  rename(x = windxcoordmeanbearing, y = windycoordmeanbearing) %>%
+  bind_rows(CompleteDataWithGoogle %>%
+              filter(!is.na(windxcoordmeanbearing) & !is.na(trashxcoordbearing)) %>% 
+              dplyr::select(trashycoordbearing, trashxcoordbearing, row) %>%
+              rename(x = trashycoordbearing, y = trashxcoordbearing)) 
+  
+
+#wind plot 360 (North) is on the right side.
+p3 <- ggplot() + 
+  geom_circle(aes(x0 = c(0,0), y0 = c(0,0), r = c(0.5,1))) + 
+  geom_point(data = CompleteDataCoordPlot, aes(x = x, y = y), alpha = 0.5, size = 2) + 
+  geom_line(data = CompleteDataCoordPlot, aes(x = x, y = y, group = row)) +
+  theme_void() + 
+  theme(aspect.ratio = 1, legend.position = NULL) + 
+  geom_text(aes(x = c(0,1.1,0,-1.1), y = c(1.1, 0, -1.1, 0) , label = c("W", "N", "E", "S")), size = 10) 
+
+grid.arrange(p4,p3,p1,p2, ncol = 4)
+
+
 #Power analysis ----
 #Power Analysis for detecting % shift in future studies
-library(pwr)
 
 #How many samples do we need to detect a X% shift?
 for(n in 1:length(mean_input_rate$mean)){
