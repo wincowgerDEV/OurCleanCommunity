@@ -1,5 +1,5 @@
 #Notes ----
-#Check out this wind data https://mrcc.illinois.edu/CLIMATE/Hourly/WindRose.jsp
+#Run the code below in sequence to reproduce study analysis. 
 
 #Libraries ----
 library(gridExtra)
@@ -237,7 +237,7 @@ sum(dataset_enviroscreen$Tot_Population_CEN_2010)/sum(dataset_enviroscreen$LAND_
 IE_enviro_skim <- skimr::skim(IE_Enviroscreen_Data)
 data_enviro_skim <- skimr::skim(dataset_enviroscreen)
 
-#location uncertainty analysis ----
+#Phone location uncertainty analysis ----
 intersected <- fread("StudyAreas/User_Cleaned_Data/uncertainty/points_inside_areas.csv") %>%
   dplyr::select(id) %>%
   mutate(inside_area = TRUE, id = as.character(id)) %>%
@@ -252,24 +252,226 @@ all_distances <- fread("StudyAreas/User_Cleaned_Data/uncertainty/all_points_dist
 BootMean(all_distances$distance_m[!all_distances$inside_area])
 mean(all_distances$distance_m[!all_distances$inside_area], na.rm = T)
 
-#Generation Rate Changes ----
+#Human trip distances, Wind, and Rain ----
+##Trip Distances ----
+#Dataset source
+#https://data.bts.gov/Research-and-Statistics/Trips-by-Distance/w96p-f2qv
+
+#Check summary stats of distances
+CompleteDataWithGoogle %>%
+  filter(!is.na(DistanceFromLocation)) %>%
+  pull(enddate) %>%
+  summary()
+
+CompleteDataWithGoogle %>%
+  filter(!is.na(DistanceFromLocation))
+
+CompleteDataWithGoogle %>%
+  filter(!is.na(startdate))
+
+CompleteDataWithGoogle %>%
+  filter(!is.na(DistanceFromLocation) & !is.na(startdate)) %>%
+  pull(startdate) 
+
+#Just look at IE trips
+IETrips <- Trips %>%
+  filter(`State Postal Code` == "CA") %>%
+  mutate(DateFormatted = as.Date(Date)) %>%
+  filter(DateFormatted < "2019-12-30") %>%
+  filter(`County Name` == "Riverside County" | `County Name` == "San Bernardino County")
+
+IEDistribution <- IETrips %>%
+  dplyr::select(`Number of Trips`:`Number of Trips >=500`) %>%
+  summarise(across(everything(), ~sum(.x, na.rm = T)))
+
+#Reformat names and set distribution estimation values.
+pdf_ie_dist <- IEDistribution %>%
+  pivot_longer(everything()) %>%
+  filter(name != "Number of Trips") %>%
+  mutate(name = factor(name, levels = c("Number of Trips <1", 
+                                        "Number of Trips 1-3", 
+                                        "Number of Trips 3-5", 
+                                        "Number of Trips 5-10",
+                                        "Number of Trips 10-25",
+                                        "Number of Trips 25-50",
+                                        "Number of Trips 50-100",
+                                        "Number of Trips 100-250",
+                                        "Number of Trips 250-500",
+                                        "Number of Trips >=500"
+  ))) %>%
+  mutate(max_dist = case_when(
+    name == "Number of Trips <1" ~ 1,
+    name == "Number of Trips 1-3" ~ 3,
+    name == "Number of Trips 3-5" ~ 5,
+    name == "Number of Trips 5-10" ~ 10,
+    name == "Number of Trips 10-25" ~ 25,
+    name == "Number of Trips 25-50" ~ 50,
+    name == "Number of Trips 50-100" ~ 100,
+    name == "Number of Trips 100-250" ~ 250,
+    name == "Number of Trips 250-500" ~ 500,
+    name == "Number of Trips >=500" ~ 3000,
+  )) %>%
+  mutate(min_dist = case_when(
+    name == "Number of Trips <1" ~ 0,
+    name == "Number of Trips 1-3" ~ 1,
+    name == "Number of Trips 3-5" ~ 3,
+    name == "Number of Trips 5-10" ~ 5,
+    name == "Number of Trips 10-25" ~ 10,
+    name == "Number of Trips 25-50" ~ 25,
+    name == "Number of Trips 50-100" ~ 50,
+    name == "Number of Trips 100-250" ~ 100,
+    name == "Number of Trips 250-500" ~ 250,
+    name == "Number of Trips >=500" ~ 500,
+  )) %>%
+  mutate(mean_dist = (max_dist + min_dist) / 2) %>%
+  mutate(percent = value/sum(value)) %>%
+  mutate(count = round(percent * 10000))
+
+#Estimate with uniform distribution
+montecarlo_vector <- c()
+for(row in 1:nrow(pdf_ie_dist)){
+  montecarlo_vector <- c(montecarlo_vector, runif(n = unlist(pdf_ie_dist[row, "count"]), min = unlist(pdf_ie_dist[row, "min_dist"]), max = unlist(pdf_ie_dist[row, "max_dist"]))) 
+}
+
+#Result doesn't seem to depend much on which of the above we choose. Could also try log uniform, might be a nice way to get to the middle ground.
+
+#compare receipt and human trip distances in meters
+p1 <- ggplot() + 
+  stat_ecdf(data = CompleteDataWithGoogle, aes(x = DistanceFromLocation), color = "red") + 
+  stat_ecdf(aes(x = montecarlo_vector * 1.60934 * 1000), color = "blue") + 
+  scale_x_log10(limits = c(1, 10000000), breaks = 10^c(0:7), labels = 10^c(0:7)) +
+  geom_text(aes(x = 100, y = 0.50, label = "Receipt Distances"), color = "red", size = 3) +
+  geom_text(aes(x = 100000, y = 0.50, label = "Human Trip Distances"), color = "blue", size = 3) +
+  theme_bw(base_size = 20) + 
+  labs(x = "Distance From Location (m)", y = "Proportion Shorter")
+#annotation_custom(ggplotGrob(p2), xmin = 500, xmax = 2000, ymin = 0.5, ymax = 1)
+
+montecarlo_meters = montecarlo_vector * 1.60934 * 1000
+
+receipt_distance_quantiles = quantile(CompleteDataWithGoogle$DistanceFromLocation, probs = seq(0.01, 0.99, by = 0.01), na.rm = T)
+montecarlo_distance_quantiles = quantile(montecarlo_meters, probs = seq(0.01, 0.99, by = 0.01), na.rm = T)
+
+# Plot Quantiles against one another. 
+p2 <- ggplot() + 
+  geom_point(aes(y = receipt_distance_quantiles, x = montecarlo_distance_quantiles)) + 
+  geom_smooth(aes(y = receipt_distance_quantiles, x = montecarlo_distance_quantiles),
+              method = "lm",
+              se = F) + 
+  scale_x_log10(breaks= 10^c(1:5)) + 
+  scale_y_log10() + 
+  theme_classic(base_size = 20) + 
+  labs(x = "Human Trip Quantile Distance (m)", y = "Receipt Quantile Distance (m)") + 
+  coord_equal() +
+  geom_abline(intercept = 0, slope = 1)
+
+#Get summary stats for goodness of fit between the two PDFs
+linear_quantile_regression = lm(log10(receipt_distance_quantiles) ~ log10(montecarlo_distance_quantiles))
+summary(linear_quantile_regression)
+
+##Difference between nearest location and actual location ----
+ggplot(CompleteDataWithGoogle) + stat_ecdf(aes(x = DistanceFromLocation)) + stat_ecdf(aes(x = googledistancemeters), color = "red") + scale_x_continuous()+ theme_classic(base_size = 20, base_line_size = 2) + scale_x_log10() + labs(x = "Meters Traveled per Day")
+
+
+##Travel Velocity ----
+ggplot(CompleteDataWithGoogle, aes(x = DistanceFromLocation/Timedifference)) + geom_histogram(bins = 10) + scale_x_continuous()+ theme_classic(base_size = 20, base_line_size = 2) + scale_x_log10() + labs(x = "Meters Traveled per Day")
+
+###Summary stats----
+max(CompleteDataWithGoogle$DistanceFromLocation, na.rm = T)
+min(CompleteDataWithGoogle$DistanceFromLocation, na.rm = T)
+
+mean(CompleteDataWithGoogle$DistanceFromLocation/CompleteDataWithGoogle$Timedifference, na.rm =T)
+min(CompleteDataWithGoogle$DistanceFromLocation/CompleteDataWithGoogle$Timedifference, na.rm =T)
+max(CompleteDataWithGoogle$DistanceFromLocation/CompleteDataWithGoogle$Timedifference, na.rm =T)
+
+quantile(CompleteDataWithGoogle$DistanceFromLocation/CompleteDataWithGoogle$Timedifference, na.rm =T)
+
+transport_speed <- CompleteDataWithGoogle$DistanceFromLocation/CompleteDataWithGoogle$Timedifference
+
+length(transport_speed[!is.na(transport_speed)])
+length(CompleteDataWithGoogle$DistanceFromLocation[!is.na(CompleteDataWithGoogle$DistanceFromLocation)])
+length(CompleteDataWithGoogle$Timedifference[!is.na(CompleteDataWithGoogle$Timedifference)])
+
+##Rain ----
+for(row in 1:nrow(CompleteDataWithGoogle)){
+  CompleteDataWithGoogle[row, "precip"] <-rainpresabs(startdate = CompleteDataWithGoogle[row,"dateprintedcleaned"], enddate = CompleteDataWithGoogle[row,"TimestampDatecleaned"])
+}
+
+#rain plot how many of the receipts could have experienced precipitation?
+p4 <- CompleteDataWithGoogle %>%
+  filter(!is.na(dateprintedcleaned) & !is.na(TimestampDatecleaned)) %>%
+  group_by(precip) %>%
+  summarise(count = n()) %>%
+  ggplot() + 
+  geom_col(aes(x = precip, y = count)) +
+  theme_bw(base_size = 20) +
+  labs(x = "Precipitation Occured?", y = "Count")
+
+##Wind ----
+for(row in 1:nrow(CompleteDataWithGoogle)){ #This is the inverse of what we would think because wind direction is the inverse. This will tell us what direction the trash came from.
+  CompleteDataWithGoogle[row, "trashbearing"] <- swfscMisc::bearing(lat2 = CompleteDataWithGoogle[row,"LocLat"]*pi/180, 
+                                                                    lon2 = CompleteDataWithGoogle[row,"LocLon"]*pi/180,
+                                                                    lat1 = CompleteDataWithGoogle[row,"lat"]*pi/180, 
+                                                                    lon1 = CompleteDataWithGoogle[row,"lon"]*pi/180)[1]
+}
+
+
+#difference between bearings.
+for(row in 1:nrow(CompleteDataWithGoogle)){
+  CompleteDataWithGoogle[row, "windmeanbearing"] <- aggregate_vector_wind_average(startdate = CompleteDataWithGoogle[row,"startdate"], enddate = CompleteDataWithGoogle[row,"enddate"])
+}
+
+###Wind velocity correlation ----
+
+x.circ <- circular(CompleteDataWithGoogle$trashbearing, type="directions", units="degrees", template="geographics", rotation="clock")
+rose.diag(x.circ, bins=10, col="gray", border=NA)
+
+y.circ <- circular(CompleteDataWithGoogle$windmeanbearing, type="directions", units="degrees", template="geographics", rotation="clock")
+rose.diag(y.circ, bins=10, col="gray", border=NA)
+
+cor.circular(x.circ, y.circ, test = T)
+
+#Calculate the trash and wind bearing x and y coordinates.
+CompleteDataWithGoogle$trashycoordbearing <- 0.5*sin(rad(CompleteDataWithGoogle$trashbearing))
+CompleteDataWithGoogle$trashxcoordbearing <- 0.5*cos(rad(CompleteDataWithGoogle$trashbearing))
+CompleteDataWithGoogle$windycoordmeanbearing <- 1*sin(rad(CompleteDataWithGoogle$windmeanbearing))
+CompleteDataWithGoogle$windxcoordmeanbearing <- 1*cos(rad(CompleteDataWithGoogle$windmeanbearing))
+CompleteDataWithGoogle$row <- 1:nrow(CompleteDataWithGoogle)
+
+#join the trash bearing data and wind data into single frame for plotting. 
+CompleteDataCoordPlot <- CompleteDataWithGoogle %>%
+  filter(!is.na(windxcoordmeanbearing) & !is.na(trashxcoordbearing)) %>% #Removes data where we don't have wind or dont have receipt direction from the analysis.
+  dplyr::select(windxcoordmeanbearing, windycoordmeanbearing, row) %>%
+  rename(x = windxcoordmeanbearing, y = windycoordmeanbearing) %>%
+  bind_rows(CompleteDataWithGoogle %>%
+              filter(!is.na(windxcoordmeanbearing) & !is.na(trashxcoordbearing)) %>% 
+              dplyr::select(trashycoordbearing, trashxcoordbearing, row) %>%
+              rename(x = trashycoordbearing, y = trashxcoordbearing)) 
+
+
+#wind plot 360 (North) is on the right side.
+p3 <- ggplot() + 
+  geom_circle(aes(x0 = c(0,0), y0 = c(0,0), r = c(0.5,1))) + 
+  geom_point(data = CompleteDataCoordPlot, aes(x = x, y = y), alpha = 0.5, size = 2) + 
+  geom_line(data = CompleteDataCoordPlot, aes(x = x, y = y, group = row)) +
+  theme_void() + 
+  theme(aspect.ratio = 1, legend.position = NULL) + 
+  geom_text(aes(x = c(0,1.1,0,-1.1), y = c(1.1, 0, -1.1, 0) , label = c("W", "N", "E", "S")), size = 10) 
+
+grid.arrange(p4,p3,p1,p2, ncol = 4)
+
+#Litter Accumulation Rate Changes ----
 
 ##Data cleaning ----
 input_rate <- site_data_cleaned %>%
-  #filter(user_id == 92684) %>%
-  #mutate(Date = substr(photo_timestamp,1,nchar(photo_timestamp)-3)) %>%
   group_by(Date, Name, Site_Length_m, Weekend, Sweeping) %>%
   summarise(Intensity = n()) %>%
   arrange(Date) %>%
   group_by(Name) %>%
   mutate(DateDiff = as.numeric(Date) - dplyr::lag(as.numeric(Date), order_by = Name)) %>%
   mutate(generationrate = Intensity/DateDiff/Site_Length_m) %>%
-  #filter(Date != as.Date("3/23/2020", format = "%m/%d/%Y")) %>% #Bring back in for 2020 analysis.
   ungroup() 
 
 input_rate_mass <- site_data_cleaned %>%
-  #filter(user_id == 92684) %>%
-  #mutate(Date = substr(photo_timestamp,1,nchar(photo_timestamp)-3)) %>%
   group_by(Date, Name, Site_Length_m, Weekend, Sweeping) %>%
   summarise(Intensity = sum(weigth_estimate_g, na.rm = T)) %>%
   arrange(Date) %>%
@@ -280,8 +482,6 @@ input_rate_mass <- site_data_cleaned %>%
 
 #Input Rate Correlation
 mean_input_rate <- site_data_cleaned %>%
-  #filter(user_id == 92684) %>%
-  #mutate(Date = substr(photo_timestamp,1,nchar(photo_timestamp)-3)) %>%
   mutate(Date = as.Date(Day, format = "%m/%d/%Y")) %>%
   group_by(Date, Name, Site_Length_m, Cal_Enviro_Screen, Road_Width_m, Landuse_Type, TractID) %>%
   summarise(Intensity = n()) %>%
@@ -289,7 +489,6 @@ mean_input_rate <- site_data_cleaned %>%
   group_by(Name) %>%
   mutate(DateDiff = as.numeric(Date) - dplyr::lag(as.numeric(Date), order_by = Name)) %>%
   mutate(generationrate = Intensity/DateDiff/Site_Length_m) %>%
-  #filter(Date != as.Date("3/23/2020", format = "%m/%d/%Y")) %>% #Bring back in for 2020 analysis.
   ungroup() %>%
   bind_rows(mutate(., Name = "All")) %>%
   group_by(Name) %>%
@@ -300,8 +499,6 @@ mean_input_rate <- site_data_cleaned %>%
   
 #Input Rate Correlation Mass
 mean_input_rate_mass <- site_data_cleaned %>%
-  #filter(user_id == 92684) %>%
-  #mutate(Date = substr(photo_timestamp,1,nchar(photo_timestamp)-3)) %>%
   mutate(Date = as.Date(Day, format = "%m/%d/%Y")) %>%
   group_by(Date, Name, Site_Length_m, Cal_Enviro_Screen, Road_Width_m, Landuse_Type, TractID) %>%
   summarise(Intensity = sum(weigth_estimate_g, na.rm = T)) %>%
@@ -309,7 +506,6 @@ mean_input_rate_mass <- site_data_cleaned %>%
   group_by(Name) %>%
   mutate(DateDiff = as.numeric(Date) - dplyr::lag(as.numeric(Date), order_by = Name)) %>%
   mutate(generationrate = Intensity/DateDiff/Site_Length_m) %>%
-  #filter(Date != as.Date("3/23/2020", format = "%m/%d/%Y")) %>% #Bring back in for 2020 analysis.
   ungroup() %>%
   bind_rows(mutate(., Name = "All")) %>%
   group_by(Name) %>%
@@ -318,8 +514,6 @@ mean_input_rate_mass <- site_data_cleaned %>%
 
 #Quanitles for all generation rate 
 site_data_cleaned %>%
-  #filter(user_id == 92684) %>%
-  #mutate(Date = substr(photo_timestamp,1,nchar(photo_timestamp)-3)) %>%
   mutate(Date = as.Date(Day, format = "%m/%d/%Y")) %>%
   group_by(Date, Name, Site_Length_m, Cal_Enviro_Screen, Road_Width_m, Landuse_Type, TractID) %>%
   summarise(Intensity = n()) %>%
@@ -327,7 +521,6 @@ site_data_cleaned %>%
   group_by(Name) %>%
   mutate(DateDiff = as.numeric(Date) - dplyr::lag(as.numeric(Date), order_by = Name)) %>%
   mutate(generationrate = Intensity/DateDiff/Site_Length_m) %>%
-  #filter(Date != as.Date("3/23/2020", format = "%m/%d/%Y")) %>% #Bring back in for 2020 analysis.
   ungroup() %>%
   pull(generationrate) %>%
   quantile(na.rm = T)
@@ -375,33 +568,6 @@ ggplot(input_rate, aes(x = Date, y = Name)) +
   scale_x_date(date_breaks = "2 month")
 
 
-
-joined_diversity <- bind_rows(material_diversity_boot, item_diversity_boot, brand_diversity_boot) %>%
-  mutate(type = factor(type, levels = c("Material", "Item", "Brand")))
-
-
-ggplot(joined_diversity, aes(x = mean_even, y = mean_numgroups, color = Name, label = Name)) +
-  geom_point() +
-  geom_errorbar(width=.05, aes(ymin=min_numgroups, ymax=max_numgroups)) +
-  geom_errorbar(width=.05, aes(xmin=min_even, xmax=max_even)) +
-  #geom_label(size = 0.5) +
-  scale_color_viridis_d(option = "C") + 
-  theme_classic() + 
-  facet_wrap(type~.)
-
-
-
-ggplot(material_diversity) + 
-  geom_point(aes(x = Date, y = shannon)) + 
-  geom_point(aes(x = Date, y = simpson), color = "red") + 
-  geom_point(aes(x = Date, y = menhincks), color = "blue") + 
-  geom_point(aes(x = Date, y = numgroups), color = "green") +
-  facet_wrap(Name ~., scales = "free") + 
-  theme_bw() + 
-  labs(y = "Diversity") + 
-  scale_x_date(date_minor_breaks = "1 week")
-
-
 #Taxonomy Data sets ----
 
 #Trash mass conversion matching. 
@@ -426,7 +592,7 @@ MaterialsAlias <- read.csv("Taxonomy/Website/Materials_Alias_V2.csv") %>%
   #mutate(RowID = 1:nrow(.)) %>%
   rename(Key = Material)
 
-#Data Processing ----
+##Data Processing ----
 
 Material_DF <- site_data_cleaned %>%
   mutate_all(removeslash) %>%
@@ -482,7 +648,7 @@ MaterialsPlot <- sunburstplot(df_join_boot = material_grouped)
 
 orca(MaterialsPlot, "material-plot.svg")
 
-##Item taxonoy ----
+##Item taxonomy ----
 ItemTreeDF <- AggregateTrees(DF = Item_DF, Alias = ItemsAlias, Hierarchy = ItemsHierarchy) %>%
   mutate(from = ifelse(from == "trash", "Items", from))
 
@@ -535,210 +701,6 @@ brand_grouped <- Brand_DF_group %>%
 brand_plot <- sunburstplot(brand_grouped)
 orca(brand_plot, "brand-plot.svg")
 #Unbranded things show us the importance of creating forensic labels, Unmerged things show us the importance of data science research in this field to build relational databases. Brands show us the minimum level of responsibility that these companies have for their environmental impact. Propose a fine on companies which is concomittant with their observed environmental impact and subsequent cleanup. Right now we are giving these companies subsidies on their pollution by paying for cleanup. 3% for philip moris and so on. We are incentivising their pollution by reinforcing the idea that cigarettes will just disappear when they enter the environment. This is the largest pollution we have ever seen since the BP oil spill and their should be a similar reponse from governments to end the pollution of our envioronment and hold the companies responsible.  
-
-#Human trip distances, Wind, and Rain ----
-##Trip Distances ----
-#Dataset source
-#https://data.bts.gov/Research-and-Statistics/Trips-by-Distance/w96p-f2qv
-
-#Check summary stats of distances
-CompleteDataWithGoogle %>%
-  filter(!is.na(DistanceFromLocation)) %>%
-  pull(enddate) %>%
-  summary()
-
-CompleteDataWithGoogle %>%
-  filter(!is.na(DistanceFromLocation))
-
-CompleteDataWithGoogle %>%
-  filter(!is.na(startdate))
-
-CompleteDataWithGoogle %>%
-  filter(!is.na(DistanceFromLocation) & !is.na(startdate)) %>%
-  pull(startdate) 
-
-#Just look at IE trips
-IETrips <- Trips %>%
-  filter(`State Postal Code` == "CA") %>%
-  mutate(DateFormatted = as.Date(Date)) %>%
-  filter(DateFormatted < "2019-12-30") %>%
-  filter(`County Name` == "Riverside County" | `County Name` == "San Bernardino County")
-
-IEDistribution <- IETrips %>%
-  dplyr::select(`Number of Trips`:`Number of Trips >=500`) %>%
-  summarise(across(everything(), ~sum(.x, na.rm = T)))
-
-#Reformat names and set distribution estimation values.
-pdf_ie_dist <- IEDistribution %>%
-  pivot_longer(everything()) %>%
-  filter(name != "Number of Trips") %>%
-  mutate(name = factor(name, levels = c("Number of Trips <1", 
-                                        "Number of Trips 1-3", 
-                                        "Number of Trips 3-5", 
-                                        "Number of Trips 5-10",
-                                        "Number of Trips 10-25",
-                                        "Number of Trips 25-50",
-                                        "Number of Trips 50-100",
-                                        "Number of Trips 100-250",
-                                        "Number of Trips 250-500",
-                                        "Number of Trips >=500"
-                                        ))) %>%
-  mutate(max_dist = case_when(
-    name == "Number of Trips <1" ~ 1,
-    name == "Number of Trips 1-3" ~ 3,
-    name == "Number of Trips 3-5" ~ 5,
-    name == "Number of Trips 5-10" ~ 10,
-    name == "Number of Trips 10-25" ~ 25,
-    name == "Number of Trips 25-50" ~ 50,
-    name == "Number of Trips 50-100" ~ 100,
-    name == "Number of Trips 100-250" ~ 250,
-    name == "Number of Trips 250-500" ~ 500,
-    name == "Number of Trips >=500" ~ 3000,
-  )) %>%
-  mutate(min_dist = case_when(
-    name == "Number of Trips <1" ~ 0,
-    name == "Number of Trips 1-3" ~ 1,
-    name == "Number of Trips 3-5" ~ 3,
-    name == "Number of Trips 5-10" ~ 5,
-    name == "Number of Trips 10-25" ~ 10,
-    name == "Number of Trips 25-50" ~ 25,
-    name == "Number of Trips 50-100" ~ 50,
-    name == "Number of Trips 100-250" ~ 100,
-    name == "Number of Trips 250-500" ~ 250,
-    name == "Number of Trips >=500" ~ 500,
-  )) %>%
-  mutate(mean_dist = (max_dist + min_dist) / 2) %>%
-  mutate(percent = value/sum(value)) %>%
-  mutate(count = round(percent * 10000))
-
-#Estimate with uniform distribution
-montecarlo_vector <- c()
-for(row in 1:nrow(pdf_ie_dist)){
-  montecarlo_vector <- c(montecarlo_vector, runif(n = unlist(pdf_ie_dist[row, "count"]), min = unlist(pdf_ie_dist[row, "min_dist"]), max = unlist(pdf_ie_dist[row, "max_dist"]))) 
-}
-
-#Result doesn't seem to depend much on which of the above we choose. Could also try log uniform, might be a nice way to get to the middle ground.
-
-#compare receipt and human trip distances in meters
-p1 <- ggplot() + 
-  stat_ecdf(data = CompleteDataWithGoogle, aes(x = DistanceFromLocation), color = "red") + 
-  stat_ecdf(aes(x = montecarlo_vector * 1.60934 * 1000), color = "blue") + 
-  scale_x_log10(limits = c(1, 10000000), breaks = 10^c(0:7), labels = 10^c(0:7)) +
-  geom_text(aes(x = 100, y = 0.50, label = "Receipt Distances"), color = "red", size = 3) +
-  geom_text(aes(x = 100000, y = 0.50, label = "Human Trip Distances"), color = "blue", size = 3) +
-  theme_bw(base_size = 20) + 
-  labs(x = "Distance From Location (m)", y = "Proportion Shorter")
-  #annotation_custom(ggplotGrob(p2), xmin = 500, xmax = 2000, ymin = 0.5, ymax = 1)
-  
-montecarlo_meters = montecarlo_vector * 1.60934 * 1000
-
-receipt_distance_quantiles = quantile(CompleteDataWithGoogle$DistanceFromLocation, probs = seq(0.01, 0.99, by = 0.01), na.rm = T)
-montecarlo_distance_quantiles = quantile(montecarlo_meters, probs = seq(0.01, 0.99, by = 0.01), na.rm = T)
-
-# Plot Quantiles against one another. 
-p2 <- ggplot() + 
-geom_point(aes(y = receipt_distance_quantiles, x = montecarlo_distance_quantiles)) + 
-  geom_smooth(aes(y = receipt_distance_quantiles, x = montecarlo_distance_quantiles),
-              method = "lm",
-              se = F) + 
-  scale_x_log10(breaks= 10^c(1:5)) + 
-  scale_y_log10() + 
-  theme_classic(base_size = 20) + 
-  labs(x = "Human Trip Quantile Distance (m)", y = "Receipt Quantile Distance (m)") + 
-  coord_equal() +
-  geom_abline(intercept = 0, slope = 1)
-
-#Get summary stats for goodness of fit between the two PDFs
-linear_quantile_regression = lm(log10(receipt_distance_quantiles) ~ log10(montecarlo_distance_quantiles))
-summary(linear_quantile_regression)
-
-##Travel Velocity ----
-ggplot(CompleteDataWithGoogle, aes(x = DistanceFromLocation/Timedifference)) + geom_histogram(bins = 10) + scale_x_continuous()+ theme_classic(base_size = 20, base_line_size = 2) + scale_x_log10() + labs(x = "Meters Traveled per Day")
-
-###Summary stats----
-max(CompleteDataWithGoogle$DistanceFromLocation, na.rm = T)
-min(CompleteDataWithGoogle$DistanceFromLocation, na.rm = T)
-
-mean(CompleteDataWithGoogle$DistanceFromLocation/CompleteDataWithGoogle$Timedifference, na.rm =T)
-min(CompleteDataWithGoogle$DistanceFromLocation/CompleteDataWithGoogle$Timedifference, na.rm =T)
-max(CompleteDataWithGoogle$DistanceFromLocation/CompleteDataWithGoogle$Timedifference, na.rm =T)
-
-quantile(CompleteDataWithGoogle$DistanceFromLocation/CompleteDataWithGoogle$Timedifference, na.rm =T)
-
-transport_speed <- CompleteDataWithGoogle$DistanceFromLocation/CompleteDataWithGoogle$Timedifference
-
-length(transport_speed[!is.na(transport_speed)])
-length(CompleteDataWithGoogle$DistanceFromLocation[!is.na(CompleteDataWithGoogle$DistanceFromLocation)])
-length(CompleteDataWithGoogle$Timedifference[!is.na(CompleteDataWithGoogle$Timedifference)])
-
-##Rain ----
-for(row in 1:nrow(CompleteDataWithGoogle)){
-  CompleteDataWithGoogle[row, "precip"] <-rainpresabs(startdate = CompleteDataWithGoogle[row,"dateprintedcleaned"], enddate = CompleteDataWithGoogle[row,"TimestampDatecleaned"])
-}
-
-#rain plot how many of the receipts could have experienced precipitation?
-p4 <- CompleteDataWithGoogle %>%
-  filter(!is.na(dateprintedcleaned) & !is.na(TimestampDatecleaned)) %>%
-  group_by(precip) %>%
-  summarise(count = n()) %>%
-  ggplot() + 
-  geom_col(aes(x = precip, y = count)) +
-  theme_bw(base_size = 20) +
-  labs(x = "Precipitation Occured?", y = "Count")
-
-##Wind ----
-for(row in 1:nrow(CompleteDataWithGoogle)){ #This is the inverse of what we would think because wind direction is the inverse. This will tell us what direction the trash came from.
-  CompleteDataWithGoogle[row, "trashbearing"] <- swfscMisc::bearing(lat2 = CompleteDataWithGoogle[row,"LocLat"]*pi/180, 
-                                                   lon2 = CompleteDataWithGoogle[row,"LocLon"]*pi/180,
-                                                   lat1 = CompleteDataWithGoogle[row,"lat"]*pi/180, 
-                                                   lon1 = CompleteDataWithGoogle[row,"lon"]*pi/180)[1]
-}
-
-
-#difference between bearings.
-for(row in 1:nrow(CompleteDataWithGoogle)){
-  CompleteDataWithGoogle[row, "windmeanbearing"] <- aggregate_vector_wind_average(startdate = CompleteDataWithGoogle[row,"startdate"], enddate = CompleteDataWithGoogle[row,"enddate"])
-}
-
-###Wind velocity correlation ----
-
-x.circ <- circular(CompleteDataWithGoogle$trashbearing, type="directions", units="degrees", template="geographics", rotation="clock")
-rose.diag(x.circ, bins=10, col="gray", border=NA)
-
-y.circ <- circular(CompleteDataWithGoogle$windmeanbearing, type="directions", units="degrees", template="geographics", rotation="clock")
-rose.diag(y.circ, bins=10, col="gray", border=NA)
-
-cor.circular(x.circ, y.circ, test = T)
-
-#Calculate the trash and wind bearing x and y coordinates.
-CompleteDataWithGoogle$trashycoordbearing <- 0.5*sin(rad(CompleteDataWithGoogle$trashbearing))
-CompleteDataWithGoogle$trashxcoordbearing <- 0.5*cos(rad(CompleteDataWithGoogle$trashbearing))
-CompleteDataWithGoogle$windycoordmeanbearing <- 1*sin(rad(CompleteDataWithGoogle$windmeanbearing))
-CompleteDataWithGoogle$windxcoordmeanbearing <- 1*cos(rad(CompleteDataWithGoogle$windmeanbearing))
-CompleteDataWithGoogle$row <- 1:nrow(CompleteDataWithGoogle)
-
-#join the trash bearing data and wind data into single frame for plotting. 
-CompleteDataCoordPlot <- CompleteDataWithGoogle %>%
-  filter(!is.na(windxcoordmeanbearing) & !is.na(trashxcoordbearing)) %>% #Removes data where we don't have wind or dont have receipt direction from the analysis.
-  dplyr::select(windxcoordmeanbearing, windycoordmeanbearing, row) %>%
-  rename(x = windxcoordmeanbearing, y = windycoordmeanbearing) %>%
-  bind_rows(CompleteDataWithGoogle %>%
-              filter(!is.na(windxcoordmeanbearing) & !is.na(trashxcoordbearing)) %>% 
-              dplyr::select(trashycoordbearing, trashxcoordbearing, row) %>%
-              rename(x = trashycoordbearing, y = trashxcoordbearing)) 
-  
-
-#wind plot 360 (North) is on the right side.
-p3 <- ggplot() + 
-  geom_circle(aes(x0 = c(0,0), y0 = c(0,0), r = c(0.5,1))) + 
-  geom_point(data = CompleteDataCoordPlot, aes(x = x, y = y), alpha = 0.5, size = 2) + 
-  geom_line(data = CompleteDataCoordPlot, aes(x = x, y = y, group = row)) +
-  theme_void() + 
-  theme(aspect.ratio = 1, legend.position = NULL) + 
-  geom_text(aes(x = c(0,1.1,0,-1.1), y = c(1.1, 0, -1.1, 0) , label = c("W", "N", "E", "S")), size = 10) 
-
-grid.arrange(p4,p3,p1,p2, ncol = 4)
-
 
 #Power analysis ----
 #Power Analysis for detecting % shift in future studies
