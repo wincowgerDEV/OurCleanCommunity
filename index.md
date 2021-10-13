@@ -1,3 +1,8 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
 # Welcome to Our Clean Community
 2018 Our Clean Community Group during training
 

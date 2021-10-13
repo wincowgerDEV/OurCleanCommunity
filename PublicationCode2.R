@@ -460,17 +460,6 @@ ggplot() +
   scale_y_log10(limits = c(0.001, 1)) 
 
 
-#ggplot() + 
-#  geom_boxplot(data = input_rate_mass %>%
-#                 bind_rows(input_rate_mass %>%
-#                             mutate(Name = "All")), aes(x = Name, y = generationrate)) + 
-#  geom_errorbar(data = mean_input_rate_mass, aes(x = Name, y = mean, ymin = minmean, ymax = maxmean),color = "red", width = 0.25)+
-#  geom_point(data = mean_input_rate_mass, aes(x = Name, y = mean), color = "red")+
-#  geom_text(data = mean_input_rate_mass, aes(x = Name, y = 0.75, label = paste("n=", count, "", sep = "")), size = 5) +
-#  theme_bw(base_size = 20) + 
-#  labs(y = "Accumulation Rate (g/Day/m)") + 
-#  scale_y_log10() 
-
 ggplot(input_rate, aes(x = Date, y = generationrate)) + 
   geom_smooth(method = "lm", color = "transparent") +
   geom_point(alpha = 0.5) + 
@@ -481,17 +470,7 @@ ggplot(input_rate, aes(x = Date, y = generationrate)) +
   labs(y = "Accumulation Rate (#/Day/m)", x = "Week of Year") + 
   scale_y_log10(limits = c(0.001, 1)) + 
   scale_x_date(date_breaks = "1 week", date_labels = "%W") 
-  
-#ggplot(input_rate_mass, aes(x = Date, y = generationrate)) + 
-#  geom_point(alpha = 0.5) + 
-#  geom_line(alpha = 0.5) + 
-#  geom_smooth(method = "lm") +
-#  facet_grid(cols = vars(Name), scales = "free_x", space = "free_x") + 
-  #geom_text(aes(x = Date, y = 0.75, label = Intensity), size = 3) +
-#  theme_classic(base_size = 18) + 
-#  labs(y = "Accumulation Rate (#/Day/m)", x = "Week of Year") + 
-#  scale_y_log10() + 
-#  scale_x_date(date_breaks = "1 week", date_labels = "%W") 
+
 
 ggplot(input_rate, aes(x = Date, y = Name)) + 
   geom_point(alpha = 0.5, size = 4) + 
@@ -508,153 +487,6 @@ ggplot(input_rate, aes(x = Date, y = Name)) +
   labs(y = "") + 
   scale_x_date(date_breaks = "2 month")
 
-
-mean_for_corrleation <- site_data_cleaned %>%
-  mutate(Date = as.Date(Day, format = "%m/%d/%Y")) %>%
-  group_by(Date, Name, Site_Length_m, Cal_Enviro_Screen, Road_Width_m, Landuse_Type, TractID) %>%
-  summarise(Intensity = n()) %>%
-  arrange(Date) %>%
-  group_by(Name) %>%
-  mutate(DateDiff = as.numeric(Date) - dplyr::lag(as.numeric(Date), order_by = Name)) %>%
-  mutate(generationrate = Intensity/DateDiff/Site_Length_m) %>%
-  ungroup() %>%
-  group_by(Name, TractID, Cal_Enviro_Screen, Road_Width_m, Landuse_Type) %>%
-  summarise(mean = mean(generationrate, na.rm = T), cv = sd(generationrate, na.rm = T)/mean(generationrate, na.rm = T), minmean = BootMean(generationrate)[1], maxmean = BootMean(generationrate)[3]) %>%
-  ungroup() %>%
-  mutate(Cal_Enviro_Screen = case_when(
-    Cal_Enviro_Screen == "40-45" ~ 42.5,
-    Cal_Enviro_Screen == "65-70" ~ 67.5,
-    Cal_Enviro_Screen == "80-85" ~ 82.5,
-    Cal_Enviro_Screen == "85-90" ~ 87.5,
-    Cal_Enviro_Screen == "90-95" ~ 92.5,
-    Cal_Enviro_Screen == "95-100" ~ 97.5,
-  )) %>%
-  mutate(Landuse_Type = case_when(
-    Landuse_Type == "Residential" ~ 1,
-    Landuse_Type == "Mixed" ~0
-  )) %>%
-  mutate(TractID = as.numeric(TractID)) %>%
-  left_join(enviroscreen, by = c("TractID" = "tract")) %>%
-  left_join(census_data %>%
-              mutate(GIDTR = as.numeric(GIDTR)) %>%
-              select(LAND_AREA, Tot_Population_CEN_2010, GIDTR), by = c("TractID" = "GIDTR")) %>%
-  mutate(Pop_Density= Tot_Population_CEN_2010/LAND_AREA)
-  #gather(key, value, -mean) %>%
-  #mutate(value = as.numeric(value))
-  
-mean_for_corrleation_numeric <- mean_for_corrleation %>%
-  select_if(is.numeric)
-
-generationcor <- stats::cor(mean_for_corrleation_numeric, method = "spearman")
-
-mean_for_corrleation_numeric %>%
-  gather(key = "variable", value = "value", -mean, -minmean, -maxmean) %>%
-  ggplot(aes(y = mean, x = value)) +
-  geom_point() +
-  geom_errorbar(aes(ymin = minmean, ymax = maxmean)) + 
-  scale_y_log10() + 
-  facet_wrap(~variable, scales = "free")+
-  theme_bw(base_size = 10)
-
-#Material Types By Site and Date
-material_composition <- site_data_cleaned %>%
-  group_by(Date, Name, Material_TT) %>%
-  summarise(Intensity = n()) %>%
-  arrange(Name, Intensity) %>%
-  ungroup()
-
-ggplot(arrange(material_composition, Date, Name, Intensity), aes(fill=Material_TT, y=Intensity, x=Date)) + 
-  geom_bar(position="fill", stat="identity") +
-  facet_wrap(Name ~.,strip.position =  "right", scales = "free_x", ncol = 1) + 
-  theme_bw()
-#Recognize critically that every day of the week at every site, plastic is the prevailing material type. 
-
-#Trash Diversity
-material_diversity <- site_data_cleaned %>%
-  #filter(user_id == 92684) %>%
-  #mutate(Date = substr(photo_timestamp,1,nchar(photo_timestamp)-3)) %>%
-  mutate(Date = as.Date(Day, format = "%m/%d/%Y")) %>%
-  group_by(Date, Name) %>%
-  dplyr::summarise(shannon = calc_shannon(Material_TT),
-                   simpson = calc_simpson(Material_TT),
-                   menhincks = calc_menshinicks(Material_TT),
-                   numgroups = calc_numgroups(Material_TT)) %>%
-  mutate(evenness = shannon/log(numgroups)) %>%
-  ungroup()
- 
-
-material_diversity_boot <- site_data_cleaned %>%
-  #filter(user_id == 92684) %>%
-  #mutate(Date = substr(photo_timestamp,1,nchar(photo_timestamp)-3)) %>%
-  mutate(Date = as.Date(Day, format = "%m/%d/%Y")) %>%
-  group_by(Date, Name) %>%
-  dplyr::summarise(shannon = calc_shannon(Material_TT),
-                   simpson = calc_simpson(Material_TT),
-                   menhincks = calc_menshinicks(Material_TT),
-                   numgroups = calc_numgroups(Material_TT)) %>%
-  mutate(evenness = shannon/log(numgroups)) %>%
-  ungroup() %>%
-  group_by(Name) %>%
-  summarise(mean_even = mean(evenness, na.rm = T), min_even = BootMean(evenness)[1], max_even = BootMean(evenness)[3], mean_numgroups = mean(numgroups, na.rm = T), min_numgroups = BootMean(numgroups)[1], max_numgroups = BootMean(numgroups)[3]) %>%
-  ungroup()%>%
-  mutate(type = "Material")
-
-ggplot(material_diversity_boot, aes(x = mean_even, y = mean_numgroups, color = Name, label = Name)) +
-  geom_point() +
-  geom_errorbar(width=.1, aes(ymin=min_numgroups, ymax=max_numgroups)) +
-  geom_errorbar(width=.1, aes(xmin=min_even, xmax=max_even)) +
-  geom_label() +
-  scale_color_viridis_d(option = "C") + 
-  theme_classic()
-
-#ItemDiversity Boot
-item_diversity_boot <- site_data_cleaned %>%
-  mutate(Date = as.Date(Day, format = "%m/%d/%Y")) %>%
-  group_by(Date, Name) %>%
-  dplyr::summarise(shannon = calc_shannon(Item_TT),
-                   simpson = calc_simpson(Item_TT),
-                   menhincks = calc_menshinicks(Item_TT),
-                   numgroups = calc_numgroups(Item_TT)) %>%
-  mutate(evenness = shannon/log(numgroups)) %>%
-  ungroup() %>%
-  group_by(Name) %>%
-  summarise(mean_even = mean(evenness, na.rm = T), min_even = BootMean(evenness)[1], max_even = BootMean(evenness)[3], mean_numgroups = mean(numgroups, na.rm = T), min_numgroups = BootMean(numgroups)[1], max_numgroups = BootMean(numgroups)[3]) %>%
-  ungroup() %>%
-  mutate(type = "Item")
-
-ggplot(item_diversity_boot, aes(x = mean_even, y = mean_numgroups, color = Name, label = Name)) +
-  geom_point() +
-  geom_errorbar(width=.1, aes(ymin=min_numgroups, ymax=max_numgroups)) +
-  geom_errorbar(width=.1, aes(xmin=min_even, xmax=max_even)) +
-  geom_label() +
-  scale_color_viridis_d(option = "C") + 
-  theme_classic()
-
-#ItemDiversity Boot
-brand_diversity_boot <- site_data_cleaned %>%
-  #filter(user_id == 92684) %>%
-  #mutate(Date = substr(photo_timestamp,1,nchar(photo_timestamp)-3)) %>%
-  mutate(Date = as.Date(Day, format = "%m/%d/%Y")) %>%
-  group_by(Date, Name) %>%
-  dplyr::summarise(shannon = calc_shannon(Manufacturer),
-                   simpson = calc_simpson(Manufacturer),
-                   menhincks = calc_menshinicks(Manufacturer),
-                   numgroups = calc_numgroups(Manufacturer)) %>%
-  mutate(evenness = shannon/log(numgroups)) %>%
-  ungroup() %>%
-  group_by(Name) %>%
-  summarise(mean_even = mean(evenness, na.rm = T), min_even = BootMean(evenness)[1], max_even = BootMean(evenness)[3], mean_numgroups = mean(numgroups, na.rm = T), min_numgroups = BootMean(numgroups)[1], max_numgroups = BootMean(numgroups)[3]) %>%
-  ungroup()%>%
-  mutate(type = "Brand")
-
-ggplot(brand_diversity_boot, aes(x = mean_even, y = mean_numgroups, color = Name, label = Name)) +
-  geom_point() +
-  geom_errorbar(width=.1, aes(ymin=min_numgroups, ymax=max_numgroups)) +
-  geom_errorbar(width=.1, aes(xmin=min_even, xmax=max_even)) +
-  geom_label() +
-  scale_color_viridis_d(option = "C") + 
-  theme_classic()
-#Evenness goes down compared to the other analyses, also less diverse than items. 
 
 
 joined_diversity <- bind_rows(material_diversity_boot, item_diversity_boot, brand_diversity_boot) %>%
