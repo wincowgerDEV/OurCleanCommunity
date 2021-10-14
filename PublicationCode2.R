@@ -555,7 +555,7 @@ ggplot(input_rate, aes(x = Date, y = generationrate)) +
 ggplot(input_rate, aes(x = Date, y = Name)) + 
   geom_point(alpha = 0.5, size = 4) + 
   geom_text_repel(aes(label = Intensity),
-                  size = 6,
+                  size = 4,
                   force_pull   = 0, # do not pull toward data points
                   nudge_y      = 0.5,
                   direction    = "x",
@@ -733,3 +733,7 @@ for(n in 1:length(mean_input_rate$mean)){
   print(power_count_10$delta / mean_input_rate$sd[n])
 }
 
+#sessioninfo ----
+sessioninfo <- sessionInfo()
+saveRDS(sessioninfo, "sessioninfo.rds")
+readRDS("sessioninfo.rds")
