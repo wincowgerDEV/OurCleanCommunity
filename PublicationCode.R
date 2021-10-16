@@ -345,10 +345,6 @@ dataset_enviroscreen <- census_data %>%
 sum(IE_Enviroscreen_Data$Tot_Population_CEN_2010)/sum(IE_Enviroscreen_Data$LAND_AREA)
 sum(dataset_enviroscreen$Tot_Population_CEN_2010)/sum(dataset_enviroscreen$LAND_AREA)
 
-#skim mean values for enviroscreen
-IE_enviro_skim <- skimr::skim(IE_Enviroscreen_Data)
-data_enviro_skim <- skimr::skim(dataset_enviroscreen)
-
 #location uncertainty analysis ----
 intersected <- fread("StudyAreas/User_Cleaned_Data/uncertainty/points_inside_areas.csv") %>%
   dplyr::select(id) %>%
@@ -378,6 +374,17 @@ input_rate <- site_data_cleaned %>%
   mutate(generationrate = Intensity/DateDiff/Site_Length_m) %>%
   #filter(Date != as.Date("3/23/2020", format = "%m/%d/%Y")) %>% #Bring back in for 2020 analysis.
   ungroup() 
+
+#ttest for difference in mean
+site_a <- input_rate %>%
+  filter(Name == "Site 7A") %>%
+  pull(generationrate)
+
+site_b <- input_rate %>%
+  filter(Name == "Site 7B") %>%
+  pull(generationrate)
+  
+t.test(x = site_a, y=site_b, alternative = "two.sided")
 
 input_rate_mass <- site_data_cleaned %>%
   #filter(user_id == 92684) %>%
@@ -428,6 +435,8 @@ mean_input_rate_mass <- site_data_cleaned %>%
   group_by(Name) %>%
   summarise(count = n(), mean = mean(generationrate, na.rm = T), cv = sd(generationrate, na.rm = T)/mean(generationrate, na.rm = T), minmean = BootMean(generationrate)[1], maxmean = BootMean(generationrate)[3]) %>%
   ungroup() 
+
+
 
 #Quanitles for all generation rate 
 site_data_cleaned %>%
