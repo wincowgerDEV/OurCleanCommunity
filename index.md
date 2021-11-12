@@ -1,7 +1,7 @@
 ---
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 # Welcome to Our Clean Community
 2018 Our Clean Community Group during training
@@ -30,6 +30,8 @@ Determine a manageable location on your street to clean up and record data three
 Example:
   
 <image src= "https://user-images.githubusercontent.com/26821843/136639726-50feba9e-5096-41b2-8a5d-a9b510b868d5.png" width = "25%"> 
+
+Imagery @2021 County of San Bernardino Maxar Technologies, U.S. Geological Survey. USDA Farm Service Agency. Map Data @2021 Google.
 
 ### Download the app to phone. 
 - Android: https://play.google.com/store/apps/details?id=org.litterati.android&hl=en

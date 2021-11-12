@@ -177,8 +177,6 @@ Weather <- read.csv("RiversideMuniAirport_Cleaned.csv") %>%
   mutate(Date = as.Date(Date, "%m/%d/%Y")) %>%
   mutate(across(where(is.character), as.numeric))
 
-mean(Weather$Mean.Wind.Speed..mph., na.rm = T) * 1.60934
-
 full_data <- fread("Litterati-Partners.csv") %>%
   mutate(timestamp = as.POSIXct(gsub(" GMT", "", Date), format = "%d/%m/%Y %H:%M:%OS")) %>%
   mutate(lat = as.numeric(gsub("/.{1,}", "", `Location (Lat / Long)`))) %>%
@@ -234,6 +232,10 @@ dataset_enviroscreen <- census_data %>%
 #compare population density for the inland empire to adding los angeles too.
 sum(IE_Enviroscreen_Data$Tot_Population_CEN_2010)/sum(IE_Enviroscreen_Data$LAND_AREA)
 sum(dataset_enviroscreen$Tot_Population_CEN_2010)/sum(dataset_enviroscreen$LAND_AREA)
+
+#skim mean values for enviroscreen
+IE_enviro_skim <- skimr::skim(IE_Enviroscreen_Data)
+data_enviro_skim <- skimr::skim(dataset_enviroscreen)
 
 #Phone location uncertainty analysis ----
 intersected <- fread("StudyAreas/User_Cleaned_Data/uncertainty/points_inside_areas.csv") %>%
@@ -469,18 +471,6 @@ input_rate <- site_data_cleaned %>%
   mutate(generationrate = Intensity/DateDiff/Site_Length_m) %>%
   ungroup() 
 
-#ttest for difference in mean
-site_a <- input_rate %>%
-  filter(Name == "Site 7A") %>%
-  pull(generationrate)
-
-site_b <- input_rate %>%
-  filter(Name == "Site 7B") %>%
-  pull(generationrate)
-
-t.test(x = site_a, y=site_b, alternative = "two.sided")
-
-
 input_rate_mass <- site_data_cleaned %>%
   group_by(Date, Name, Site_Length_m, Weekend, Sweeping) %>%
   summarise(Intensity = sum(weigth_estimate_g, na.rm = T)) %>%
@@ -573,7 +563,6 @@ ggplot(input_rate, aes(x = Date, y = Name)) +
                   hjust        = 0,
                   segment.size = 0.2,
                   max.iter = 1e4, max.time = 1) +
-  geom_point(data = CompleteDataWithGoogle, aes(x = enddate, y = "Receipts"), alpha = 0.5, size = 4) +
   theme_classic(base_size = 20) + 
   labs(y = "") + 
   scale_x_date(date_breaks = "2 month")
