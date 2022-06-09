@@ -468,7 +468,9 @@ input_rate <- site_data_cleaned %>%
   arrange(Date) %>%
   group_by(Name) %>%
   mutate(DateDiff = as.numeric(Date) - dplyr::lag(as.numeric(Date), order_by = Name)) %>%
+  mutate(Days_Since_First = as.numeric(Date) - min(as.numeric(Date))) %>%
   mutate(generationrate = Intensity/DateDiff/Site_Length_m) %>%
+  mutate(max_norm_generation = scale(generationrate)) %>%
   ungroup() 
 
 input_rate_mass <- site_data_cleaned %>%
@@ -551,6 +553,40 @@ ggplot(input_rate, aes(x = Date, y = generationrate)) +
   scale_y_log10(limits = c(0.001, 1)) + 
   scale_x_date(date_breaks = "1 week", date_labels = "%W") 
 
+#Testing if the days since first date impacts the mean trend of the data. 
+ggplot(input_rate, aes(x = Days_Since_First, y = max_norm_generation)) + 
+  geom_smooth() +
+  geom_point(alpha = 0.5) + 
+  geom_line(alpha = 0.5) + 
+  #facet_grid(cols = vars(Name), scales = "free_x", space = "free_x") + 
+  #geom_text(aes(x = Date, y = 0.75, label = Intensity), size = 3) +
+  theme_classic(base_size = 18) + 
+  labs(y = "Accumulation Rate (#/Day/m)", x = "Days Since First") #+ 
+  #scale_y_log10(limits = c(0.001, 1))  
+
+input_rate_2 <- input_rate %>%
+  filter(Days_Since_First > 7)
+
+#Testing if the days since first date impacts the mean trend of the data. 
+ggplot(input_rate_2, aes(x = Days_Since_First, y = max_norm_generation)) + 
+  geom_smooth() +
+  geom_point(alpha = 0.5) + 
+  geom_line(alpha = 0.5) + 
+  #facet_grid(cols = vars(Name), scales = "free_x", space = "free_x") + 
+  #geom_text(aes(x = Date, y = 0.75, label = Intensity), size = 3) +
+  theme_classic(base_size = 18) + 
+  labs(y = "Accumulation Rate (#/Day/m)", x = "Days Since First") #+ 
+#scale_y_log10(limits = c(0.001, 1))  
+
+#This is significant for total count but is heavily impacted by the first week which adds leverage. Not significant for normalized. 
+model <- lm(input_rate$max_norm_generation ~ input_rate$Days_Since_First)
+
+summary(model)
+
+#This is insignificant but has a similar estimate value. 
+model2 <- lm(input_rate_2$max_norm_generation ~ input_rate_2$Days_Since_First)
+
+summary(model2)
 
 ggplot(input_rate, aes(x = Date, y = Name)) + 
   geom_point(alpha = 0.5, size = 4) + 
